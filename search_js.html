@@ -1,0 +1,70 @@
+<script>
+ //=================================================================================================================================================================
+ //-----------------------------------Client Name List--------------------------------------------------------------------------------------------------------------
+ //=================================================================================================================================================================
+ 
+/*
+ *
+ * Fill select box with client names from spreadsheet
+ * @param {String []} clientList Array from getClientName()
+ *
+ * Need to make this function only execute when Search is loaded. Currently runs at each page load.
+ */
+ 
+  google.script.run.withSuccessHandler(selectFill).getClientName();
+  
+  // https://stackoverflow.com/questions/740195/adding-options-to-a-select-using-jquery
+  function selectFill(clientList){
+    for ( var i = 1; i < clientList.length; i++){
+      var o = new Option(clientList[i], [i]);
+      /// jquerify the DOM object 'o' so we can use the html method
+      //clientList[i][3] Second Index is location of FULL NAME in the spreadsheet. CHANGE ACCORDINGLY
+      $(o).html(clientList[i][3]);
+      $("#clientName").append(o);
+    }
+  }
+  
+ 
+ 
+ //=================================================================================================================================================================
+ //-----------------------------------Client Info Search------------------------------------------------------------------------------------------------------------
+ //=================================================================================================================================================================
+ 
+/*
+ *
+ * Hold and place client data into respective placeholders
+ *  @param {String[]} info Array from getClientInfo matching selected clientName
+ *
+ */
+   
+  $(document).ready(function(){
+    $("#search").click(function(){
+      google.script.run.withSuccessHandler(clientInfo).getClientInfo($("#clientName option:selected").text());
+    });
+  });  
+  
+  function clientInfo(info){ 
+    
+    /*
+    * Replacing the placeholders with the available info[]
+    * Should(?) add if statements or error catches for the data. else -> 'N/a' or '-'
+    */
+     
+    //Client ID
+    if(info[0][0] != ''){
+    document.getElementById('clientID').innerHTML = '<strong>' + info[0][0] +'</strong>';}
+    else{
+    document.getElementById('clientID').innerHTML = '<span style="background-color:Tomato"><strong>-</strong></span>';}
+    
+    //Client Name
+    document.getElementById('selectedName').innerHTML = '<strong>' + info[0][3] + '</strong>';
+    
+    
+    //Update Funder Report Link Based on Chosen Client
+    var funderURLTemplate = document.getElementById("FunderReportButtonTemplate").href;
+    var funderLink = document.getElementById("FunderReportButton");
+    funderLink.href = funderURLTemplate + info[0][0];
+    
+  }
+
+</script>

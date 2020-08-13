@@ -1,0 +1,38 @@
+<script>
+
+  
+function getLastReport(data){
+
+  if(data[5] != ''){
+    google.script.run.withSuccessHandler(listParse).beaconParse(data[5])
+  }
+  
+  console.log(data)
+  
+  var answers = JSON.parse(data[4]);
+  var myForm = document.getElementById("myForm").elements;
+  
+  var type = []
+  
+  for(var i = 0; i < myForm.length; i++){
+    let element = myForm[i]
+    let answer = answers[element.name]
+  
+    if(element.type == "checkbox" || element.type == "radio"){
+      if(Array.isArray(answer)){
+        for(x of answer)
+          if(element.value == x)
+            element.click()}
+      else
+        if(element.value == answer)
+          element.click()
+    }
+    else if(element.type != "file")
+      element.value = answer
+    else
+      {}
+  }
+}
+
+</script>
+

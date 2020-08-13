@@ -1,0 +1,174 @@
+<div style="border-bottom: 1px solid #666;">
+  <h2>ABA Treatment Dosage/Medical Necessity Assessment</h2>
+</div>
+<div class=basic id=BarriersLearning>
+  <div class=head>
+    <p> Barriers/Learning Considerations: <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(BarriersLearning)'></i></p>
+  </div>
+  <div class=med>
+  <table>
+    <tr>
+      <th>Barriers</th>
+      <th>Current Status</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td>Behavior Problems:</td>
+      <td><input type=radio id=MNABPPresent name=MNABPStatus value=Present><label for=MNABPPresent>Present</label>
+          <input type=radio id=MNABPNotPresent name=MNABPStatus value='Not Present'><label for=MNABPNotPresent>Not Present</label></td>
+      <td><textarea id="MNABPNotes" style="width: 99%;" rows="5" name="MNABPNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Defective Verbal Behavior Skills:</td>
+      <td><input type=radio id=MNADVBSPresent name=MNADVBSStatus value=Present><label for=MNADVBSPresent>Present</label>
+          <input type=radio id=MNADVBSNotPresent name=MNADVBSStatus value='Not Present'><label for=MNADVBSNotPresent>Not Present</label></td>
+      <td><textarea id="MNADVBSNotes" style="width: 99%;" rows="5" name="MNADVBSNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Prompt Dependency:</td>
+      <td><input type=radio id=MNAPDSPresent name=MNAPDStatus value=Present><label for=MNAPDPresent>Present</label>
+          <input type=radio id=MNAPDNotPresent name=MNAPDStatus value='Not Present'><label for=MNAPDNotPresent>Not Present</label></td>
+      <td><textarea id="MNAPDNotes" style="width: 99%;" rows="5" name="MNAPDNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Defective Social Skills:</td>
+      <td><input type=radio id=MNADSSSPresent name=MNADSSStatus value=Present><label for=MNADSSPresent>Present</label>
+          <input type=radio id=MNADSSNotPresent name=MNADSSStatus value='Not Present'><label for=MNADSSNotPresent>Not Present</label></td>
+      <td><textarea id="MNADSSNotes" style="width: 99%;" rows="5" name="MNADSSNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Reinforcer Dependency:</td>
+      <td><input type=radio id=MNARDSPresent name=MNARDStatus value=Present><label for=MNARDPresent>Present</label>
+          <input type=radio id=MNARDNotPresent name=MNARDStatus value='Not Present'><label for=MNARDNotPresent>Not Present</label></td>
+      <td><textarea id="MNARDNotes" style="width: 99%;" rows="5" name="MNARDNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Failure to Make Eye Contact:</td>
+      <td><input type=radio id=MNAFMECSPresent name=MNAFMECStatus value=Present><label for=MNAFMECPresent>Present</label>
+          <input type=radio id=MNAFMECNotPresent name=MNAFMECStatus value='Not Present'><label for=MNAFMECNotPresent>Not Present</label></td>
+      <td><textarea id="MNAFMECNotes" style="width: 99%;" rows="5" name="MNAFMECNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Sensory Defensiveness:</td>
+      <td><input type=radio id=MNASDSPresent name=MNASDStatus value=Present><label for=MNASDPresent>Present</label>
+          <input type=radio id=MNASDNotPresent name=MNASDStatus value='Not Present'><label for=MNASDNotPresent>Not Present</label></td>
+      <td><textarea id="MNASDNotes" style="width: 99%;" rows="5" name="MNASDNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Self-Stimulation:</td>
+      <td><input type=radio id=MNASSSPresent name=MNASSStatus value=Present><label for=MNASSPresent>Present</label>
+          <input type=radio id=MNASSNotPresent name=MNASSStatus value='Not Present'><label for=MNASSNotPresent>Not Present</label></td>
+      <td><textarea id="MNASSNotes" style="width: 99%;" rows="5" name="MNASSNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Obsessive Compulsive Disorder:</td>
+      <td><input type=radio id=MNAOCDSPresent name=MNAOCDStatus value=Present><label for=MNAOCDPresent>Present</label>
+          <input type=radio id=MNAOCDNotPresent name=MNAOCDStatus value='Not Present'><label for=MNAOCDNotPresent>Not Present</label></td>
+      <td><textarea id="MNAOCDNotes" style="width: 99%;" rows="5" name="MNAOCDNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Hyperactivity: </td>
+      <td><input type=radio id=MNAHyperSPresent name=MNAHyperStatus value=Present><label for=MNAHyperPresent>Present</label>
+          <input type=radio id=MNAHyperNotPresent name=MNAHyperStatus value='Not Present'><label for=MNAHyperNotPresent>Not Present</label></td>
+      <td><textarea id="MNAHyperNotes" style="width: 99%;" rows="5" name="MNAHyperNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Comorbid Behavioral Health Conditions:</td>
+      <td><input type=radio id=MNACBHCSPresent name=MNACBHCStatus value=Present><label for=MNACBHCPresent>Present</label>
+          <input type=radio id=MNACBHCNotPresent name=MNACBHCStatus value='Not Present'><label for=MNACBHCNotPresent>Not Present</label></td>
+      <td><textarea id="MNACBHCNotes" style="width: 99%;" rows="5" name="MNACBHCNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Scheduling Conflict:</td>
+      <td><input type=radio id=MNASCSPresent name=MNASCStatus value=Present><label for=MNASCPresent>Present</label>
+          <input type=radio id=MNASCNotPresent name=MNASCStatus value='Not Present'><label for=MNASCNotPresent>Not Present</label></td>
+      <td><textarea id="MNASCNotes" style="width: 99%;" rows="5" name="MNASCNotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Frequent Illness:</td>
+      <td><input type=radio id=MNAFISPresent name=MNAFIStatus value=Present><label for=MNAFIPresent>Present</label>
+          <input type=radio id=MNAFINotPresent name=MNAFIStatus value='Not Present'><label for=MNAFINotPresent>Not Present</label></td>
+      <td><textarea id="MNAFINotes" style="width: 99%;" rows="5" name="MNAFINotes"></textarea></td>
+    </tr>
+    <tr>
+      <td>Frequent Cancellation:</td>
+      <td><input type=radio id=MNAFCSPresent name=MNAFCStatus value=Present><label for=MNAFCPresent>Present</label>
+          <input type=radio id=MNAFCNotPresent name=MNAFCStatus value='Not Present'><label for=MNAFCNotPresent>Not Present</label></td>
+      <td><textarea id="MNAFCNotes" style="width: 99%;" rows="5" name="MNAFCNotes"></textarea></td>
+    </tr>
+  </table>
+  </div>
+</div>
+<div class=basic id=CoreSkills>
+  <div class=med>
+   <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(CoreSkills)'></i>
+    <table>
+      <tr>
+        <th> Core Skill Areas Affected by ASD </th>
+        <th> Present Levels of Functioning </th>
+        <th> Weekly Treatment Hours Recommended </th>
+      </tr>
+      <tr>
+        <td>Restricted & Repetitive Behaviors</td>
+        <td><input type=checkbox id=CSAAASDRRB1 name=CSAAASDRRB value= 'May have difficulty planning and organizing; has trouble adapting to changes in routine'>
+            <label for=CSAAASDRRB1> May have difficulty planning and organizing; has trouble adapting to changes in routine</label><br>
+            <input type=checkbox id=CSAAASDRRB2 name=CSAAASDRRB value='Behavior concerns are enough to be obvious to a casual observer; narrow, specific interests; difficulty coping with change to routine or surroundings'>
+            <label for=CSAAASDRRB2> Behavior concerns are enough to be obvious to a casual observer; narrow, specific interests; difficulty coping with change to routine or surroundings </label><br>
+            <input type=checkbox id=CSAAASDRRB3 name=CSAAASDRRB value= 'Extreme difficulty coping with unexpected changes to routine or environment, trouble changing behaviors, great distress or difficulty changing focus or attention'>
+            <label for=CSAAASDRRB3>Extreme difficulty coping with unexpected changes to routine or environment, trouble changing behaviors, great distress or difficulty changing focus or attention</label>
+        </td>
+        <td><input type=number id=CSAAADRRBHours name="CSAAADRRBHours"></td>
+      </tr>
+      <tr>
+        <td>Communication</td>
+        <td><input type=checkbox id=CSAAASDC1 name=CSAAASDC value= 'Verbal language observed but obvious communication difficulty exists'>
+            <label for=CSAAASDC1> Verbal language observed but obvious communication difficulty exists</label><br>
+            <input type=checkbox id=CSAAASDC2 name=CSAAASDC value='Verbal language observed but is often through the use of overly simple sentences; Significant lack of nonverbal skills'>
+            <label for=CSAAASDC2> Verbal language observed but is often through the use of overly simple sentences; Significant lack of nonverbal skills </label><br>
+            <input type=checkbox id=CSAAASDC3 name=CSAAASDC value= 'Highly visible lack of verbal and nonverbal communication'>
+            <label for=CSAAASDC3>Highly visible lack of verbal and nonverbal communication</label>
+        </td>
+        <td><input type=number id=CSAAASDCHours name="CSAAASDCHours"></td>
+      </tr>
+      <tr>
+        <td>Reinforcer Effectiveness Response to Treatment</td>
+        <td><input type=checkbox id=CSAAASDRERT1 name=CSAAASDRERT value= 'Works readily for social and verbal with an intermittent schedule of reinforcement; has a range of tangible reinforcers that are easily identified'>
+            <label for=CSAAASDRERT1> Works readily for social and verbal with an intermittent schedule of reinforcement; has a range of tangible reinforcers that are easily identified</label><br>
+            <input type=checkbox id=CSAAASDRERT2 name=CSAAASDRERT value='Works for a range of tangible reinforcers with visual support; may work for social reinforcement with support'>
+            <label for=CSAAASDRERT2> Works for a range of tangible reinforcers with visual support; may work for social reinforcement with support </label><br>
+            <input type=checkbox id=CSAAASDRERT3 name=CSAAASDRERT value= 'Very limited variety in reinforcers; may not work for social reinforcement; Often requires continuous reinforcements'>
+            <label for=CSAAASDRERT3>Very limited variety in reinforcers; may not work for social reinforcement; Often requires continuous reinforcements</label>
+        </td>
+        <td><input type=number id=CSAAASDRERTHours name="CSAAASDRERTHours"></td>
+      </tr>
+      <tr>
+        <td>Social</td>
+        <td><input type=checkbox id=CSAAASDS1 name=CSAAASDS value= 'Decreased interest in social interactions; ability to engage in social skills but may struggle to maintain interaction'>
+            <label for=CSAAASDS1>Decreased interest in social interactions; ability to engage in social skills but may struggle to maintain interaction</label><br>
+            <input type=checkbox id=CSAAASDS2 name=CSAAASDS value='Unusual response to social cues, communication and interaction with others. Decreased ability to initiate interactions with others'>
+            <label for=CSAAASDS2> Unusual response to social cues, communication and interaction with others. Decreased ability to initiate interactions with others</label><br>
+            <input type=checkbox id=CSAAASDS3 name=CSAAASDS value= 'Very limited desire to engage socially or participate in social interactions'>
+            <label for=CSAAASDS3>Very limited desire to engage socially or participate in social interactions</label>
+        </td>
+        <td><input type=number id=CSAAASDSHours name="CSAAASDSHours"></td>
+      </tr>
+      <tr>
+        <td>Sensory Response to Treatment</td>
+        <td><input type=checkbox id=CSAAASDSRT1 name=CSAAASDSRT value= 'Unusual but limited sensory considerations; does not impede or interfere with relationships or learning'>
+            <label for=CSAAASDSRT1>Unusual but limited sensory considerations; does not impede or interfere with relationships or learning</label><br>
+            <input type=checkbox id=CSAAASDSRT2 name=CSAAASDSRT value='Unusual sensory considerations that are easily redirected, may not interfere with learning, but may interfere with peer interactions'>
+            <label for=CSAAASDSRT2> Unusual sensory considerations that are easily redirected, may not interfere with learning, but may interfere with peer interactions</label><br>
+            <input type=checkbox id=CSAAASDSRT3 name=CSAAASDSRT value= 'Sensory considerations are present and significant; often impedes learning'>
+            <label for=CSAAASDSRT3>Sensory considerations are present and significant; often impedes learning</label>
+        </td>
+        <td><input type=number id=CSAAASDSRTHours name="CSAAASDSRTHours"></td>
+      </tr>
+    </table>
+    Total Hours<input type=number name=CSAAATotal>
+  </div>
+</div>
+<div class=basic id=DirectServiceRequest>
+  <h4> Direct Service Request <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(DirectServiceRequest)'></i></h4>
+  <label for=DSR1T1>How many hours, per week, of one-to-one treatment? </label><input type=number id=DSR1T1 name="Hours of One-to-One Treatment"><br>
+  <!--<label for=DSRS>How many hours, per week, of supervision? </label><input type=number id=DSRS name="Hours of Supervision">-->
+</div>

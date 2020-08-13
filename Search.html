@@ -1,0 +1,246 @@
+
+<!--
+
+To Do: 
+       -Re organize containers (specifically the container-bodies)
+         -Question and Answer will unalign if answer takes two lines or a field is missing
+         -Relatively Finished: [ ]TopContainer [ ]Intermediate Container [x]Schedule [ ]Contacts [x]PrimaryInsurance [x]SecondaryInsurance
+       -Cleaner UI
+
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <base target="_top">
+    <?!= include("search_css"); ?>
+  </head>
+  
+  <body>        
+    <h1> Client Quick Lookup </h1>  
+    <div class="header"> <!-- Heading Section for Client Lookup and User Buttons -->
+      <div style="width:30%">
+        <label for="clientName">Client List: </label>
+      
+        <select id="clientName" style="width:70%;">
+        <option disabled selected>Choose Client</option>
+        </select>
+        <button title="Lookup Client Info" id="search"> Search </button>
+      </div>
+      <div style="display:flex; width:50%;">
+        <div style="width: 33%">
+          Client ID: <span id="clientID" style="background-color: #7db7ff;" ></span>
+        </div>
+        <div>
+          Selected: <span id="selectedName" style="background-color: #7db7ff;"></span>
+        </div>
+      </div>
+      <div id="FunderReportLink">
+        <?var url = getScriptUrl();?>
+        <a hidden id="FunderReportButtonTemplate" href='<?=url?>?page=Form&clientID='></a>
+        <a id="FunderReportButton" href='<?=url?>?page=Form&clientID='> Visit Client Funder Report </a>
+        <!-- NEED TO PASS CLIENT INFO TO FORM -->
+      </div>
+    </div>                <!-- End Heading Section-->
+    
+    
+    <!------------------- First Body Container -----------------------
+    <div class = "container1" > 
+      <div class="body" style="border-right: 1px solid #666;">
+        <div class="question" style="width: 55%;">
+          <div align= "right">
+            <p>IAC STATUS:</p>
+            <p>On hold? </p>
+            <p>Current Auth Start Date: </p>
+            <p>Current Auth End Date: </p>
+          </div>
+        </div>
+        <div class="answer" >
+          <div align= "left" id="status">
+          </div>
+        </div>
+      </div>
+      <div class="body" style="border-right: 1px solid #666;">
+        <div class="question">
+          <div align= "right">
+            <p>BACS:</p>
+            <p>Supervisor:</p>
+          </div>
+        </div>
+        <div class="answer">
+          <div align= "left" id="supervisors">
+          </div>
+        </div>
+      </div>
+      <div class="body" style="border-right: 1px solid #666;">
+        <div class="question">
+          <div align= "right">
+            <p>BT 1:</p>
+            <p>BT 2:</p>
+            <p>BT 3:</p>
+          </div>
+        </div>
+        <div class="answer">
+          <div align= "left" id=btList>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="question">
+          <div align= "right">
+            <p> DOB: </p>
+            <p> Gender: </p>
+            <p> Primary Language: </p>
+            <p> Secondary Langauge:  </p>
+          </div>
+        </div>
+        <div class="answer">
+          <div align= "left" id="dob">
+            <p>-</p>
+            <p>-</p>
+            <p>-</p>
+            <p>-</p>
+          </div>
+        </div>
+      </div>
+    </div> <!-- End First Body Container -->
+    
+    
+    <!------------------- Second Body Container --------------------
+    <!--
+    <div class="container2">
+      <div>
+       -
+      </div>
+    </div> <!-- End Second Body Container -->
+    
+    <!------------------- Third Body Container -------------------
+    
+    <div class="container3">
+      BT SCHEDULE
+    </div>
+    
+    <div id = "schedule">
+    <table>
+      <tr>
+        <th>BT</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+        <th>Saturday</th>
+        <th>Sunday</th>
+      </tr>
+      <tr>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+    </table>
+
+    </div> <!-- End Third Body Container -->
+    
+    <!------------------- Fourth Body Container ---------------------
+ 
+    <div class="container4">
+      <div style='width= 33%;'> <!--Left-
+        <div class="container3">
+          Contact Info
+        </div>
+        <div class="infotable">
+          <div class="question">
+            <div align= "right">
+              <p> Primary Guardian: </p>
+              <p> Relationship:  </p>
+              <p> Mobile Phone #:</p>
+              <p> Home Phone #:</p>
+              <p> Email:</p>
+              <p> Street Address:</p>
+              <p> City:</p>
+              <p> State:</p>
+              <p> Zip Code:</p>
+              <p> County: </p>
+            </div>
+          </div>
+          <div class="answer">
+            <div align= "left" id="contactInfo">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div> <!-- Right -
+        <div> <!--Right-Top-
+          <div class= "container3">
+            Primary Insurance
+          </div>
+          <div>
+            <div class="infotable">
+              <div class="question" style='width: 25%;'>
+                <div align= "right">
+                  <p> Insurance Plan: </p>
+                  <p> Payer: </p>
+                  <p> Member ID:  </p>
+                  <p> Card on file? </p>
+                </div>
+              </div>
+              
+              <div class="answer" id = "primaryIns">
+              </div>
+              
+            </div>
+          </div>
+        </div>
+        <div> <!-- Right-Bottom-
+          <div class= "container3">
+            Secondary Insurance
+          </div>
+          <div>
+            <div class="infotable">
+              <div class="question" style='width: 25%;'>
+                <div align= "right">
+                  <p> Insurance Plan: </p>
+                  <p> Payer: </p>
+                  <p> Member ID:  </p>
+                  <p> Card on file? </p>
+                </div>
+              </div>
+              
+              <div class="answer" id = secondaryIns>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- End Fourth Body Container -->
+
+  <?!= include("search_js"); ?>
+  </body>
+</html>
+

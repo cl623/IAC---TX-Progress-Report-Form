@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <?!= include('Nav/Side Bar _css');?>
+  <?!= include('content_css');?>
+  <?!= include('tables_css');?>
+
+</head>
+<body>
+
+<div id="mySidebar" class="sidebar">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">☰</a>
+  <a onclick=goToSection(this) id='BasicInfoRef'    >Basic Client Info</a>
+  <a onclick=goToSection(this) id= 'FamilyConcernsRef'                  >Family Concerns</a>
+  <a onclick=goToSection(this) id= 'MedicalHistoryRef'                  >Medical & Mental Health History</a>
+  <a onclick=goToSection(this) id= 'ServicesRef'                        >Past and Current Services</a>
+  <a onclick=goToSection(this) id= 'ScheduleRef'                        >Current Schedule</a>
+  <a onclick=goToSection(this) id= 'ImpairmentsRef'                     >Impairments and Skill Assessment</a>
+  <a onclick=goToSection(this) id= 'VinelandRef'                        >Vineland Assessment</a>
+  <a onclick=goToSection(this) id= 'MaladaptiveRef'                     >Maladaptive Behaviors</a>
+  <a onclick=goToSection(this) id= 'RisksRef'                           >Client Risk Assessment</a>
+  <a onclick=goToSection(this) id= 'CrisisRef'                          >Client Crisis Plan</a>
+  <a onclick=goToSection(this) id= 'ReinforcerRef'                      >Reinforcer Assessment Results</a>
+  <a onclick=goToSection(this) id= 'TreatmentRef'                       >Treatment Methods</a>
+  <a onclick=goToSection(this) id= 'CoordinationRef'                    >Coordination of Care</a>
+  <a onclick=goToSection(this) id= 'NecessityRef'                       >Medical Necessity Assessment</a>
+  <a onclick=goToSection(this) id= 'SessionRef'                         >Impairments and Skill Assessment</a>
+  <a onclick=goToSection(this) id= 'EtcRef'                             >Skill Goals</a>
+  <a onclick=goToSection(this) id= 'BEHRef'                             >BEH Reduction Progress</a>
+  <a onclick=goToSection(this) id= 'PTRef'                             >Parent Training Goals</a>
+  
+  <br><br><br><br>
+  <a onclick=showAll(this) id= 'AllRef' class="activePage"          >VIEW ALL</a>
+</div>
+
+<div id="main" style="text-align: center; background-color: #f0f0f0;">
+  <div style="width:100%; display: flex; overflow: auto; height: 50px;">
+    <div class="navbar">
+      <button id="openNav" class="openbtn" onclick="openNav()" style="float: left;">☰</button>
+      <a class="active" href="#"><i class="fa fa-fw fa-home"></i> Home</a> 
+      <?var url = getScriptUrl();?>
+      <a href='<?=url?>?page=Search'><i class="fa fa-fw fa-search"></i> Search</a> 
+      
+      <a href="#"><i class="fa fa-fw fa-envelope"></i> Share for Review</a> 
+      <a onclick="createTemplate()"><i class="fa fa-fw fa-user"></i> Preview Report</a>
+      <button style="margin-top: 8px;" onclick="myFunction()">Save Form</button>
+      <button  style="margin-top: 8px;" title='Load Most Recent Submitted Report' id='loadBtn' disabled> Load Recent Report </button>
+      <button style="margin-top: 8px;" onclick="myAlerts()">Go to next alert</button>
+    </div>
+  </div>
+  
+
+    <form id="myForm">
+  <div id="BasicInfoContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" >
+   <?!=include("Basic Client Info");?>
+  </div>
+  <div id="FamilyConcernsContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Family Concerns");?>
+  </div>
+  <div id="MedicalHistoryContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Medical History");?>
+  </div>
+  <div id="ServicesContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Past and Current Services");?>
+  </div>
+  <div id="CurrentScheduleContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Current Schedule");?>
+  </div>
+  <div id="ImpairmentsSkillContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden> <!-- Add to Sidebar -->
+   <?!=include("Impairments and Skill Assessment");?>
+  </div>
+  <div id="VinelandContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Vineland Assessment");?>
+  </div>
+  <div id="MaladaptiveContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Maladaptive Behavior");?>
+  </div>
+  <div id="RiskAssociatedContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Client Risk Associated with Treatment");?>
+  </div>
+  <div id="CrisisPlanContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Client Crisis Plan");?>
+  </div>
+  <div id="ReinforcerContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Reinforcer Assessment Results");?>
+  </div>
+  <div id="TreatmentMethodsContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Treatment Methods");?>
+  </div>
+  <div id="CoordinationContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Coordination of Care");?>
+  </div>
+  <div id="MedicalNecessityContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Medical Necessity Assessment");?>
+  </div>
+  <div id="SessionScheduleContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Proposed Session Schedule");?>
+  </div>
+  
+  <div id="EtcContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+    <input type="file" id='importReportFile' onchange="fileReportUpload(this, 'importTest','importImage')"> 
+    <div><p id=importTest><img id=importImage src= '#' style="width:100%; max-width: 800px;"/></p><a onclick=submitReportParse()>IMPORT REPORT</a></div>
+    <?!=include("Etc");?>
+  </div>
+    <div id="BEHContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("BEH Reduction Progress");?>
+  </div>
+  <div id="PTContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
+   <?!=include("Parent Training Goals");?>
+  </div>
+  </form>
+ 
+</div>
+
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+ <?!= include('Loading_js');?>
+ <?!= include('sidebar_js');?>
+ <?!= include('form_js');?>
+ <?!= include('SubmitElements_js');?>
+</body>
+</html> 

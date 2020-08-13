@@ -1,0 +1,204 @@
+<div style="border-bottom: 1px solid #666;">
+  <h2>Client Risk Associated With Treatment <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(ClientRisk)'></i></h2>
+</div>
+<div class=basic id=ClientRisk>
+ <div class=med>
+  <table>
+    <col width=40%>
+    <col width=12%>
+    <col width=12%>
+    <col width=12%>
+    <col width=12%>
+    <col width=12%>
+    <tr>
+      <th> Risks </th>
+      <th> Present </th>
+      <th> Ideation </th>
+      <th> Plan </th>
+      <th> Means </th>
+      <th> Prior Attempt </th>
+    </tr>
+    <tr>
+      <td> Assaultive Behavior </td>
+      <td> <input type=checkbox id=riskABPresentYes name='Assaultive Behavior' value=Present onclick="riskInfo(this,'ABCrisisPlanContainer','Assaultive Behavior','riskAB')"><label for=riskABPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskABIdeationYes name='Assaultive Behavior' value=Ideation onclick="riskInfo(this,'ABCrisisPlanContainer','Assaultive Behavior','riskAB')"><label for=riskABIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskABPlanYes name='Assaultive Behavior' value=Plan onclick="riskInfo(this,'ABCrisisPlanContainer','Assaultive Behavior','riskAB')"><label for=riskABPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskABMeansYes name='Assaultive Behavior' value=Means onclick="riskInfo(this,'ABCrisisPlanContainer','Assaultive Behavior','riskAB')"><label for=riskABMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskABPriorYes name='Assaultive Behavior' value=Prior onclick="riskInfo(this,'ABCrisisPlanContainer','Assaultive Behavior','riskAB')"><label for=riskABPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Self-Injurious Behavior (SIB) </td>
+      <td> <input type=checkbox id=riskSIBPresentYes name='Self-Injurious Behavior' value=Present onclick="riskInfo(this,'SIBCrisisPlanContainer','Self-Injurious Behavior (SIB)','riskSIB')"><label for=riskSIBPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskSIBIdeationYes name='Self-Injurious Behavior' value=Ideation onclick="riskInfo(this,'SIBCrisisPlanContainer','Self-Injurious Behavior (SIB)','riskSIB')"><label for=riskSIBIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskSIBPlanYes name='Self-Injurious Behavior' value=Plan onclick="riskInfo(this,'SIBCrisisPlanContainer','Self-Injurious Behavior (SIB)','riskSIB')"><label for=riskSIBPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskSIBMeansYes name='Self-Injurious Behavior' value=Means onclick="riskInfo(this,'SIBCrisisPlanContainer','Self-Injurious Behavior (SIB)','riskSIB')"><label for=riskSIBMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskSIBPriorYes name='Self-Injurious Behavior' value=Prior onclick="riskInfo(this,'SIBCrisisPlanContainer','Self-Injurious Behavior (SIB)','riskSIB')"><label for=riskSIBPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Fire Setting </td>
+      <td> <input type=checkbox id=riskFSPresentYes name='Fire Setting' value=Present onclick="riskInfo(this,'FSCrisisPlanContainer','Fire Setting','riskFS')"><label for=riskFSPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskFSIdeationYes name='Fire Setting' value=Ideation onclick="riskInfo(this,'FSCrisisPlanContainer','Fire Setting','riskFS')"><label for=riskFSIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskFSPlanYes name='Fire Setting' value=Plan onclick="riskInfo(this,'FSCrisisPlanContainer','Fire Setting','riskFS')"><label for=riskFSPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskFSMeansYes name='Fire Setting' value=Means onclick="riskInfo(this,'FSCrisisPlanContainer','Fire Setting','riskFS')"><label for=riskFSMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskFSPriorYes name='Fire Setting' value=Prior onclick="riskInfo(this,'FSCrisisPlanContainer','Fire Setting','riskFS')"><label for=riskFSPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Impulsive Behavior </td>
+      <td> <input type=checkbox id=riskIBPresentYes name='Impulsive Behavior' value=Present onclick="riskInfo(this,'IBCrisisPlanContainer','Impulsive Behavior','riskIB')"><label for=riskIBPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskIBIdeationYes name='Impulsive Behavior' value=Ideation onclick="riskInfo(this,'IBCrisisPlanContainer','Impulsive Behavior','riskIB')"><label for=riskIBIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskIBPlanYes name='Impulsive Behavior' value=Plan onclick="riskInfo(this,'IBCrisisPlanContainer','Impulsive Behavior','riskIB')"><label for=riskIBPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskIBMeansYes name='Impulsive Behavior' value=Means onclick="riskInfo(this,'IBCrisisPlanContainer','Impulsive Behavior','riskIB')"><label for=riskIBMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskIBPriorYes name='Impulsive Behavior' value=Prior onclick="riskInfo(this,'IBCrisisPlanContainer','Impulsive Behavior','riskIB')"><label for=riskIBPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Current Family Abuse/Violence </td>
+      <td> <input type=checkbox id=riskCFAVPresentYes name='Current Family Abuse Violence' value=Present onclick="riskInfo(this,'CFAVCrisisPlanContainer','Current Family Abuse/Violence','riskCFAV')"><label for=riskCFAVPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskCFAVIdeationYes name='Current Family Abuse Violence' value=Ideation onclick="riskInfo(this,'CFAVCrisisPlanContainer','Current Family Abuse/Violence','riskCFAV')"><label for=riskCFAVIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskCFAVPlanYes name='Current Family Abuse Violence' value=Plan onclick="riskInfo(this,'CFAVCrisisPlanContainer','Current Family Abuse/Violence','riskCFAV')"><label for=riskCFAVPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskCFAVMeansYes name='Current Family Abuse Violence' value=Means onclick="riskInfo(this,'CFAVCrisisPlanContainer','Current Family Abuse/Violence','riskCFAV')"><label for=riskCFAVMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskCFAVPriorYes name='Current Family Abuse Violence' value=Prior onclick="riskInfo(this,'CFAVCrisisPlanContainer','Current Family Abuse/Violence','riskCFAV')"><label for=riskCFAVPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Elopement/Bolting </td>
+      <td> <input type=checkbox id=riskEBPresentYes name='Elopement/Bolting' value=Present onclick="riskInfo(this,'EBCrisisPlanContainer','Elopement/Bolting','riskEB')"><label for=riskEBPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskEBIdeationYes name='Elopement/Bolting' value=Ideation onclick="riskInfo(this,'EBCrisisPlanContainer','Elopement/Bolting','riskEB')"><label for=riskEBIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskEBPlanYes name='Elopement/Bolting' value=Plan onclick="riskInfo(this,'EBCrisisPlanContainer','Elopement/Bolting','riskEB')"><label for=riskEBPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskEBMeansYes name='Elopement/Bolting' value=Means onclick="riskInfo(this,'EBCrisisPlanContainer','Elopement/Bolting','riskEB')"><label for=riskEBMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskEBPriorYes name='Elopement/Bolting' value=Prior onclick="riskInfo(this,'EBCrisisPlanContainer','Elopement/Bolting','riskEB')"><label for=riskEBPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Sexually Offending Behavior </td>
+      <td> <input type=checkbox id=riskSOBPresentYes name='Sexually Offending Behavior' value=Present onclick="riskInfo(this,'SOBCrisisPlanContainer','Sexually Offending Behavior','riskSOB')"><label for=riskSOBPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskSOBIdeationYes name='Sexually Offending Behavior' value=Ideation onclick="riskInfo(this,'SOBCrisisPlanContainer','Sexually Offending Behavior','riskSOB')"><label for=riskSOBIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskSOBPlanYes name='Sexually Offending Behavior' value=Plan onclick="riskInfo(this,'SOBCrisisPlanContainer','Sexually Offending Behavior','riskSOB')"><label for=riskSOBPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskSOBMeansYes name='Sexually Offending Behavior' value=Means onclick="riskInfo(this,'SOBCrisisPlanContainer','Sexually Offending Behavior','riskSOB')"><label for=riskSOBMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskSOBPriorYes name='Sexually Offending Behavior' value=Prior onclick="riskInfo(this,'SOBCrisisPlanContainer','Sexually Offending Behavior','riskSOB')"><label for=riskSOBPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Substance Abuse </td>
+      <td> <input type=checkbox id=riskSAPresentYes name='Substance Abuse' value=Present onclick="riskInfo(this,'SACrisisPlanContainer','Substance Abuse','riskSA')"><label for=riskSAPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskSAIdeationYes name='Substance Abuse' value=Ideation onclick="riskInfo(this,'SACrisisPlanContainer','Substance Abuse','riskSA')"><label for=riskSAIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskSAPlanYes name='Substance Abuse' value=Plan onclick="riskInfo(this,'SACrisisPlanContainer','Substance Abuse','riskSA')"><label for=riskSAPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskSAMeansYes name='Substance Abuse' value=Means onclick="riskInfo(this,'SACrisisPlanContainer','Substance Abuse','riskSA')"><label for=riskSAMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskSAPriorYes name='Substance Abuse' value=Prior onclick="riskInfo(this,'SACrisisPlanContainer','Substance Abuse','riskSA')"><label for=riskSAPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Psychotic Symptoms </td>
+      <td> <input type=checkbox id=riskPSPresentYes name='Psychotic Symptoms' value=Present onclick="riskInfo(this,'PSCrisisPlanContainer','Psychotic Symptoms','riskPS')"><label for=riskPSPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskPSIdeationYes name='Psychotic Symptoms' value=Ideation onclick="riskInfo(this,'PSCrisisPlanContainer','Psychotic Symptoms','riskPS')"><label for=riskPSIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskPSPlanYes name='Psychotic Symptoms' value=Plan onclick="riskInfo(this,'PSCrisisPlanContainer','Psychotic Symptoms','riskPS')"><label for=riskPSPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskPSMeansYes name='Psychotic Symptoms' value=Means onclick="riskInfo(this,'PSCrisisPlanContainer','Psychotic Symptoms','riskPS')"><label for=riskPSMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskPSPriorYes name='Psychotic Symptoms' value=Prior onclick="riskInfo(this,'PSCrisisPlanContainer','Psychotic Symptoms','riskPS')"><label for=riskPSPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Coping with Significant Loss </td>
+      <td> <input type=checkbox id=riskCSLPresentYes name='Coping with Significant Loss' value=Present onclick="riskInfo(this,'CSLCrisisPlanContainer','Coping with Significant Loss','riskCSL')"><label for=riskCSLPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskCSLIdeationYes name='Coping with Significant Loss' value=Ideation onclick="riskInfo(this,'CSLCrisisPlanContainer','Coping with Significant Loss','riskCSL')"><label for=riskCSLIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskCSLPlanYes name='Coping with Significant Loss' value=Plan onclick="riskInfo(this,'CSLCrisisPlanContainer','Coping with Significant Loss','riskCSL')"><label for=riskCSLPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskCSLMeansYes name='Coping with Significant Loss' value=Means onclick="riskInfo(this,'CSLCrisisPlanContainer','Coping with Significant Loss','riskCSL')"><label for=riskCSLMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskCSLPriorYes name='Coping with Significant Loss' value=Prior onclick="riskInfo(this,'CSLCrisisPlanContainer','Coping with Significant Loss','riskCSL')"><label for=riskCSLPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Suicidality </td>
+      <td> <input type=checkbox id=riskSuicidalityPresentYes name='Suicidality' value=Present onclick="riskInfo(this,'SuicidalityCrisisPlanContainer','Suicidality','riskSuicidality')"><label for=riskSuicidalityPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskSuicidalityIdeationYes name='Suicidality' value=Ideation onclick="riskInfo(this,'SuicidalityCrisisPlanContainer','Suicidality','riskSuicidality')"><label for=riskSuicidalityIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskSuicidalityPlanYes name='Suicidality' value=Plan onclick="riskInfo(this,'SuicidalityCrisisPlanContainer','Suicidality','riskSuicidality')"><label for=riskSuicidalityPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskSuicidalityMeansYes name='Suicidality' value=Means onclick="riskInfo(this,'SuicidalityCrisisPlanContainer','Suicidality','riskSuicidality')"><label for=riskSuicidalityMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskSuicidalityPriorYes name='Suicidality' value=Prior onclick="riskInfo(this,'SuicidalityCrisisPlanContainer','Suicidality','riskSuicidality')"><label for=riskSuicidalityPriorYes> Yes</label></td>     
+    </tr>
+    <tr>
+      <td> Homicidality </td>
+      <td> <input type=checkbox id=riskHomicidalityPresentYes name='Homicidality' value=Present onclick="riskInfo(this,'HomicidalityCrisisPlanContainer','Homicidality','riskHomicidality')"><label for=riskHomicidalityPresentYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskHomicidalityIdeationYes name='Homicidality' value=Ideation onclick="riskInfo(this,'HomicidalityCrisisPlanContainer','Homicidality','riskHomicidality')"><label for=riskHomicidalityIdeationYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskHomicidalityPlanYes name='Homicidality' value=Plan onclick="riskInfo(this,'HomicidalityCrisisPlanContainer','Homicidality','riskHomicidality')"><label for=riskHomicidalityPlanYes> Yes</label></td>
+           
+      <td> <input type=checkbox id=riskHomicidalityMeansYes name='Homicidality' value=Means onclick="riskInfo(this,'HomicidalityCrisisPlanContainer','Homicidality','riskHomicidality')"><label for=riskHomicidalityMeansYes> Yes</label></td>
+      
+      <td> <input type=checkbox id=riskHomicidalityPriorYes name='Homicidality' value=Prior onclick="riskInfo(this,'HomicidalityCrisisPlanContainer','Homicidality','riskHomicidality')"><label for=riskHomicidalityPriorYes> Yes</label></td>     
+    </tr>
+  </table>
+ </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

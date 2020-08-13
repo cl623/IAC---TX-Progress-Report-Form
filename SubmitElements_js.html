@@ -1,0 +1,1028 @@
+<script>
+var reviewedCounter = 0;
+var fileName;
+var skillData;
+var categories = ["","Communication Skills Domain: Listening & Understanding", "Communication Skills Domain: Talking", "Communication Skills Domain: Reading & Writing",
+         "Daily Living Skills Domain: Caring for Self", "Daily Living Skills Domain: Caring for Home", "Daily Living Skills Domain: Living in the Community", 
+         "Social & Relationship Skills Domain: Relating to Others", "Social & Relationship Skills Domain: Playing & Using Leisure Time", "Social & Relationship Skills Domain: Adapting/Adaptive Learning",
+         "Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills", "Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills"]
+  var file,
+      reader = new FileReader();
+
+  // Upload the file to Google Drive
+  reader.onloadend = function(e) {
+    google.script.run
+      .withSuccessHandler(fileURL)
+      .saveToDrive(
+         e.target.result, file.name
+      );
+  };
+  
+  function submitReportParse(){
+    file = $('#importReportFile')[0].files[0];
+    showMessage("Uploading file..");
+    reader.readAsDataURL(file);
+    google.script.run.withSuccessHandler(listParse).convertDocuments(file.name)
+  }
+  
+  function fileURL(file){
+    fileName = file;
+  }
+  
+  function listParse(skills){
+  
+  
+  skillData = skills;
+  console.log(skillData)
+  $("#testparse").html('');
+  if(!$("input[name=ReportType]").is(":checked")){
+    alert("Please select report type in 'Basic Client Info' section");
+  }
+  if($("input[name=ReportType]:checked").val() == "Initial Client ABA Assessment/Initial Client ABA Treatment Plan Template"){
+    for(var i =0; i < skillData[0].length; i++){
+    console.log(skills[0][i].baseline)
+    let skillHTML = ''
+    if(skillData[0][i].title != null){
+    let skillTitle = "<div class=basic>"+
+                       "<div class=head>"+
+                          "<p><strong>"+ skillData[0][i].title +"</strong></p>"+
+                        "</div>"+
+                        "<div class=med id=skillAcqGoal"+ i +">"+
+                          "<table>"+
+                            "<col width=15%>"+
+                            "<col width=85%>"
+      skillHTML += skillTitle
+      }
+    let skillType = "<tr>"+
+        "<td> Goal Type: </td>"+
+        "<td>New Goal</td>"+
+      "</tr>"
+      skillHTML += skillType
+    let skillCategory = "<tr>"+
+        "<td> Goal Category </td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[0][i].title +"goal_category' style='width: 100%; height: 46px;'>"+
+        "<option value='Communication Skills Domain: Listening & Understanding'>Communication Skills Domain: Listening & Understanding</option>"+
+        "<option value='Communication Skills Domain: Talking'>Communication Skills Domain: Talking</option>"+
+        "<option value='Communication Skills Domain: Reading & Writing'>Communication Skills Domain: Reading & Writing</option>"+
+        "<option value='Daily Living Skills Domain: Caring for Self'>Daily Living Skills Domain: Caring for Self</option>"+
+        "<option value='Daily Living Skills Domain: Caring for Home'>Daily Living Skills Domain: Caring for Home</option>"+
+        "<option value='Daily Living Skills Domain: Living in the Community'>Daily Living Skills Domain: Living in the Community</option>"+
+        "<option value='Social & Relationship Skills Domain: Relating to Others'>Social & Relationship Skills Domain: Relating to Others</option>"+
+        "<option value='Social & Relationship Skills Domain: Playing & Using Leisure Time'>Social & Relationship Skills Domain: Playing & Using Leisure Time</option>"+
+        "<option value='Social & Relationship Skills Domain: Adapting/Adaptive Learning'>Social & Relationship Skills Domain: Adapting/Adaptive Learning</option>"+
+        "<option value='Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills'>Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills</option>"+
+        "<option value='Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills'>Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills</option></select>"+
+        "</td>"+
+      "</tr>"
+      skillHTML += skillCategory
+    if(skillData[0][i].goal != null || skillData[0][i].goal != undefined || skillData[0][i].goal != ''){
+      let skillGoal = "<tr>"+
+        "<td> Goal: </td>"+
+        "<td>"+ skillData[0][i].goal +"</td>"+
+        "</tr>"
+        skillHTML += skillGoal
+      }
+    else{
+      let skillGoal = "<tr><td class=missingInfo>Goal:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillGoal;
+    }
+    if(skillData[0][i].objective_1 != null || skillData[0][i].objective_1 != undefined || skillData[0][i].objective_1 != ''){  
+      let skillObjective_1 = "<tr>"+
+        "<td> Objective 1: </td>"+
+        "<td>"+ skillData[0][i].objective_1 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_1;
+      }
+    if(skillData[0][i].objective_2 != null || skillData[0][i].objective_2 != undefined || skillData[0][i].objective_2 != ''){  
+      let skillObjective_2 = "<tr>"+
+        "<td> Objective 2: </td>"+
+        "<td>"+ skillData[0][i].objective_2 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_2;
+      }
+    if(skillData[0][i].objective_3 != null || skillData[0][i].objective_3 != undefined || skillData[0][i].objective_3 != ''){  
+    let skillObjective_3 = "<tr>"+
+        "<td> Objective 3: </td>"+
+        "<td>"+ skillData[0][i].objective_3 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_3;
+      }
+    if(skillData[0][i].objective_4 != null || skillData[0][i].objective_3 != undefined || skillData[0][i].objective_3 != ''){  
+    let skillObjective_4 = "<tr>"+
+        "<td> Objective 4: </td>"+
+        "<td>"+ skillData[0][i].objective_4 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_4;
+      }
+    if(skillData[0][i].mastery_criteria != null || skillData[0][i].mastery_criteria != undefined || skillData[0][i].mastery_criteria != ''){  
+    let skillMasteryCriteria = "<tr>"+
+        "<td> Mastery Criteria: </td>"+
+        "<td>"+ skillData[0][i].mastery_criteria +"</td>"+
+      "</tr>"
+      skillHTML +=skillMasteryCriteria;
+      }
+    else{
+      let skillMasteryCriteria = "<tr><td class=missingInfo>Mastery Criteria:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillMasteryCriteria;
+    }
+    let skillMaintenanceCriteria = "<tr>"+
+        "<td> Maintenance Mastery Criteria </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[0][i].title +"mastery_criteria' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillMaintenanceCriteria
+    if(!skillData[0][i].start_date == null || !skillData[0][i].start_date == undefined || !skillData[0][i].start_date == ''){  
+    let skillStartDate = "<tr>"+
+        "<td> Projected Start Date: </td>"+
+        "<td>"+ skillData[0][i].start_date +"</td>"+
+      "</tr>"
+      skillHTML +=skillStartDate;
+      }
+    else{
+      let skillStartDate = "<tr><td class=missingInfo>Projected Start Date:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillStartDate;
+    }
+    let skillMasteryTarget = "<tr>"+
+        "<td> Mastery Target Date:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[0][i].title +"mastery_target' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillMasteryTarget
+    let skillInitialBaseline = "<tr>"+
+        "<td> Initial Baseline: </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[0][i].title +"initial_baseline' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillInitialBaseline
+    let skillProgram = "<tr>"+
+        "<td> Generalization Planning/Programming:</td>"+
+        "<td style='padding: 0;'><textarea name="+ skillData[0][i].title +"program' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML +=skillProgram
+    skillHTML += "</table>"+
+               "</div>"+
+             "</div>"
+    
+    $('#testparse').append(skillHTML)
+    }
+  }
+  
+  if($("input[name=ReportType]:checked").val() == "Client ABA Reassessment/Client ABA Treatment Progress Report Template"){
+  if(!skillData[0] == ""){
+  for(var i =0; i < skillData[0].length; i++){
+    var imageHTML = ''
+    for(var j=0; j < skillData[0][i].images.length; j++){
+       imageHTML += "<img src='https://drive.google.com/uc?export=download&id="+skillData[0][i].images[j]+"'>"
+    }
+    
+    let skillHTML = ''
+    if(!skillData[0][i].title == null || !skillData[0][i].title == undefined || !skillData[0][i].title == ' '){
+    let skillTitle = "<div class=basic>"+
+                       "<div class=head>"+
+                         "<p><strong>"+ skillData[0][i].title +"</strong></p>"+
+                       "</div>"+
+                       "<div class=med id=skillAcqGoal"+i+">"+
+                         "<table>"+
+                           "<col width=15%>"+
+                           "<col width=85%>"
+      skillHTML += skillTitle
+      }
+    let skillType = "<tr>"+
+        "<td> Goal Type: </td>"+
+        "<td>Current Goal</td>"+
+      "</tr>"
+      skillHTML += skillType
+    let skillCategory = "<tr>"+
+        "<td> Goal Category </td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[0][i].title +"goal_category' style='width: 100%; height: 46px;'>"+
+        "<option value='Communication Skills Domain: Listening & Understanding'>Communication Skills Domain: Listening & Understanding</option>"+
+        "<option value='Communication Skills Domain: Talking'>Communication Skills Domain: Talking</option>"+
+        "<option value='Communication Skills Domain: Reading & Writing'>Communication Skills Domain: Reading & Writing</option>"+
+        "<option value='Daily Living Skills Domain: Caring for Self'>Daily Living Skills Domain: Caring for Self</option>"+
+        "<option value='Daily Living Skills Domain: Caring for Home'>Daily Living Skills Domain: Caring for Home</option>"+
+        "<option value='Daily Living Skills Domain: Living in the Community'>Daily Living Skills Domain: Living in the Community</option>"+
+        "<option value='Social & Relationship Skills Domain: Relating to Others'>Social & Relationship Skills Domain: Relating to Others</option>"+
+        "<option value='Social & Relationship Skills Domain: Playing & Using Leisure Time'>Social & Relationship Skills Domain: Playing & Using Leisure Time</option>"+
+        "<option value='Social & Relationship Skills Domain: Adapting/Adaptive Learning'>Social & Relationship Skills Domain: Adapting/Adaptive Learning</option>"+
+        "<option value='Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills'>Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills</option>"+
+        "<option value='Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills'>Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills</option></select>"+
+        "</td>"+
+      "</tr>"
+      skillHTML += skillCategory
+    if(skillData[0][i].goal == null || skillData[0][i].goal == undefined || skillData[0][i].goal == ''){
+      let skillGoal = "<tr><td class=missingInfo>Goal:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillGoal;
+    }
+    else{
+      let skillGoal = "<tr>"+
+        "<td> Goal: </td>"+
+        "<td>"+ skillData[0][i].goal +"</td>"+
+        "</tr>"
+        skillHTML += skillGoal
+      }
+    if(!skillData[0][i].objective_1 == null || !skillData[0][i].objective_1 == undefined || !skillData[0][i].objective_1 == ''){  
+      let skillObjective_1 = "<tr>"+
+        "<td> Objective 1: </td>"+
+        "<td>"+ skillData[0][i].objective_1 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_1;
+      }
+    if(!skillData[0][i].objective_2 == null || !skillData[0][i].objective_2 == undefined || !skillData[0][i].objective_2 == ''){  
+      let skillObjective_2 = "<tr>"+
+        "<td> Objective 2: </td>"+
+        "<td>"+ skillData[0][i].objective_2 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_2;
+      }
+    if(!skillData[0][i].objective_3 == null || !skillData[0][i].objective_3 == undefined || !skillData[0][i].objective_3 == ''){  
+    let skillObjective_3 = "<tr>"+
+        "<td> Objective 3: </td>"+
+        "<td>"+ skillData[0][i].objective_3 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_3;
+      } 
+    if(!skillData[0][i].objective_4 == null || !skillData[0][i].objective_4 == undefined || !skillData[0][i].objective_4 == ''){  
+    let skillObjective_4 = "<tr>"+
+        "<td> Objective 4: </td>"+
+        "<td>"+ skillData[0][i].objective_4 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_4;
+      }
+    if(skillData[0][i].mastery_criteria == null || skillData[0][i].mastery_criteria == undefined || skillData[0][i].mastery_criteria == ""){  
+      let skillMasteryCriteria = "<tr><td class=missingInfo>Mastery Criteria:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillMasteryCriteria; 
+    }
+    else{
+    let skillMasteryCriteria = "<tr>"+
+        "<td> Mastery Criteria: </td>"+
+        "<td>"+ skillData[0][i].mastery_criteria +"</td>"+
+      "</tr>"
+      skillHTML +=skillMasteryCriteria;
+      }
+    let skillMaintenanceCriteria = "<tr>"+
+        "<td> Maintenance Mastery Criteria </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[0][i].title +"maintenance_criteria' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillMaintenanceCriteria
+    if(skillData[0][i].start_date == null || skillData[0][i].start_date == undefined || skillData[0][i].start_date == ""){  
+      let skillStartDate = "<tr>"+
+        "<td class=missingInfo>Start Date: </td>"+
+        "<td clas=missingInfo></td></tr>"
+        }
+    else{
+    let skillStartDate = "<tr>"+
+        "<td> Start Date: </td>"+
+        "<td>"+ skillData[0][i].start_date +"</td>"+
+      "</tr>"
+      skillHTML +=skillStartDate;
+      }
+    let skillMasteryTarget = "<tr>"+
+        "<td> Mastery Target Date:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[0][i].title +"mastery_target' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillMasteryTarget
+    let skillInitialBaseline = "<tr>"+
+        "<td> Initial Baseline: </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[0][i].title +"initial_baseline' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillInitialBaseline
+    if(skillData[0][i].baseline == null || skillData[0][i].baseline == undefined || skillData[0][i].baseline == ""){
+    let skillBaseline = "<tr><td class=missingInfo>Baseline:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillBaseline;
+      }
+    else{
+       let skillBaseline = "<tr>"+
+        "<td> Baseline: </td>"+
+        "<td>"+ skillData[0][i].baseline +"</td>"+
+      "</tr>"
+      skillHTML +=skillBaseline
+    }
+    if(skillData[0][i].objectives_mastered == null || skillData[0][i].objectives_mastered == undefined || skillData[0][i].objectives_mastered == ""){
+      var skillObjMastered = "<tr><td class=missingInfo>Objectives Mastered:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillObjMastered;
+    }
+    else{
+    let skillObjMastered = "<tr>"+
+        "<td> Objectives mastered:</td>"+
+        "<td>"+ skillData[0][i].objectives_mastered +"</td>"+
+      "</tr>"
+      skillHTML += skillObjMastered
+      }
+    if(skillData[0][i].total_mastered_targets == null || skillData[0][i].total_mastered_targets == undefined || skillData[0][i].total_mastered_targets == ""){
+      let skillTarMastered = "<tr><td class=missingInfo>Total Mastered Targets:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillTarMastered;
+    }
+    else{
+    let skillTarMastered = "<tr>"+
+        "<td> Total Mastered Targets:</td>"+
+        "<td>"+ skillData[0][i].total_mastered_targets +"</td>"+
+      "</tr>"
+      skillHTML += skillTarMastered
+      }      
+    let skillProgram = "<tr>"+
+        "<td> Generalization Planning/Programming:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[0][i].title +"program' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML +=skillProgram
+    let skillGraphOptions = "<tr>"+
+        "<td> Graph Options:</td>"+
+        "<td> "+ skillData[0][i].graph_options +"</td>"+
+      "</tr>"
+      skillHTML+=skillGraphOptions
+    let skillImages ="<tr>"+
+        "<td colspan='2'>"+imageHTML+"</td>"+
+      "</tr>"
+      skillHTML +=skillImages
+    let skillProgressStatus = "<tr>"+
+        "<td> Current Progress Status: </td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[0][i].title +"goal_status' style='width: 100%; height: 46px;' onchange='mastered(this, reasonMastered"+i+")'><option value='Goal Discontinued'>Goal Discontinued</option><option value='No Progress'>No Progress</option><option value='Minimal Progress'>Minimal Progress</option><option value='Moderate Progress'>Moderate Progress</option><option value='Significant Progress'>Significant Progress</option><option value='Goal Mastered'>Goal Mastered</option></select></td>"+
+      "</tr>"
+      skillHTML +=skillProgressStatus
+    let skillProgressReason = "<tr id='reasonMastered"+i+"'>"+
+        "<td> Reason for Not Meeting Goal:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[0][i].title +"progress_reason' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillProgressReason
+    let skillRecommended = "<tr>"+
+        "<td> Recommended for Continued Treatment: </td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[0][i].title +"continued_treatment' style='width: 100%; height: 46px;' onchange='recommended(this, reasonRecommended"+i+")'><option value='No'>No</option><option value='Yes'>Yes</option></select></td>"+
+      "</tr>"
+      skillHTML += skillRecommended
+    let skillRecommendation = "<tr id='reasonRecommended"+i+"'>"+
+        "<td> Reason for Not Recommending for Continued Treatment: </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[0][i].title +"recommendation' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillRecommendation
+    skillHTML += "</table>"+
+               "</div>"+
+             "</div>"
+    $('#testparse').append(skillHTML)
+  }}
+  
+  
+  
+  if(!skillData[2] == ""){
+  for(var i =0; i < skillData[2].length; i++){
+  let skillHTML = ''
+    if(skillData[2][i].title != null){
+    let skillTitle = "<div class=basic>"+
+                       "<div class=head>"+
+                          "<p><strong>"+ skillData[2][i].title +"</strong></p>"+
+                        "</div>"+
+                        "<div class=med id=skillAcqGoal"+ i +">"+
+                          "<table>"+
+                            "<col width=15%>"+
+                            "<col width=85%>"
+      skillHTML += skillTitle
+      }
+    let skillType = "<tr>"+
+        "<td> Goal Type: </td>"+
+        "<td>New Goal</td>"+
+      "</tr>"
+      skillHTML += skillType
+    let skillCategory = "<tr>"+
+        "<td> Goal Category </td>"+
+        "<td style='padding: 0'><select name='"+ skillData[2][i].title +"goal_category' style='width: 100%; height: 46px;'>"+
+        "<option value='Communication Skills Domain: Listening & Understanding'>Communication Skills Domain: Listening & Understanding</option>"+
+        "<option value='Communication Skills Domain: Talking'>Communication Skills Domain: Talking</option>"+
+        "<option value='Communication Skills Domain: Reading & Writing'>Communication Skills Domain: Reading & Writing</option>"+
+        "<option value='Daily Living Skills Domain: Caring for Self'>Daily Living Skills Domain: Caring for Self</option>"+
+        "<option value='Daily Living Skills Domain: Caring for Home'>Daily Living Skills Domain: Caring for Home</option>"+
+        "<option value='Daily Living Skills Domain: Living in the Community'>Daily Living Skills Domain: Living in the Community</option>"+
+        "<option value='Social & Relationship Skills Domain: Relating to Others'>Social & Relationship Skills Domain: Relating to Others</option>"+
+        "<option value='Social & Relationship Skills Domain: Playing & Using Leisure Time'>Social & Relationship Skills Domain: Playing & Using Leisure Time</option>"+
+        "<option value='Social & Relationship Skills Domain: Adapting/Adaptive Learning'>Social & Relationship Skills Domain: Adapting/Adaptive Learning</option>"+
+        "<option value='Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills'>Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills</option>"+
+        "<option value='Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills'>Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills</option></select>"+
+        "</td>"+
+      "</tr>"
+      skillHTML += skillCategory
+    if(skillData[2][i].goal == null || skillData[2][i].goal == undefined || skillData[2][i].goal == ''){
+      let skillGoal = "<tr><td class=missingInfo>Goal:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillGoal;
+    }
+    else{
+      let skillGoal = "<tr>"+
+        "<td> Goal: </td>"+
+        "<td>"+ skillData[2][i].goal +"</td>"+
+        "</tr>"
+        skillHTML += skillGoal
+      }
+    if(!skillData[2][i].objective_1 == null || !skillData[2][i].objective_1 == undefined || !skillData[2][i].objective_1 == ''){  
+      let skillObjective_1 = "<tr>"+
+        "<td> Objective 1: </td>"+
+        "<td>"+ skillData[2][i].objective_1 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_1;
+      }
+    if(!skillData[2][i].objective_1 == null || !skillData[2][i].objective_2 == undefined || !skillData[2][i].objective_2 == ''){  
+      let skillObjective_2 = "<tr>"+
+        "<td> Objective 2: </td>"+
+        "<td>"+ skillData[2][i].objective_2 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_2;
+      }
+    if(!skillData[2][i].objective_3 == null || !skillData[2][i].objective_3 == undefined || !skillData[2][i].objective_3 == ''){ 
+    let skillObjective_3 = "<tr>"+
+        "<td> Objective 3: </td>"+
+        "<td>"+ skillData[2][i].objective_3 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_3;
+      }
+    if(!skillData[2][i].objective_4 == null || !skillData[2][i].objective_4 == undefined || !skillData[2][i].objective_4 == ''){ 
+    let skillObjective_4 = "<tr>"+
+        "<td> Objective 4: </td>"+
+        "<td>"+ skillData[2][i].objective_4 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_4;
+      }
+    if(skillData[2][i].mastery_criteria == null || skillData[2][i].mastery_criteria == undefined || skillData[2][i].mastery_criteria == ""){  
+      let skillMasteryCriteria = "<tr><td class=missingInfo>Mastery Criteria:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillMasteryCriteria; 
+    }
+    else{
+    let skillMasteryCriteria = "<tr>"+
+        "<td> Mastery Criteria: </td>"+
+        "<td>"+ skillData[2][i].mastery_criteria +"</td>"+
+      "</tr>"
+      skillHTML +=skillMasteryCriteria;
+      }
+    let skillMaintenanceCriteria = "<tr>"+
+        "<td> Maintenance Mastery Criteria </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[2][i].title +"maintenance_criteria' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillMaintenanceCriteria
+    if(skillData[2][i].start_date == null || skillData[2][i].start_date == undefined || skillData[2][i].start_date == ""){  
+      let skillStartDate = "<tr>"+
+        "<td class=missingInfo>Start Date: </td>"+
+        "<td clas=missingInfo></td></tr>"
+        }
+    else{
+    let skillStartDate = "<tr>"+
+        "<td> Start Date: </td>"+
+        "<td>"+ skillData[0][i].start_date +"</td>"+
+      "</tr>"
+      skillHTML +=skillStartDate;
+      }
+    let skillMasteryTarget = "<tr>"+
+        "<td> Mastery Target Date:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[2][i].title +"mastery_target' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillMasteryTarget
+    let skillInitialBaseline = "<tr>"+
+        "<td> Initial Baseline: </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[2][i].title +"initial_baseline' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillInitialBaseline
+    let skillProgram = "<tr>"+
+        "<td> Generalization Planning/Programming:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[2][i].title +"program' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML +=skillProgram
+    skillHTML += "</table>"+
+               "</div>"+
+             "</div>"
+  
+    $('#testparse').append(skillHTML)
+  }}
+  if($("input[name=ReportType]:checked").val() == "Client ABA Reassessment/Client ABA Treatment Progress Report Template"){
+  if(!skillData[1] == ""){
+  for(var i =0; i < skillData[1].length; i++){
+    var imageHTML = ''
+    for(var j=0; j < skillData[1][i].images.length; j++){
+       imageHTML += "<img src='https://drive.google.com/uc?export=download&id="+skillData[1][i].images[j]+"'>"
+    }
+    
+    let skillHTML = ''
+    if(skillData[1][i].title != null){
+    let skillTitle = "<div class=basic>"+
+                       "<div class=head>"+
+                         "<p><strong>"+ skillData[1][i].title +"</strong></p>"+
+                       "</div>"+
+                       "<div class=med id=skillAcqGoal"+i+">"+
+                         "<table>"+
+                           "<col width=15%>"+
+                           "<col width=85%>"
+      skillHTML += skillTitle
+      }
+    let skillType = "<tr>"+
+        "<td> Goal Type: </td>"+
+        "<td>Current Goal</td>"+
+      "</tr>"
+      skillHTML += skillType
+    let skillCategory = "<tr>"+
+        "<td> Goal Category </td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[1][i].title +"goal_category' style='width: 100%; height: 46px;'>"+
+        "<option value='Communication Skills Domain: Listening & Understanding'>Communication Skills Domain: Listening & Understanding</option>"+
+        "<option value='Communication Skills Domain: Talking'>Communication Skills Domain: Talking</option>"+
+        "<option value='Communication Skills Domain: Reading & Writing'>Communication Skills Domain: Reading & Writing</option>"+
+        "<option value='Daily Living Skills Domain: Caring for Self'>Daily Living Skills Domain: Caring for Self</option>"+
+        "<option value='Daily Living Skills Domain: Caring for Home'>Daily Living Skills Domain: Caring for Home</option>"+
+        "<option value='Daily Living Skills Domain: Living in the Community'>Daily Living Skills Domain: Living in the Community</option>"+
+        "<option value='Social & Relationship Skills Domain: Relating to Others'>Social & Relationship Skills Domain: Relating to Others</option>"+
+        "<option value='Social & Relationship Skills Domain: Playing & Using Leisure Time'>Social & Relationship Skills Domain: Playing & Using Leisure Time</option>"+
+        "<option value='Social & Relationship Skills Domain: Adapting/Adaptive Learning'>Social & Relationship Skills Domain: Adapting/Adaptive Learning</option>"+
+        "<option value='Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills'>Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills</option>"+
+        "<option value='Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills'>Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills</option></select>"+
+        "</td>"+
+      "</tr>"
+      skillHTML += skillCategory
+    if(skillData[1][i].goal == null || skillData[1][i].goal == undefined || skillData[1][i].goal == ''){
+      let skillGoal = "<tr><td class=missingInfo>Goal:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillGoal;
+    }
+    else{
+      let skillGoal = "<tr>"+
+        "<td> Goal: </td>"+
+        "<td>"+ skillData[1][i].goal +"</td>"+
+        "</tr>"
+        skillHTML += skillGoal
+      }
+   if(!skillData[1][i].objective_1 == null || !skillData[1][i].objective_1 == undefined || !skillData[1][i].objective_1 == ''){ 
+      let skillObjective_1 = "<tr>"+
+        "<td> Objective 1: </td>"+
+        "<td>"+ skillData[1][i].objective_1 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_1;
+      }
+    if(!skillData[1][i].objective_2 == null || !skillData[1][i].objective_2 == undefined || !skillData[1][i].objective_2 == ''){
+      let skillObjective_2 = "<tr>"+
+        "<td> Objective 2: </td>"+
+        "<td>"+ skillData[1][i].objective_2 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_2;
+      }
+    if(!skillData[1][i].objective_3 == null || !skillData[1][i].objective_3 == undefined || !skillData[1][i].objective_3 == ''){
+    let skillObjective_3 = "<tr>"+
+        "<td> Objective 3: </td>"+
+        "<td>"+ skillData[1][i].objective_3 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_3;
+      }
+    if(!skillData[1][i].objective_4 == null || !skillData[1][i].objective_4 == undefined || !skillData[1][i].objective_4 == ''){  
+    let skillObjective_4 = "<tr>"+
+        "<td> Objective 4: </td>"+
+        "<td>"+ skillData[1][i].objective_4 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_4;
+      }
+    if(skillData[1][i].mastery_criteria == null || skillData[1][i].mastery_criteria == undefined || skillData[1][i].mastery_criteria == ""){  
+      let skillMasteryCriteria = "<tr><td class=missingInfo>Mastery Criteria:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillMasteryCriteria; 
+    }
+    else{
+    let skillMasteryCriteria = "<tr>"+
+        "<td> Mastery Criteria: </td>"+
+        "<td>"+ skillData[1][i].mastery_criteria +"</td>"+
+      "</tr>"
+      skillHTML +=skillMasteryCriteria;
+      }
+    let skillMaintenanceCriteria = "<tr>"+
+        "<td> Maintenance Mastery Criteria </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[1][i].title +"maintenance_criteria' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillMaintenanceCriteria
+    if(skillData[1][i].start_date == null || skillData[1][i].start_date == undefined || skillData[1][i].start_date == ""){  
+      let skillStartDate = "<tr>"+
+        "<td class=missingInfo>Start Date: </td>"+
+        "<td clas=missingInfo></td></tr>"
+        }
+    else{
+    let skillStartDate = "<tr>"+
+        "<td> Start Date: </td>"+
+        "<td>"+ skillData[1][i].start_date +"</td>"+
+      "</tr>"
+      skillHTML +=skillStartDate;
+      }
+    let skillMasteryTarget = "<tr>"+
+        "<td> Mastery Target Date:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[1][i].title +"mastery_target' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillMasteryTarget
+    let skillInitialBaseline = "<tr>"+
+        "<td> Initial Baseline: </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[1][i].title +"initial_baseline' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillInitialBaseline
+    if(skillData[1][i].baseline == null || skillData[1][i].baseline == undefined || skillData[1][i].baseline == ""){
+    let skillBaseline = "<tr><td class=missingInfo>Baseline:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillBaseline;
+      }
+    else{
+       let skillBaseline = "<tr>"+
+        "<td> Baseline: </td>"+
+        "<td>"+ skillData[1][i].baseline +"</td>"+
+      "</tr>"
+      skillHTML +=skillBaseline
+    }
+    if(skillData[1][i].objectives_mastered == null || skillData[1][i].objectives_mastered == undefined || skillData[1][i].objectives_mastered == ""){
+      var skillObjMastered = "<tr><td class=missingInfo>Objectives Mastered:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillObjMastered;
+    }
+    else{
+    let skillObjMastered = "<tr>"+
+        "<td> Objectives mastered:</td>"+
+        "<td>"+ skillData[1][i].objectives_mastered +"</td>"+
+      "</tr>"
+      skillHTML += skillObjMastered
+      }
+    if(skillData[1][i].total_mastered_targets == null || skillData[1][i].total_mastered_targets == undefined || skillData[1][i].total_mastered_targets == ""){
+      let skillTarMastered = "<tr><td class=missingInfo>Total Mastered Targets:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillTarMastered;
+    }
+    else{
+    let skillTarMastered = "<tr>"+
+        "<td> Total Mastered Targets:</td>"+
+        "<td>"+ skillData[1][i].total_mastered_targets +"</td>"+
+      "</tr>"
+      skillHTML += skillTarMastered
+      } 
+    let skillProgram = "<tr>"+
+        "<td> Generalization Planning/Programming:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[1][i].title +"program' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML +=skillProgram
+    let skillGraphOptions = "<tr>"+
+        "<td> Graph Options:</td>"+
+        "<td> "+ skillData[1][i].graph_options +"</td>"+
+      "</tr>"
+      skillHTML+=skillGraphOptions
+    let skillImages ="<tr>"+
+        "<td colspan='2'>"+imageHTML+"</td>"+
+      "</tr>"
+      skillHTML +=skillImages
+    let skillProgressStatus = "<tr>"+
+        "<td> Current Progress Status: </td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[1][i].title +"goal_status' style='width: 100%; height: 46px;' onchange='mastered(this, behreasonMastered"+i+")'><option value='Goal Discontinued'>Goal Discontinued</option><option value='No Progress'>No Progress</option><option value='Minimal Progress'>Minimal Progress</option><option value='Moderate Progress'>Moderate Progress</option><option value='Significant Progress'>Significant Progress</option><option value='Goal Mastered'>Goal Mastered</option></select></td>"+
+      "</tr>"
+      skillHTML +=skillProgressStatus
+    let skillProgressReason = "<tr id='behreasonMastered"+i+"'>"+
+        "<td> Reason for Not Meeting Goal:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[1][i].title +"progress_reason' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillProgressReason
+    let skillRecommended = "<tr>"+
+        "<td> Recommended for Continued Treatment: </td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[1][i].title +"continued_treatment' style='width: 100%; height: 46px;' onchange='recommended(this, behreasonRecommended"+i+")'><option value='No'>No</option><option value='Yes'>Yes</option></select></td>"+
+      "</tr>"
+      skillHTML += skillRecommended
+    let skillRecommendation = "<tr id='behreasonRecommended"+i+"'>"+
+        "<td> Reason for Not Recommending for Continued Treatment: </td>"+
+        "<td style='padding: 0;'><textarea name="+ skillData[1][i].title +"recommendation' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillRecommendation
+    skillHTML += "</table>"+
+               "</div>"+
+             "</div>"
+    
+    
+    $('#BEHData').append(skillHTML)
+  }}
+  }  
+  
+    if($("input[name=ReportType]:checked").val() == "Client ABA Reassessment/Client ABA Treatment Progress Report Template"){
+  if(!skillData[3] == ""){
+  for(var i =0; i < skillData[3].length; i++){
+    var imageHTML = ''
+    for(var j=0; j < skillData[3][i].images.length; j++){
+       imageHTML += "<img src='https://drive.google.com/uc?export=download&id="+skillData[3][i].images[j]+"'>"
+    }
+    
+    let skillHTML = ''
+    if(skillData[3][i].title != null){
+    let skillTitle =   "<div class=basic>"+
+                         "<div class=head>"+
+                           "<p><strong>"+ skillData[3][i].title +"</strong></p>"+
+                         "</div>"+
+                         "<div class=med id=ptGoal"+i+">"+
+                           "<table>"+
+                             "<col width=15%>"+
+                             "<col width=85%>"
+      skillHTML += skillTitle
+      }
+    let skillType = "<tr>"+
+      "<td> Goal Type: </td>"+
+      "<td>Current Goal</td>"+
+    "</tr>"
+      skillHTML += skillType
+    let skillCategory = "<tr>"+
+        "<td> Goal Category </td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[3][i].title +"goal_category' style='width: 100%; height: 46px;'>"+
+        "<option value='Communication Skills Domain: Listening & Understanding'>Communication Skills Domain: Listening & Understanding</option>"+
+        "<option value='Communication Skills Domain: Talking'>Communication Skills Domain: Talking</option>"+
+        "<option value='Communication Skills Domain: Reading & Writing'>Communication Skills Domain: Reading & Writing</option>"+
+        "<option value='Daily Living Skills Domain: Caring for Self'>Daily Living Skills Domain: Caring for Self</option>"+
+        "<option value='Daily Living Skills Domain: Caring for Home'>Daily Living Skills Domain: Caring for Home</option>"+
+        "<option value='Daily Living Skills Domain: Living in the Community'>Daily Living Skills Domain: Living in the Community</option>"+
+        "<option value='Social & Relationship Skills Domain: Relating to Others'>Social & Relationship Skills Domain: Relating to Others</option>"+
+        "<option value='Social & Relationship Skills Domain: Playing & Using Leisure Time'>Social & Relationship Skills Domain: Playing & Using Leisure Time</option>"+
+        "<option value='Social & Relationship Skills Domain: Adapting/Adaptive Learning'>Social & Relationship Skills Domain: Adapting/Adaptive Learning</option>"+
+        "<option value='Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills'>Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills</option>"+
+        "<option value='Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills'>Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills</option></select>"+
+        "</td>"+
+      "</tr>"
+      skillHTML += skillCategory
+          if(skillData[3][i].goal == null || skillData[3][i].goal == undefined || skillData[3][i].goal == ''){
+      let skillGoal = "<tr><td class=missingInfo>Goal:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillGoal;
+    }
+    else{
+      let skillGoal = "<tr>"+
+        "<td> Goal: </td>"+
+        "<td>"+ skillData[3][i].goal +"</td>"+
+        "</tr>"
+        skillHTML += skillGoal
+      }
+    if(!skillData[3][i].objective_1 == null || !skillData[3][i].objective_1 == undefined || !skillData[3][i].objective_1 == ''){ 
+      let skillObjective_1 = "<tr>"+
+        "<td> Objective 1: </td>"+
+        "<td>"+ skillData[3][i].objective_1 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_1;
+      }
+    if(!skillData[3][i].objective_2 == null || !skillData[3][i].objective_2 == undefined || !skillData[3][i].objective_2 == ''){
+      let skillObjective_2 = "<tr>"+
+        "<td> Objective 2: </td>"+
+        "<td>"+ skillData[3][i].objective_2 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_2;
+      }
+    if(!skillData[3][i].objective_3 == null || !skillData[3][i].objective_3 == undefined || !skillData[3][i].objective_3 == ''){
+    let skillObjective_3 = "<tr>"+
+        "<td> Objective 3: </td>"+
+        "<td>"+ skillData[3][i].objective_3 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_3;
+      }
+    if(!skillData[3][i].objective_4 == null || !skillData[3][i].objective_4 == undefined || !skillData[3][i].objective_4 == ''){  
+    let skillObjective_4 = "<tr>"+
+        "<td> Objective 4: </td>"+
+        "<td>"+ skillData[3][i].objective_4 +"</td>"+
+      "</tr>"
+      skillHTML +=skillObjective_4;
+      }
+     if(skillData[3][i].mastery_criteria == null || skillData[3][i].mastery_criteria == undefined || skillData[3][i].mastery_criteria == ""){  
+      let skillMasteryCriteria = "<tr><td class=missingInfo>Mastery Criteria:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillMasteryCriteria; 
+    }
+    else{
+    let skillMasteryCriteria = "<tr>"+
+        "<td> Mastery Criteria: </td>"+
+        "<td>"+ skillData[3][i].mastery_criteria +"</td>"+
+      "</tr>"
+      skillHTML +=skillMasteryCriteria;
+      }
+    let skillMaintenanceCriteria = "<tr>"+
+        "<td> Maintenance Mastery Criteria </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[3][i].title +"maintenance_criteria' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillMaintenanceCriteria
+    if(skillData[3][i].start_date == null || skillData[3][i].start_date == undefined || skillData[3][i].start_date == ""){  
+      let skillStartDate = "<tr>"+
+        "<td class=missingInfo>Start Date: </td>"+
+        "<td clas=missingInfo></td></tr>"
+        }
+    else{
+    let skillStartDate = "<tr>"+
+        "<td> Start Date: </td>"+
+        "<td>"+ skillData[3][i].start_date +"</td>"+
+      "</tr>"
+      skillHTML +=skillStartDate;
+      }
+     let skillMasteryTarget = "<tr>"+
+        "<td> Mastery Target Date:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[3][i].title +"mastery_target' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillMasteryTarget
+    let skillInitialBaseline = "<tr>"+
+        "<td> Initial Baseline: </td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[3][i].title +"initial_baseline' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillInitialBaseline
+    if(skillData[3][i].baseline == null || skillData[3][i].baseline == undefined || skillData[3][i].baseline == ""){
+    let skillBaseline = "<tr><td class=missingInfo>Baseline:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillBaseline;
+      }
+    else{
+       let skillBaseline = "<tr>"+
+        "<td> Baseline: </td>"+
+        "<td>"+ skillData[3][i].baseline +"</td>"+
+      "</tr>"
+      skillHTML +=skillBaseline
+    }
+    if(skillData[3][i].objectives_mastered == null || skillData[3][i].objectives_mastered == undefined || skillData[3][i].objectives_mastered == ""){
+      var skillObjMastered = "<tr><td class=missingInfo>Objectives Mastered:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillObjMastered;
+    }
+    else{
+    let skillObjMastered = "<tr>"+
+        "<td> Objectives mastered:</td>"+
+        "<td>"+ skillData[3][i].objectives_mastered +"</td>"+
+      "</tr>"
+      skillHTML += skillObjMastered
+      }
+    if(skillData[3][i].total_mastered_targets == null || skillData[3][i].total_mastered_targets == undefined || skillData[3][i].total_mastered_targets == ""){
+      let skillTarMastered = "<tr><td class=missingInfo>Total Mastered Targets:</td><td class=missingInfo></td></tr>"
+      skillHTML+=skillTarMastered;
+    }
+    else{
+    let skillTarMastered = "<tr>"+
+        "<td> Total Mastered Targets:</td>"+
+        "<td>"+ skillData[3][i].total_mastered_targets +"</td>"+
+      "</tr>"
+      skillHTML += skillTarMastered
+      } 
+    let skillProgram = "<tr>"+
+        "<td> Generalization Planning/Programming:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[3][i].title +"program' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML +=skillProgram
+    let skillGraphOptions = "<tr>"+
+        "<td> Graph Options:</td>"+
+        "<td> "+ skillData[3][i].graph_options +"</td>"+
+      "</tr>"
+      skillHTML+=skillGraphOptions
+    let skillImages ="<tr>"+
+        "<td colspan='2'>"+imageHTML+"</td>"+
+      "</tr>"
+      skillHTML +=skillImages
+    let skillProgressStatus = "<tr>"+
+        "<td> Current Progress Status: </td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[3][i].title +"goal_status' style='width: 100%; height: 46px;' onchange='mastered(this, behreasonMastered"+i+")'><option value='Goal Discontinued'>Goal Discontinued</option><option value='No Progress'>No Progress</option><option value='Minimal Progress'>Minimal Progress</option><option value='Moderate Progress'>Moderate Progress</option><option value='Significant Progress'>Significant Progress</option><option value='Goal Mastered'>Goal Mastered</option></select></td>"+
+      "</tr>"
+      skillHTML +=skillProgressStatus
+    let skillProgressReason = "<tr id='behreasonMastered"+i+"'>"+
+        "<td> Reason for Not Meeting Goal:</td>"+
+        "<td style='padding: 0;'><textarea name='"+ skillData[3][i].title +"progress_reason' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillProgressReason
+    let skillRecommended = "<tr>"+
+        "<td> Recommended for Continued Treatment: </td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[3][i].title +"continued_treatment' style='width: 100%; height: 46px;' onchange='recommended(this, behreasonRecommended"+i+")'><option value='No'>No</option><option value='Yes'>Yes</option></select></td>"+
+      "</tr>"
+      skillHTML += skillRecommended
+    let skillRecommendation = "<tr id='behreasonRecommended"+i+"'>"+
+        "<td> Reason for Not Recommending for Continued Treatment: </td>"+
+        "<td style='padding: 0;'><textarea name='" skillData[3][i].title +"recommendation' style='width: 99%; height: 46px;'></textarea></td>"+
+      "</tr>"
+      skillHTML += skillRecommendation
+    skillHTML += "</table>"+
+               "</div>"+
+             "</div>"
+   
+    $('#PTData').append(skillHTML)
+  }}}
+  
+  }
+  }
+  
+  function mastered(select, row){
+    if(select.value == 'Goal Mastered'){
+    row.deleteCell(1);
+    row.deleteCell(0);
+    }
+    else{
+      if(row.cells.length != 2){
+      row.insertCell(0).innerHTML = "<textarea style='width: 99%; height: 46px;'></textarea>"
+      row.insertCell(0).innerHTML = "Reason for Not Meeting Goal:"
+      row.cells[1].style.padding = "0px";
+      }
+    }
+  }
+  
+  function recommended(select, row){
+    if(select.value == 'Yes'){
+      row.cells[1].innerHTML = "<textarea style='width: 99%; height: 46px;'></textarea>"
+      row.cells[0].innerHTML = "New Target Mastery Date:"
+    }
+    else{
+      row.cells[1].innerHTML = "<textarea style='width: 99%; height: 46px;'></textarea>"
+      row.cells[0].innerHTML = "Reason for Not Recommending for Continued Treatment:"
+    }
+  }
+
+  function showMessage(e) {
+    $('#progress').html(e);
+  }
+
+
+  var formData;
+  var username;
+
+  function myFunction() {
+    
+    file = $('#vinelandScoreTableFile')[0].files[0];
+    showMessage("Uploading file..");
+    reader.readAsDataURL(file);
+  
+    document.getElementById("medTableLengthConfirm").checked = true;
+    document.getElementById("allergiesTableLengthConfirm").checked = true;
+    document.getElementById("curMedTableLengthConfirm").checked = true;
+    document.getElementById("curVitTableLengthConfirm").checked = true;
+    
+    document.getElementById("medTableLength").value = document.getElementById("medTable").rows.length - 1;
+    document.getElementById("allergiesTableLength").value = document.getElementById("allergiesTable").rows.length - 1;
+    document.getElementById("curMedTableLength").value = document.getElementById("medicationsTable").rows.length - 1;
+    document.getElementById("curVitTableLength").value = document.getElementById("vitaminsTable").rows.length - 1;
+    
+    var myForm = document.getElementById("myForm");
+    var answerData = $("#myForm").getFormObject();
+    answerData['Name1'] = $('#ClientName').text();
+    
+    answerData['ClientDOB'] = $("#DOB").text();
+    answerData['Client Age at Assessment'] = $("#AAA").text();
+    
+    answerData['Guardian 1 Name'] = $("#Guardian1Name").text();
+    answerData['Guardian 1 Address'] = $("#Guardian1Add").text();
+    answerData['Guardian 1 HP'] = $("#Guardian1HP").text();
+    answerData['Guardian 1 CP'] = $("#Guardian1CP").text();
+    
+    answerData['Guardian 2 Name'] = $("#Guardian2Name").text();
+    answerData['Guardian 2 Address'] = $("#Guardian2Add").text();
+    answerData['Guardian 2 HP'] = $("#Guardian2HP").text();
+    answerData['Guardian 2 CP'] = $("#Guardian2CP").text();
+    
+    answerData['Emergency 1 Name'] = $("#Emergency1Name").text();
+//    answerData['Emergency 1 Relationship'] = $("#DOB").text();
+    answerData['Emergency 1 HP'] = $("#Emergency1HP").text();
+    answerData['Emergency 1 CP'] = $("#Emergency1CP").text();
+    
+    answerData['Emergency 2 Name'] = $("#Emergency2Name").text();
+//    answerData['Emergency 2 Relationship'] = $("#DOB").text();
+    answerData['Emergency 2 HP'] = $("#Emergency2HP").text();
+    answerData['Emergency 2 CP'] = $("#Emergency2CP").text();
+    
+    answerData['Name of Primary Insured'] = $("#PrimaryInsuranceHolderName").text();
+    answerData['Primary Insured ID'] = $("#PrimaryInsuranceID").text();
+    answerData['Primary Insurance Plan'] = $("#PrimaryInsurancePlanName").text();
+    answerData['Primary Insurance Name'] = $("#PrimaryInsurancePayerName").text();
+    
+    answerData['Name of Secondary Insured'] = $("#SecondaryInsuranceHolderName").text();
+    answerData['Secondary Insured ID'] = $("#SecondaryInsuranceID").text();
+    answerData['Secondary Insurance Plan'] = $("#SecondaryInsurancePlanName").text();
+    answerData['Secondary Insurance Name'] = $("#SecondaryInsurancePayerName").text();
+    
+    answerData['Primary Language'] = $("#PrimaryLangauge").text();
+    answerData['Secondary Language'] = $("#SecondaryLanguage").text();
+
+    if($('#ClientGen').text() == 'Male'){
+      answerData['Pronoun1'] = 'his'
+      answerData['Pronoun2'] = 'him'
+      answerData['Pronoun3'] = 'he'
+      answerData['Pronoun4'] = 'boy'
+    }
+    else{
+      answerData['Pronoun1'] = 'her'
+      answerData['Pronoun2'] = 'her'
+      answerData['Pronoun3'] = 'she'
+      answerData['Pronoun4'] = 'girl'
+
+    }
+    
+    console.log(answerData);
+    
+    formData = answerData;
+    
+    var reviewedCounter = 0;
+    var timestamp = new Date();
+    var clientID = document.getElementById("ClientID").innerText;
+    var data = [clientID, timestamp.toString(), username, reviewedCounter, JSON.stringify(formData), fileName, JSON.stringify(skillData)]
+    console.log(data)
+        google.script.run.withSuccessHandler(saveMsg).sendFormData([data]);
+//        
+//        
+//        
+//    const url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=media'
+// 
+  }
+  
+  function saveMsg(e){
+    alert(e);
+  }
+  
+  function createTemplate(){
+  myFunction();
+  var timestamp = new Date();
+  var data = [document.getElementById("ClientID").innerText, timestamp.toString(), username, reviewedCounter, JSON.stringify(formData), fileName, JSON.stringify(skillData)]
+  console.log(skillData)
+    google.script.run.withSuccessHandler(openDoc).makeTemplate([data], skillData);
+  }
+  
+  function openDoc(url){
+    window.open(url);
+  }
+  
+  $.fn.getFormObject = function() {
+    var object = $(this).serializeArray().reduce(function(obj, item) {
+        var name = item.name.replace("[]", "");
+        if ( typeof obj[name] !== "undefined" ) {
+            if ( !Array.isArray(obj[name]) ) {
+                obj[name] = [ obj[name], item.value ];
+            } else {
+               obj[name].push(item.value);
+            }
+        } else {
+            obj[name] = item.value;
+        }
+        return obj;
+    }, {});
+    return object;
+}
+</script>

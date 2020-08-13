@@ -1,0 +1,150 @@
+<div style="border-bottom: 1px solid #666;">
+  <h2>Vineland Assessment</h2>
+</div>
+<div class=basic id=VinelandFormReport>
+<h4>Vineland Adaptive Behavior Scales, Third Edition (Vineland™-3) Comprehensive Interview Form Report <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(VinelandFormReport)'></i></h4>
+<label for="vinelandDate" style="width: 50px;">Test Date: </label>
+<input type="date" id="vinelandDate" name="vinelandDate"><br>
+<label for="vinelandRespondent" style="width: 50px;"> Interview Respondent Name: </label>
+<input type="text" id="vinelandRespondent" name="vinelandRespondent"><br>
+<label for="vinelandRelationship" style="width: 50px;">Relationship: </label>
+<input type="text" id="vinelandRelationship" name="vinelandRelationship"><br>
+<label for="vinelandExaminer" style="width: 50px;">Examiner: </label>
+<input type="text" id="vinelandExaminer" name="vinelandExaminer"><br>
+<label for="vinelandIQScore" style="width: 50px;">Overall IQ Score: </label>
+<input type="text" id="vinelandIQScore" name="vinelandIQScore"><br>
+</div>
+<div class=basic>
+<h4> Overall Summary</h4>
+  <div class=basic>
+    <textarea id="vinelandSummary" name="vinelaneSummary" rows="23" style="width:99%;">The Vineland-3 is a standardized measure of adaptive behavior-the things that people do to function in their everyday lives. Whereas ability measures focus on what the examinee can do in a testing situation, the Vineland-3 focuses on what he or she actually does in daily life. Because it is a norm-based instrument, the examinee's adaptive functioning is compared to that of others his or her age.
+
+X was evaluated using the Vineland-3 Comprehensive Interview Form on XX/XX/XXXX. Parent First & Last Name, X’s mother, was interviewed by BACS Name, who completed the form.
+
+X's overall level of adaptive functioning is described by his/her score on the Adaptive Behavior Composite (ABC). His/Her ABC score is 83, which is somewhat below the normative mean of 100, the normative standard deviation is 15. The percentile rank for this overall score is 13.
+
+The ABC score is based on scores for three specific adaptive behavior domains: Communication, Daily Living Skills, and Socialization. The domain scores are also expressed as standard scores with a mean of 100 and standard deviation of 15.
+
+The Communication domain measures how well X listens and understands, expresses himself/herself through speech, and reads and writes. His/Her Communication standard score is 92. This corresponds to a percentile rank of 30.
+
+The Daily Living Skills domain assesses X's performance of the practical, everyday tasks of living that are appropriate for his/her age. His/Her standard score for Daily Living Skills is 79, which corresponds to a percentile rank of 8. This domain is a relative weakness for X.
+
+X's score for the Socialization domain reflects her functioning in social situations. His/Her Socialization standard score is 90. The percentile rank is 25.
+    </textarea>
+  </div>
+</div>
+<div class=basic id=DASS>
+  <h4>Developmental Assessment Score Summary <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(DASS)'></i></h4>
+  <label for="vinelandScoreTableFile">Upload Score Summary File:</label>
+  <input type="file" id='vinelandScoreTableFile' name='vinelandScoreTableFile' onchange="fileUpload(this, 'vinelandTableCont','vinelandTableImage')"> <p id=vinelandTableCont> </p> <img id=vinelandTableImage src= '#' style="width:100%; max-width: 800px;"/>
+  <div>
+    <table class="shortTable">
+      <col width="30%">
+      <col width="10%">
+      <col width="30%">
+      <col width="30%">
+      <tr>
+        <th> Domain </th>
+        <th> Standard Score </th>
+        <th> Age Equivalent </th>
+        <th> Adaptive Level </th>
+      </tr>
+      <tr>
+        <td> Communication </td>
+        <td> <input type="number" id="DASSC1" name="DASS Communication Score"> </td>
+        <td> <input type="text" style="width:100%;" disabled> </td>
+        <td> <input type="text" style="width:100%;" disabled> </td>
+      </tr>
+      <tr>
+        <td> Receptive</td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text" style="width:100%;" id="DASSCR2" name="DASS Receptive Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSCR3" name="DASS Receptive Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Expressive </td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text"  style="width:100%;" id="DASSCE2" name="DASS Expressive Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSCE3" name="DASS Expressive Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Written </td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text" style="width:100%;" id="DASSCW2" name="DASS Written Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSCW3" name="DASS Written Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Daily Living Skills </td>
+        <td> <input type="number" id="DASSDLS1" name="DASS Daily Living Skills Score"> </td>
+        <td> <input type="text" style="width:100%;"  disabled> </td>
+        <td> <input type="text" style="width:100%;"  disabled> </td>
+      </tr>
+      <tr>
+        <td> Personal </td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text" style="width:100%;" id="DASSDLSP2" name="DASS Personal Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSDLSP3" name="DASS Personal Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Domestic </td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text" style="width:100%;" id="DASSDLSD2" name="DASS Domestic Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSDLSD3" name="DASS Domestic Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Community </td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text" style="width:100%;" id="DASSDLSC2" name="DASS Community Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSDLSC3" name="DASS Community Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Socialization </td>
+        <td> <input type="number" id="DASSS1" name="DASS Socialization Score"> </td>
+        <td> <input type="text" style="width:100%;"  disabled> </td>
+        <td> <input type="text" style="width:100%;"  disabled> </td>
+      </tr>
+      <tr>
+        <td> Interpersonal Relationships </td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text" style="width:100%;" id="DASSSIR2" name="DASS Interpersonal Relationships Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSSIR3" name="DASS Interpersonal Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Play and Leisure Time </td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text" style="width:100%;" id="DASSSPLT2" name="DASS Play and Leisure Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSSPLT3" name="DASS Play and Leisure Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Coping Skills</td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text" style="width:100%;" id="DASSSCS2" name="DASS Coping Skills Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSSCS3" name="DASS Coping Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Motor Skills</td>
+        <td> <input type="number" id="DASSMS1" name="DASS Motor Skills Score"> </td>
+        <td> <input type="text" style="width:100%;"  disabled> </td>
+        <td> <input type="text" style="width:100%;"  disabled> </td>
+      </tr>
+      <tr>
+        <td> Fine Motor </td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text" style="width:100%;" id="DASSMSFM2" name="DASS Fine Motor Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSMSFM3" name="DASS Fine Motor Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Gross Motor </td>
+        <td> <input type="number" disabled> </td>
+        <td> <input type="text" style="width:100%;" id="DASSMSGM2" name="DASS Gross Motor Age Equivalent"> </td>
+        <td> <input type="text" style="width:100%;" id="DASSMSGM3" name="DASS Gross Motor Adaptive Level"> </td>
+      </tr>
+      <tr>
+        <td> Adaptive Behavior Composite</td>
+        <td> <input type="number" id="DASSABC1" name="DASS Adaptive Behavior Composite Score"> </td>
+        <td> <input type="text" style="width:100%;"  disabled> </td>
+        <td> <input type="text" style="width:100%;"  disabled> </td>
+      </tr>
+    </table>
+  </div>
+</div>

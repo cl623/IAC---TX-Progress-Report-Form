@@ -1,0 +1,333 @@
+<div style="border-bottom: 1px solid #666;">
+  <h2>Basic Report Information</h2>
+</div>
+
+  <div class="basic">
+    <div class="head">
+       <p>Client Info </p> 
+    </div>
+    <div class="data">
+      <table class=default>
+        <tr>
+          <td> Client Name: </td>
+          <td id="ClientName" contenteditable> Loading... </td>
+        </tr>
+        <tr>
+          <td> Gender: </td>
+          <td id="ClientGen" contenteditable> Loading... </td>
+        </tr>
+        <tr>
+          <td> IAC Client ID #: </td>
+          <td id="ClientID" contenteditable> Loading... </td>
+        </tr>
+        <tr>
+          <td> Client DOB: </td>
+          <td id="DOB" contenteditable> Loading...</td>
+        </tr>
+        <tr>
+          <td> Client Age at Assessment: </td>
+          <td id="AAA" contenteditable> PLACEHOLDER </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="basic" id=formInfo>
+    <div class="head">
+      <p>Form Info<i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(formInfo)'></i></p>
+    </div>
+    <div class="data">
+    <table class=default>
+      <tr>
+        <td> Funder Report Type:</td>
+        <td>
+          <input type="radio" id="InitialTX" name="ReportType" value="Initial Client ABA Assessment/Initial Client ABA Treatment Plan Template"> <label for="InitialTX"> Initial Client ABA Assessment/Initial Client ABA Treatment Plan Template </label><br>
+          <input type="radio" id="ProgressReport" name="ReportType" value="Client ABA Reassessment/Client ABA Treatment Progress Report Template"> <label for="ProgressReport"> Client ABA Reassessment/Client ABA Treatment Progress Report Template </label>
+        </td>
+      </tr>
+      <tr>
+        <td> Report Written By: </td> 
+        <td><input type="text" id="RWB" name="Report Written By"> </td>
+      </tr>
+      <tr>
+        <td> Date Report was Written: </td> 
+        <td><input type="date" id="DRW" name="Date Report Written:"> </td>
+      </tr>
+      <tr>
+        <td> Initial ABA Assessment Performed By: </td> 
+        <td><input type="text" id="IAAPB" name="Initial ABA Assessment Performed By"></td>
+      </tr>
+      <tr>
+        <td> Date(s) of Initial ABA Assessement: </td> 
+        <td><input type="date" id="DIAA" name="Date of Initial ABA Assessment 1"><br>
+        <input type="date" id="DIAA2" name="Date of Initial ABA Assessment 2"><br>
+        <input type="date" id="DIAA3" name="Date of Initial ABA Assessment 3"></td>
+      </tr>
+    </table>
+    </div>
+  </div>
+  <div class="basic" id='diaInfo'>
+    <div class="head">
+       <p>Daignosis Info <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(diaInfo)'></i></p> 
+    </div>
+    <div class="data">
+      <table class=default>
+        <tr>
+          <td> Diagnosis: </td>
+          <td><input type="text" id="DIAG" name="Diagnosis"> </td>
+        </tr>
+        <tr>
+          <td> Date of Diagnosis: </td>
+          <td><input type="date" id="DOD" placeholder= "MM/DD/YYYY" name="Date of Diagnosis"> </td>
+        </tr>
+        <tr>
+          <td> Diagnosed By: </td>
+          <td><input type="text" id="DOC" name="Diagnosed By"> </td>
+        </tr>
+        <tr>
+          <td>Client's Age at Diagnosis: </td>
+          <td><input type="text" id="CAAD" placeholder= "X YEARS, Y MONTHS" name="Client Age at Diagnosis"> </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  
+
+
+
+<div style="border-bottom: 1px solid #666;">
+  <h2>Contact Information</h2>
+</div>
+<div class = "col">
+  <div class="section25">
+    <div class="head">
+      <p>Legal Guardian 1 Contact Info</p>  
+    </div>
+    <div class="data">
+      <table class=default>
+        <tr>
+          <td> Name: </td>
+          <td id="Guardian1Name"> Loading... </td>
+        </tr>
+        <tr>
+          <td>Address: </td>
+          <td id="Guardian1Add"> Loading... </td>
+        </tr>
+        <tr>
+          <td> Home Phone: </td>
+          <td id="Guardian1HP"> Loading... </td>
+        </tr>
+        <tr>
+          <td> Cell Phone: </td>
+          <td id="Guardian1CP"> Loading... </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="section25">
+    <div class="head">
+      <p>Legal Guardian 2 Contact Info</p> 
+    </div>
+    <div class="data">
+      <table class=default>
+        <tr>
+          <td> Name: </td>
+          <td id="Guardian2Name"> Loading... </td>
+        </tr>
+        <tr>
+          <td>Address: </td>
+          <td id="Guardian2Add"> Loading... </td>
+        </tr>
+        <tr>
+          <td> Home Phone: </td>
+          <td id="Guardian2HP"> Loading... </td>
+        </tr>
+        <tr>
+          <td> Cell Phone: </td>
+          <td id="Guardian2CP"> Loading... </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="section25">
+    <div class="head">
+      <p>Emergency Contact 1 Info </p> 
+    </div>     
+    <div class="data">
+      <table class=default>
+        <tr>
+          <td> Name: </td>
+          <td id="Emergency1Name"> Loading... </td>
+        </tr>
+        <tr>
+          <td> Phone #1: </td>
+          <td id="Emergency1HP"> Loading... </td>
+        </tr>
+        <tr>
+          <td> Phone #2: </td>
+          <td id="Emergency1CP"> Loading... </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="section25">
+    <div class="head">
+      <p>Emergency Contact 2 Info</p>
+    </div>
+    <div class="data">
+      <table class=default>
+        <tr>
+          <td> Name: </td>
+          <td id="Emergency2Name"> PLACEHOLDER </td>
+        </tr>
+        <tr>
+          <td> Phone #1: </td>
+          <td id="Emergency2HP"> PLACEHOLDER </td>
+        </tr>
+        <tr>
+          <td> Phone #2: </td>
+          <td id="Emergency2CP"> PLACEHOLDER </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class=basic style="margin-top: 20px;">
+  <div class="head">
+    <p> Household Languages </p>
+  </div>
+  <div class="data" style="display:flex;">
+    <div style="width: 50%;">
+      <table class=default>
+        <tr>
+          <td style="width: 200px;"> Primary Language: </td>
+          <td id="PrimaryLangauge">Loading...</td>
+        </tr>
+      </table>
+    </div>
+    <div style="width: 50%;">
+      <table class=default>
+        <tr>
+          <td style="width: 200px;"> Secondary Language:</td>
+          <td id="SecondaryLanguage">Loading...</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<div style="border-bottom: 1px solid #666;">
+  <h2>Medical & Insurance Information</h2>
+</div>
+<div class="col">
+  <div id='PhysicianInfo' class= "section33">
+    <div class= "head">
+       <p>Primary Physician Info <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(PhysicianInfo)'></i></p> 
+    </div>
+    <div class="data">
+      <table class=default>
+        <tr>
+          <td> PCP Name </td>
+          <td><input type="text" id="PCP" name="PCP Name"></td>
+        </tr>
+        <tr>
+          <td> PCP Phone: </td>
+          <td><input type="tel" id="PCPP" placeholder="123-456-7890" name="PCP Phone"></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div id='PrimaryIns' class="section33">
+    <div class="head">
+      <p> Primary Insurance Info </p>
+    </div>
+    <div class="data">
+      <table class=default>
+        <tr>
+          <td> Insured's Name: </td>
+          <td id="PrimaryInsuranceHolderName">PLACEHOLDER</td>
+        </tr>
+        <tr>
+          <td> MemberID: </td>
+          <td id="PrimaryInsuranceID">Loading...</td>
+        </tr>
+        <tr>
+          <td> Plan Name: </td>
+          <td id="PrimaryInsurancePlanName">Loading...</td>
+        </tr>
+        <tr>
+          <td> Insurance Payer Name: </td>
+          <td id="PrimaryInsurancePayerName">Loading...</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div id='SecondaryIns' class="section33">
+    <div class="head">
+      <p> Secondary Insurance Info </p>
+    </div>
+    <div class="data">
+      <table class=default>
+        <tr>
+          <td> Insured's Name: </td>
+          <td id="SecondaryInsuranceHolderName">Loading...</td>
+        </tr>
+        <tr>
+          <td> MemberID: </td>
+          <td id="SecondaryInsuranceID">Loading...</td>
+        </tr>
+        <tr>
+          <td> Plan Name: </td>
+          <td id="SecondaryInsurancePlanName">Loading...</td>
+        </tr>
+        <tr>
+          <td> Insurance Payer Name: </td>
+          <td id="SecondaryInsurancePayerName">Loading...</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div style="border-bottom: 1px solid #666;">
+  <h2>Other Service Info</h2>
+</div>
+
+  <div class=basic id=serviceInfo>
+    <div class="head">
+      <p> Service Info <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(serviceInfo)'></i></p>
+    </div>
+    <div class="data" style="display:flex;">
+      <div style="width: 50%;">
+        <table class=default>
+          <tr>
+            <td style="width: 200px;"> Service Delivery Address: </td>
+            <td><input type="text" id="ServiceAdd" name="Service Address"></td>
+          </tr>
+        </table>
+      </div>
+      <div style="width: 50%;">
+        <table class=default>
+          <tr>
+            <td style="width: 200px;"> Name of Supervising BCBA/LABA:</td>
+            <td><input type="text" id="Supervisor" name="Name of Supervisor"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <div style="border-bottom: 1px solid #666;">
+  <h2>Symptomology</h2>
+</div>
+
+  <div class=basic id=symptomology>
+    <div class="head">
+      <p>Current Symptomology<i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(symptomology)'></i></p>
+    </div>
+    <div class="data" id=currSymptomology>
+      
+    </div>
+  </div>

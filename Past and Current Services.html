@@ -1,0 +1,249 @@
+<div style="border-bottom: 1px solid #666;">
+  <h2>Past & Current Services</h2>
+</div>
+
+<br>
+
+<div style="border: 1px solid #666; padding: 5px; margin: 10px 0; text-align: left;" id=pastServices>
+  <h4>Past Services   <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(pastServices)'></i></h4>
+  <p> 
+    Has the client previously received <strong>Early Intervention (EI)</strong> treatment services? 
+    <input type="radio" id="EIYes" name="Early Intervention" value="Yes"> <label for="EIYes"> Yes </label>
+    <input type="radio" id="EINo" name="Early Intervention" value="No"> <label for="EINo"> No </label>
+  </p>
+
+  <div id="EITrue" hidden>
+    Name of facility where EI treatment services took place: <textarea id=EIAREA rows=1 cols=50 name="Previous EI Facility Name"></textarea>
+    <br><br>
+    Location of Facility: <textarea id=EIAREA2 rows=1 cols=50 name="Previous EI Facility Location"></textarea>
+  </div>
+
+<div id="EITrue2" hidden >
+  <div class=con>
+    <div class="head">
+      <div style= "float: left">
+      <p> IFSP Service Delivery Plan</p> 
+      </div>
+      <div style="float: right; padding: 3px;">
+        <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Add a row to the table" id="IFSPTableAdd"> + </a>
+        <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Remove a row from the table" id="IFSPTableMinus"> -- </a>
+      </div>
+    </div>
+    <div class="med">
+      <table id='IFSPTable'>
+        <col width="11%">  <!-- Need to set col width in CSS eventually -->
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <col width= "11%">
+        <tr>
+          <th>EI Service/Method</th>
+          <th>Provider</th>
+          <th>Location of Service</th>
+          <th>Frequency & Length</th>
+          <th>Intensity of Service</th>
+          <th>Duration of Service</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+        </tr>
+      <!--
+      <tr>
+        <td><textarea id='ISFPTable1Col1'  style="width: 99%;" rows=2 placeholder="EI Service/Method" ></textarea></td>
+        <td><textarea id='ISFPTable1Col2'  style="width: 99%;" rows=2 placeholder="Provider"></textarea></td>
+        <td><textarea id='ISFPTable1Col3'  style="width: 99%;" rows=2 placeholder="Location"></textarea></td>
+        <td><textarea id='ISFPTable1Col4'  style="width: 99%;" rows=2 placeholder="Frequency/Length"></textarea></td>
+        <td><textarea id='ISFPTable1Col5'  style="width: 99%;" rows=2 placeholder="Intensity"></textarea></td>
+        <td><textarea id='ISFPTable1Col6'  style="width: 99%;" rows=2 placeholder="Duration"></textarea></td>
+        <td><textarea id='ISFPTable1Col7'  style="width: 99%;" rows=2 placeholder="Start Date"></textarea></td>
+        <td><textarea id='ISFPTable1Col8'  style="width: 99%;" rows=2 placeholder="End Date"></textarea></td>
+      </tr>
+      -->
+    </table>
+  </div>
+</div>
+
+</div>
+
+<p style="border-top: 1px dotted #666; padding: 10px 0"> 
+  Has the client previously received other treatment services outside of EI? 
+  <input type="radio" id="OSEIYes" name="OtherServicesNotEI" value="Yes"> <label for="OSEIYes"> Yes </label>
+  <input type="radio" id="OSEINo" name="OtherServicesNotEI" value="No"> <label for="OSEINo"> No </label>
+</p>
+
+<div id="OSEITrue" hidden>
+  <div class=con>
+    <div class="head">
+      <div style="float: left;">
+      <p> IFSP Service Delivery Plan</p> 
+      </div>
+      <div style="float: right; padding: 3px;">
+        <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Add a row to the table" id="OSEITableAdd"> + </a>
+        <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Remove a row from the table" id="OSEITableMinus"> -- </a>
+      </div>
+    </div>
+    <div class="med">
+      <table id='OSEITable'>
+        <col width="11%">  <!-- Need to set col width in CSS eventually -->
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <tr>
+          <th>Treatment Service</th>
+          <th>Session Duration</th>
+          <th>Frequency</th>
+          <th>Location</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+        </tr>
+      <!--
+      <tr>
+        <td><textarea id='OSEITable1Col1'  style="width: 99%;" rows=2 placeholder="Treatment Service" ></textarea></td>
+        <td><textarea id='OSEITable1Col2'  style="width: 99%;" rows=2 placeholder="Session Duration"></textarea></td>
+        <td><textarea id='OSEITable1Col3'  style="width: 99%;" rows=2 placeholder="Frequency"></textarea></td>
+        <td><textarea id='OSEITable1Col4'  style="width: 99%;" rows=2 placeholder="Location"></textarea></td>
+        <td><textarea id='OSEITable1Col5'  style="width: 99%;" rows=2 placeholder="Start Date"></textarea></td>
+        <td><textarea id='OSEITable1Col6'  style="width: 99%;" rows=2 placeholder="End Date"></textarea></td>
+      </tr>
+      -->
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!------------------------------- Current Services ---------------------------->
+
+<div style="border: 1px solid #666; padding: 5px; margin: 10px 0; text-align: left;" id=currentServices>
+  <h4>Current Services   <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(currentServices)'></i></h4>
+  <p> 
+    Is the client currently receiving EI treatment services? 
+    <input type="radio" id="CEIYes" name="CEarlyIntervention" value="Yes"> <label for="CEIYes"> Yes </label>
+    <input type="radio" id="CEINo" name="CEarlyIntervention" value="No"> <label for="CEINo"> No </label>
+  </p>
+  
+  <div id="CEITrue" hidden>
+    Name of facility where EI treatment services took place: <textarea id="CEIAREA" rows="1" cols="50" name="Current EI Facility Name"></textarea>
+    <br><br>
+    Location of Facility: <textarea id="CEIAREA2" rows="1" cols="50" name="Current EI Facility Location"></textarea>
+  </div>
+  
+  <div id="CEITrue2" hidden>
+    <div class=con>
+      <div class="head">
+        <div style="float: left;">
+        <p> IFSP Service Delivery Plan</p> 
+        </div>
+        <div style="float: right; padding: 3px;">
+          <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Add a row to the table" id="CEITableAdd"> + </a>
+          <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Remove a row from the table" id="CEITableMinus"> -- </a>
+        </div>
+      </div>
+      <div class="med">
+        <table id='CEITable'>
+        <col width="11%">  <!-- Need to set col width in CSS eventually -->
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <col width="11%">
+        <col width= "11%">
+        <tr>
+          <th>EI Service/Method</th>
+          <th>Provider</th>
+          <th>Location of Service</th>
+          <th>Frequency & Length</th>
+          <th>Intensity of Service</th>
+          <th>Duration of Service</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+        </tr>
+      <!--
+      <tr>
+        <td><textarea id='CEITable1Col1'  style="width: 99%;" rows=2 placeholder="EI Service/Method" ></textarea></td>
+        <td><textarea id='CEITable1Col2'  style="width: 99%;" rows=2 placeholder="Provider"></textarea></td>
+        <td><textarea id='CEITable1Col3'  style="width: 99%;" rows=2 placeholder="Location"></textarea></td>
+        <td><textarea id='CEITable1Col4'  style="width: 99%;" rows=2 placeholder="Frequency/Length"></textarea></td>
+        <td><textarea id='CEITable1Col5'  style="width: 99%;" rows=2 placeholder="Intensity"></textarea></td>
+        <td><textarea id='CEITable1Col6'  style="width: 99%;" rows=2 placeholder="Duration"></textarea></td>
+        <td><textarea id='CEITable1Col7'  style="width: 99%;" rows=2 placeholder="Start Date"></textarea></td>
+        <td><textarea id='CEITable1Col8'  style="width: 99%;" rows=2 placeholder="End Date"></textarea></td>
+      </tr>
+      -->
+    </table>
+      <br><br>
+      </div>
+    </div>
+  </div>
+  <p style="border-top: 1px dotted #666; padding: 10px 0">
+    Is the client currently attending public/private school? 
+    <input type="radio" id="schoolYes" name="attendingSchool" value="Yes"> <label for="schoolYes"> Yes </label>
+    <input type="radio" id="schoolNo" name="attendingSchool" value="No"> <label for="schoolNo"> No </label>
+  </p>
+  <p id='schoolTrue' hidden>Name of school: 
+                      <input type=text id='schoolName' name="Name of School"><br><br>
+                    Location of school: 
+                      <input id='schoolLocation' name="Location of School"><br><br>
+                    Is the school private or public? 
+                      <input type=radio name="Private or Public School" value=Public id=schoolPP1><label for=schoolPP1> Public </label>
+                      <input type=radio name="Private or Public School" value=Private id=schoolPP2><label for=schoolPP2> Private </label><br><br>
+                    Day or residential placement: 
+                      <input type=radio name="Day or Residential Placement" value=Day id=dayPlacement><label for=dayPlacement> Day </label>
+                      <input type=radio name="Day or Residential Placement" value=Residential id=residentialPlacement><label for=residentialPlacement> Residential </label><br><br>
+                   Select the program type: <br>
+                     <input type='checkbox' id='schoolType1' name='Program Type' value='General Education'><label for=schoolType1>general education</label><br>
+                     <input type='checkbox' id='schoolType2' name='Program Type' value='Substantially Separate Special Education'><label for=schoolType2>substantially separate special education</label><br>
+                     <input type='checkbox' id='schoolType3' name='Program Type' value='An Inclusive Integrated General Education'><label for=schoolType3>an inclusive integrated general education</label><br><br>
+                   Select the most appropriate option: <br>
+                     <input type='radio' id='notIEP504' name='IEP504' value='notIEP504'><label for=notIEP504>The client is not on an IEP and is not on a 504 Accomodation Plan</label><br>
+                     <input type='radio' id='isIEP' name='IEP504' value='isIEP'><label for=isIEP>Client is on an IEP</label><br>
+                     <input type='radio' id='is504' name='IEP504' value='is504'><label for=is504>Client is on a 504 plan</label><br>
+                     <input type='radio' id='isEval' name='IEP504' value='isEval'><label for=isEval>Client is being evaluated by the Special Education Department to determine eligibility to receive Special Education services and supports</label>
+                  <br><br>
+  </p>
+  <div id='is504True' hidden>
+    <div class=med><table>
+      <col width='20%'>
+       <tr>
+         <th>504 Category</th>
+         <th>Accomodation</th>
+       </tr>
+       <tr>
+         <td>Response</td>
+         <td><textarea id='504Response0' name="504 Category Response"></textarea></td>
+       </tr>
+       <tr>
+         <td>Scheduling/Timing</td>
+         <td><textarea id='504Response1' name="504 Category Scheduling/Timing"></textarea></td>
+       </tr>
+       <tr>
+         <td>Setting</td>
+         <td><textarea id='504Response2' name="504 Category Setting"></textarea></td>
+       </tr>
+       <tr>
+         <td>Presentation</td>
+         <td><textarea id='504Response3' name="504 Category Presentation"></textarea></td>
+       </tr>
+       <tr>
+         <td>Other</td>
+         <td><textarea id='504Response4' name="504 Category Other"></textarea></td>
+       </tr>
+       </table>
+     </div>
+  </div>
+  <div id='isIEPTrue' hidden>
+    <h2>Service Delivery IEP:</h2>
+    <br>
+    <strong>Upload Services in Other Settings Table: </strong><input type='file' name='IEPTables' value='fileupload' id='IEPTables' accept='image/*'>
+    <br>
+  </div>
+  <div id='isEvalTrue' hidden>
+    A Special Education Eligibility Determination Meeting has been scheduled for: 
+    <input type='date' name='Special Education Eligibility Determination meeting date' placeholder= 'MM/DD/YYYY'>
+  </div>
+</div>

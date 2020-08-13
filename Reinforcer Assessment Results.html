@@ -1,0 +1,51 @@
+<div style="border-bottom: 1px solid #666;">
+  <h2>Reinforcer Assessment Results</h2>
+</div>
+<div class=basic>
+  <h4> Method: </h4>
+  <input type=checkbox id=reinforcerMethod1 name=reinforcerMethod value='Direct Observation'>                                     <label for=reinforcerMethod1> Direct Observation </label><br>
+  <input type=checkbox id=reinforcerMethod2 name=reinforcerMethod value='Parent, Legal Guardian, Caregiver, or Family Interview'> <label for=reinforcerMethod2> Parent, Legal Guardian, Caregiver, or Family Interview </label><br>
+  <input type=checkbox id=reinforcerMethod3 name=reinforcerMethod value='Paired Choice'>                                          <label for=reinforcerMethod3> Paired Choice </label><br>
+  <input type=checkbox id=reinforcerMethod4 name=reinforcerMethod value='MSWO'>                                                   <label for=reinforcerMethod4> MSWO </label><br>
+  <input type=checkbox id=reinforcerMethod5 name=reinforcerMethod value='Free Operant Engagement Based'>                          <label for=reinforcerMethod5> Free Operant Engagement Based </label><br><br>
+  
+  <div class=basic id=CurrentReinforcers>
+    <div class=head>
+      <p>Current Reinforcers <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(CurrentReinforcers)'></i></p>
+    </div>
+    <div class=med>
+    <table>
+      <col width=15%>
+      <col width=85%>
+      <tr>
+        <th> Category </th>
+        <th> Reinforcer </th>
+      </tr>
+      <tr>
+        <td> Food </td>
+        <td><input type=text id=reinforcerFood placeholder="Example: Potato Chips, Skittles, M & M's" style='width:100%' name="reinforcerFood"></td>
+      </tr>
+      <tr>
+        <td> Social </td>
+        <td><input type=text id=reinforcerSocial placeholder="Example: Fist Bumps, High Fives, Tickles" style='width:100%' name="reinforcerSocial"></td>
+      </tr>
+      <tr>
+        <td> Common Items/Toys </td>
+        <td><input type=text id=reinforcerToys placeholder="Play Dough, Legos, Bubbles" style='width:100%' name="reinforcerToys"></td>
+      </tr>
+      <tr>
+        <td> Electronics </td>
+        <td><input type=text id=reinforcerElectronics placeholder="Example: iPad, Table, iPod" style='width:100%' name="reinforcerElectronics"></td>
+      </tr>
+      <tr>
+        <td> Activities </td>
+        <td><input type=text id=reinforcerActivities placeholder="Example: Coloring, Painting, Playing Go Fish" style='width:100%' name="reinforcerActivities"></td>
+      </tr>
+      <tr>
+        <td> Other </td>
+        <td><input type=text id=reinforcerOther placeholder="Example: New Car Smell, Ripping Jeans, Fonts" style='width:100%' name="reinforcerOther"></td>
+      </tr>
+    </table>
+    </div>
+  </div>
+</div>

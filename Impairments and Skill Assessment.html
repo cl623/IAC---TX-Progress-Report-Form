@@ -1,0 +1,177 @@
+<div style="border-bottom: 1px solid #666;">
+  <h2>Impairments and Skill Assessment</h2>
+</div>
+<div class=basic id=currStrengths>
+  <h4>Client's capabilities/strengths & family support system:   <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(currStrengths)'></i></h4>
+  <textarea id="CCSFSS" name="Client's capabilities & support system" style="width: 99%;" rows="3">
+  X is an engaging young boy/girl with a high activity level. He has emerging communication skills and is able to indicate his basic wants and needs in a verbal format. X’s parents are supported by multiple extended family members who live within close physical proximity to X and his/her family.
+  </textarea>
+</div>
+<div class=basic id=currImpairments>
+  <h4>Current Impairments<i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(currImpairments)'></i></h4>
+  <div style="font-size: 14px;">
+    <div class=basic>
+      <table class=med style="height: 23px; padding: 0;" id=impairmentTable>
+        <col width="90%">
+        <col width="10%">
+        <tr>
+          <th>Impairments/Barriers</th>
+          <th>0 = None</th>
+          <th>1 = Mild/Mildy Incapacitating</th>
+          <th>2 = Moderate/Moderately Incapacitating</th>
+          <th>3 = Severe/Severely Incapacitating</th>
+        </tr>
+        <tr>
+          <td>Danger to Self</td>
+          <td><input type="radio" id=impairment00 name=DangertoSelf value=0></td>
+          <td><input type="radio" id=impairment01 name=DangertoSelf value=1></td>
+          <td><input type="radio" id=impairment02 name=DangertoSelf value=2></td>
+          <td><input type="radio" id=impairment03 name=DangertoSelf value=3></td>
+        </tr>
+        <tr>
+          <td>Danger to Others</td>
+          <td><input type="radio" id=impairment10 name=DangertoOthers value=0></td>
+          <td><input type="radio" id=impairment11 name=DangertoOthers value=1></td>
+          <td><input type="radio" id=impairment12 name=DangertoOthers value=2></td>
+          <td><input type="radio" id=impairment13 name=DangertoOthers value=3></td>
+        </tr>
+        <tr>
+          <td>Communication</td>
+          <td><input type="radio" id=impairment20 name=Communication value=0></td>
+          <td><input type="radio" id=impairment21 name=Communication value=1></td>
+          <td><input type="radio" id=impairment22 name=Communication value=2></td>
+          <td><input type="radio" id=impairment23 name=Communication value=3></td>
+        </tr>
+        <tr>
+          <td>Social Interactions</td>
+          <td><input type="radio" id=impairment30 name=SocialInteraction value=0></td>
+          <td><input type="radio" id=impairment31 name=SocialInteraction value=1></td>
+          <td><input type="radio" id=impairment32 name=SocialInteraction value=2></td>
+          <td><input type="radio" id=impairment33 name=SocialInteraction value=3></td>
+        </tr>
+        <tr>
+          <td>Restricted, Repetitive Patterns of Stereotypical Behavior</td>
+          <td><input type="radio" id=impairment40 name=StereotypicalBehavior value=0></td>
+          <td><input type="radio" id=impairment41 name=StereotypicalBehavior value=1></td>
+          <td><input type="radio" id=impairment42 name=StereotypicalBehavior value=2></td>
+          <td><input type="radio" id=impairment43 name=StereotypicalBehavior value=3></td>
+        </tr>
+        <tr>
+          <td>Mood Disturbance (Depression or Mania)</td>
+          <td><input type="radio" id=impairment50 name=MoodDisturbance value=0></td>
+          <td><input type="radio" id=impairment51 name=MoodDisturbance value=1></td>
+          <td><input type="radio" id=impairment52 name=MoodDisturbance value=2></td>
+          <td><input type="radio" id=impairment53 name=MoodDisturbance value=3></td>
+        </tr>
+        <tr>
+          <td>Anxiety</td>
+          <td><input type="radio" id=impairment60 name=Anxiety value=0></td>
+          <td><input type="radio" id=impairment61 name=Anxiety value=1></td>
+          <td><input type="radio" id=impairment62 name=Anxiety value=2></td>
+          <td><input type="radio" id=impairment63 name=Anxiety value=3></td>
+        </tr>
+        <tr>
+          <td>Pyschosis/Hallucinations/Delusions</td>
+          <td><input type="radio" id=impairment70 name=Pyschosis value=0></td>
+          <td><input type="radio" id=impairment71 name=Pyschosis value=1></td>
+          <td><input type="radio" id=impairment72 name=Pyschosis value=2></td>
+          <td><input type="radio" id=impairment73 name=Pyschosis value=3></td>
+        </tr>
+        <tr>
+          <td>Thinking/Cognition/Memory/Concentration Problems</td>
+          <td><input type="radio" id=impairment80 name=ConcentrationProblems value=0></td>
+          <td><input type="radio" id=impairment81 name=ConcentrationProblems value=1></td>
+          <td><input type="radio" id=impairment82 name=ConcentrationProblems value=2></td>
+          <td><input type="radio" id=impairment83 name=ConcentrationProblems value=3></td>
+        </tr>
+        <tr>
+          <td>Impulsive/Reckless/Dangerous Behavior</td>
+          <td><input type="radio" id=impairment90 name=DangerousBehavior value=0></td>
+          <td><input type="radio" id=impairment91 name=DangerousBehavior value=1></td>
+          <td><input type="radio" id=impairment92 name=DangerousBehavior value=2></td>
+          <td><input type="radio" id=impairment93 name=DangerousBehavior value=3></td>
+        </tr>
+        <tr>
+          <td>Activites of Daily Living Problems</td>
+          <td><input type="radio" id=impairment100 name=DailyLivingProblems value=0></td>
+          <td><input type="radio" id=impairment101 name=DailyLivingProblems value=1></td>
+          <td><input type="radio" id=impairment102 name=DailyLivingProblems value=2></td>
+          <td><input type="radio" id=impairment103 name=DailyLivingProblems value=3></td>
+        </tr>
+        <tr>
+          <td>Weight Changes Associated with a Behavioral Diagnosis</td>
+          <td><input type="radio" id=impairment110 name=WeightChanges value=0></td>
+          <td><input type="radio" id=impairment111 name=WeightChanges value=1></td>
+          <td><input type="radio" id=impairment112 name=WeightChanges value=2></td>
+          <td><input type="radio" id=impairment113 name=WeightChanges value=3></td>
+        </tr>
+        <tr>
+          <td>Medical/Physical Condition</td>
+          <td><input type="radio" id=impairment120 name=MedicalCondition value=0></td>
+          <td><input type="radio" id=impairment121 name=MedicalCondition value=1></td>
+          <td><input type="radio" id=impairment122 name=MedicalCondition value=2></td>
+          <td><input type="radio" id=impairment123 name=MedicalCondition value=3></td>
+        </tr>
+        <tr>
+          <td>Substance Abuse/Dependence</td>
+          <td><input type="radio" id=impairment130 name=SubstanceAbuse value=0></td>
+          <td><input type="radio" id=impairment131 name=SubstanceAbuse value=1></td>
+          <td><input type="radio" id=impairment132 name=SubstanceAbuse value=2></td>
+          <td><input type="radio" id=impairment133 name=SubstanceAbuse value=3></td>
+        </tr>
+        <tr>
+          <td>Job/School Performance Problems</td>
+          <td><input type="radio" id=impairment134 name=JobSchoolPerformance value=0></td>
+          <td><input type="radio" id=impairment135 name=JobSchoolPerformance value=1></td>
+          <td><input type="radio" id=impairment136 name=JobSchoolPerformance value=2></td>
+          <td><input type="radio" id=impairment137 name=JobSchoolPerformance value=3></td>
+        </tr>
+        <tr>
+          <td>Legal Problems</td>
+          <td><input type="radio" id=impairment138 name=LegalProblems value=0></td>
+          <td><input type="radio" id=impairment139 name=LegalProblems value=1></td>
+          <td><input type="radio" id=impairment140 name=LegalProblems value=2></td>
+          <td><input type="radio" id=impairment141 name=LegalProblems value=3></td>
+        </tr>        
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class=basic id=currDelays>
+  <h4>Current Delays in Skill Acquisition, Generalization, and Maintenance   <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(currDelays)'></i></h4>
+   <div style="display:flex; padding: 10px;">
+      <div style="width: 50%;">
+        <p><strong> Communication Skills Domain: </strong></p>
+        <input type="checkbox" id="ICSD1" name="Current Communication Skills Domain" value="Listening & Understanding">
+        <label for="ICSD1"> Listening & Understanding</label><br>
+        <input type="checkbox" id="ICSD2" name="Current Communication Skills Domain" value="Talking">
+        <label for="ICSD2"> Talking</label><br>
+        <input type="checkbox" id="ICSD3" name="Current Communication Skills Domain" value="Reading">
+        <label for="ICSD3"> Reading</label><br>
+        
+        <p><strong> Daily Living Skills Domain: </strong></p>
+        <input type="checkbox" id="IDLSD1" name="Current Daily Living Skills Domain" value="Caring for Self">
+        <label for="IDLSD1"> Caring for Self</label><br>
+        <input type="checkbox" id="IDLSD2" name="Current Daily Living Skills Domain" value="Caring for Home">
+        <label for="IDLSD2"> Caring for Home</label><br>
+        <input type="checkbox" id="IDLSD3" name="Current Daily Living Skills Domain" value="Living in the Community">
+        <label for="IDLSD3"> Living in the Community</label><br>
+      </div>
+      <div style="width: 50%;">
+        <p><strong> Social Skills & Relationship Skills Domain: </strong></p>
+        <input type="checkbox" id="ISSRSD1" name="Current Social Skills & Relationship Skills Domain" value="Relating to Others">
+        <label for="ISSRSD1"> Relating to Others</label><br>
+        <input type="checkbox" id="ISSRSD2" name="Current Social Skills & Relationship Skills Domain" value="Playing & Using Leisure Time">
+        <label for="ISSRSD2"> Playing & Using Leisure Time</label><br>
+        <input type="checkbox" id="ISSRSD3" name="Current Social Skills & Relationship Skills Domain" value="Adapting/Adaptive Functioning">
+        <label for="ISSRSD3"> Adapting/Adaptive Functioning</label><br>
+        
+        <p><strong> Physical Activity Skills Domain: </strong></p>
+        <input type="checkbox" id="IPASD1" name="Current Physical Activity Skills Domain" value="Using Large Muscles/ Gross Motor Skills">
+        <label for="IPASD1"> Using Large Muscles/ Gross Motor Skills</label><br>
+        <input type="checkbox" id="IPASD2" name="Current Physical Activity Skills Domain" value="Using Small Muscles/ Fine Motor Skills">
+        <label for="IPASD2"> Using Small Muscles/ Fine Motor Skills</label><br>
+      </div>
+    </div>
+</div>

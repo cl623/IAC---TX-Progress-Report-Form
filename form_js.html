@@ -1,0 +1,1099 @@
+<script> 
+
+  function emailTag(){
+    var text= $("#IAAPB").val()
+    google.script.run.tag(text)
+  }
+  
+  var alertIterator = 0;
+  var alerts;
+  
+  function myAlerts(){
+    alerts = document.getElementsByClassName('missingInfo')
+    if((alertIterator) < alerts.length){
+    alerts[alertIterator].scrollIntoView({behavior:"smooth"});
+    alertIterator++;
+    }
+    else{
+    alertIterator = 1;
+    alerts[0].scrollIntoView({behavior:"smooth"});
+    }
+  }
+
+  function setMissing(element){
+  if(element.classList.contains('missingInfo'))
+    element.classList.remove("missingInfo");
+  else
+    element.classList.add("missingInfo");
+  }
+
+ //=================================================================================================================================================================
+ //-----------------------------------Prefill Basic Client Info-----------------------------------------------------------------------------------------------------
+ //=================================================================================================================================================================
+
+  google.script.url.getLocation(function(location) {
+    var clientID = location.parameters.clientID[0];
+    google.script.run.withSuccessHandler(clientPrefill).getClientInfo(undefined, clientID);
+    google.script.run.withSuccessHandler(setUser).getUser();
+    maladaptiveScript();
+  });
+
+function setUser(user){
+  username = user;
+}
+
+function fileUpload(x, container,image){
+  readURL(x, image);
+  
+  var txt = "";
+  if ('files' in x) {
+    if (x.files.length == 0) {
+      txt = "Select one or more files.";
+    } else {
+      for (var i = 0; i < x.files.length; i++) {
+        txt += "<br><strong>" + (i+1) + ". file</strong><br>";
+        var file = x.files[i];
+        if ('name' in file) {
+          txt += "name: " + file.name + "<br>";
+        }
+        if ('size' in file) {
+          txt += "size: " + file.size + " bytes <br>";
+        }
+      }
+    }
+  } 
+  else {
+    if (x.value == "") {
+      txt += "Select one or more files.";
+    } else {
+      txt += "The files property is not supported by your browser!";
+      txt  += "<br>The path of the selected file: " + x.value; // If the browser does not support the files property, it will return the path of the selected file instead. 
+    }
+  }
+  document.getElementById(container).innerHTML = txt;
+}
+  
+function readURL(input, container) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    
+    reader.onload = function(e) {
+      $('#'+container).attr('src', e.target.result);
+    }
+    
+    reader.readAsDataURL(input.files[0]); // convert to base64 string
+  }
+}
+
+  function maladaptiveScript(){
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //-------------------Create Maladaptive Behavior Checklist----------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     
+  var malList = ["Accusations of Others","Active Non-Compliance","Affect Incongruous with Situation","Aggressive Behaviors","Biting","Brooding",
+                 "Complaints Concerning Fairness or Treatment","Contextually Unrelated Verbalizations and Vocalizations","Conversations Held with Imaginary Persons",
+                 "Criticism of Others","Cruelty to Animals","Cursing","Delayed Echolalia","Destruction of Another's Property","Destruction of Environment",
+                 "Destruction of Personal Property","Disruption of Materials/Environment","Escape Behaviors","Excessive Eating","Excessively Slow Responsivity",
+                 "Facial Grimaces","Fire Setting","Flatness of Affect","Food Expectoration","Food Hoarding","Food Stealing","Full Echolalia","Hand Waving/Finger Play",
+                 "Head Weaving","Hitting or Kicking","Hoarding","Idiosyncratic Speech","Immature Speech","Impulsivity","Inappropriate Auditory Stimulation",
+                 "Inappropriate Denial/Defensive Responses","Inappropriate Eating Pace","Inappropriate Eye Movement","Inappropriate Intonation","Inappropriate Noises",
+                 "Inappropriate Object Manipulation","Inappropriate Oral Behaviors","Inappropriate Physical Contact","Inappropriate Question Asking",
+                 "Inappropriate Removal of Clothing","Inappropriate Rubbing/Stroking","Inappropriate Selectivity of Food Items","Inappropriate Self-Initiated Commentary",
+                 "Inappropriate Sitting","Inappropriate Speech","Inappropriate Vocalizations","Ingestion of Inedible Substances-(Pica)","Intrusion of Personal Space",
+                 "Intrusive Social Initiation","Laughing/Hysteria","Light Gazing","Lying","Masturbation","Morbid Content of Speech","Motor Perseverative",
+                 "Mouthing of Non-Food Items","Muscle Tensing","Need for Sameness in the Environment","Nonverbal Instigation","Orifice Probing/Laceration",
+                 "Other Eating Problems","Out of Seat","Overly Directive Speech","Partial Echolalia","Passive/Non-Compliance","Perseverative Behavior","Pinching",
+                 "Posturing","Pushing/Tripping","Refusal to Eat","Ritualistic Behavior","Rocking","Sarcasm","Self-Deprecating Statements","Self-Injurious Behavior (SIB)",
+                 "Self-Injurious-Behavior (SIB)-Eye-Poking","Self-Injurious-Behavior (SIB)-Hair-Pulling","Self-Injurious-Behavior (SIB)-Hitting",
+                 "Self-Injurious-Behavior (SIB)-Biting-Self","Self-Injurious-Behavior (SIB)-Head-Banging","Self-Injurious-Behavior (SIB)-Scratching",
+                 "Self-Stimulatory Behavior","Self-Talk","Shyness","Singing/Humming","Smearing","Socially Inappropriate Speech Content or Topics",
+                 "Speech which is Inappropriate because of Context","Spinning","Spitting","Stealing","Struggling/Physical Resistance","Tantrums","Teasing",
+                 "Teeth Grinding","Throwing Contents/Spilling Objects","Throwing Objects at Others","Thrusting Body Parts","Tissue Rubbing/Irritation","Toe Walking",
+                 "Twirling","Verbal Instigation","Verbal Perseverative","Verbal Refusals","Verbal Threats","Word Salad"];
+                 
+  var malListDiv = document.getElementById('MaladaptiveList');
+//  malListDiv.innerHTML = "<p>" + malList[5] + "</p>";
+  
+  for(var x = 0; x < malList.length; x++){
+    var checkBox = document.createElement("input");
+    var label = document.createElement("label");
+    checkBox.type = "checkbox";
+    checkBox.value = malList[x];
+    checkBox.id = 'mal' + x;
+    checkBox.name= 'Maladaptive Behaviors'
+    checkBox.onclick = function(){
+      if(this.checked){
+      
+      //Create row in behavior score table
+       var clientName = document.getElementById('ClientName').textContent;
+        var malTable = document.getElementById('malTable');
+        var row = malTable.insertRow(-1);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        var cell5 = row.insertCell(4);
+        cell1.innerHTML = this.value;
+        cell2.innerHTML = "<input type=number id='"+ this.value + "FreqScore' name='"+ this.value + "FreqScore'>";
+        cell3.innerHTML = "<input type=number id='"+ this.value + "IntensityScore' name='"+ this.value + "IntensityScore'>";
+        cell4.innerHTML = "<input type=number id='"+ this.value + "DurationScore' name='"+ this.value + "DurationScore'>";
+        cell5.innerHTML = "<input type=number id='"+ this.value + "DiscriminationScore' name='"+ this.value + "DiscriminationScore'>";
+        
+      //Create row in hypothesized functions table
+        var malTable2 = document.getElementById('malTable2');
+        var rowt2 = malTable2.insertRow(-1);
+        var cellt21 = rowt2.insertCell(0);
+        var cellt22 = rowt2.insertCell(1);
+        cellt21.innerHTML = this.value;
+        cellt22.innerHTML = "<textarea rows=1 id="+ this.id + "HF name='"+ this.value + "HF' style='width:99%;'></textarea>";
+        
+      //Create BEH Reduction Goal
+        $("#BEHData").append("<div class=basic id="+this.id+"BEH>"+
+                               "<div class=head>"+
+                                 "<p><strong>"+ this.value +"</strong></p>"+
+                               "</div>"+
+                               "<div class=med id=skillAcqGoal"+this.id+">"+
+                                 "<table>"+
+                                   "<col width=15%>"+
+                                   "<col width=85%>" +
+                                   "<tr>"+
+                                     "<td> Goal Type: </td>"+
+                                     "<td>New Goal</td>"+
+                                   "</tr>" +
+                                   "<tr>"+
+                                     "<td> Goal Category </td>"+
+                                     "<td style='padding: 0;'><select name='goalCategory' style='width: 100%; height: 46px;'></select></td>"+
+                                   "</tr>" +
+                                   "<tr>"+
+                                     "<td> Goal: </td>"+
+                                     "<td><input type=text name='"+this.value+" Goal'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Objective 1: </td>"+
+                                     "<td><input type=text name='"+this.value+" Objective 1'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Objective 2: </td>"+
+                                     "<td><input type=text name='"+this.value+" Objective 2'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Objective 3: </td>"+
+                                     "<td><input type=text name='"+this.value+" Objective 3'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Objective 4: </td>"+
+                                     "<td><input type=text name='"+this.value+" Objective 4'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Mastery Criteria: </td>"+
+                                     "<td><input type=text name='"+this.value+" Mastery Criteria'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Maintenance Mastery Criteria: </td>"+
+                                     "<td><input type=text name='"+this.value+" Maintenance Mastery Criteria'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Start Date: </td>"+
+                                     "<td><input type=text name='"+this.value+" Start Date'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Mastery Target Date: </td>"+
+                                     "<td><input type=text name='"+this.value+" Mastery Target Date'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Initial Baseline: </td>"+
+                                     "<td><input type=text name='"+this.value+" Initial Baseline'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Baseline: </td>"+
+                                     "<td><input type=text name='"+this.value+" Baseline'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Objectives Mastered: </td>"+
+                                     "<td><input type=text name='"+this.value+" Objectives Mastered'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Total Mastered Targets: </td>"+
+                                     "<td><input type=text name='"+this.value+" Total Mastered Targets'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Generalization Planning/Programming: </td>"+
+                                     "<td><input type=text name='"+this.value+" Generalization Planning/Programming'></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Current Progress Status: </td>"+
+                                     "<td style='padding: 0;'><select name='goalStatus' style='width: 100%; height: 46px;' onchange='mastered(this, behreasonMastered"+this.id+")'><option value='Goal Discontinued'>Goal Discontinued</option><option value='No Progress'>No Progress</option><option value='Minimal Progress'>Minimal Progress</option><option value='Moderate Progress'>Moderate Progress</option><option value='Significant Progress'>Significant Progress</option><option value='Goal Mastered'>Goal Mastered</option></select></td>"+
+                                   "</tr>"+
+                                   "<tr id='behreasonMastered"+this.id+"'>"+
+                                     "<td> Reason for Not Meeting Goal:</td>"+
+                                     "<td style='padding: 0;'><textarea style='width: 99%; height: 46px;'></textarea></td>"+
+                                   "</tr>"+
+                                   "<tr>"+
+                                     "<td> Recommended for Continued Treatment: </td>"+
+                                     "<td style='padding: 0;'><select name='ContinuedTreatment' style='width: 100%; height: 46px;' onchange='recommended(this, behreasonRecommended"+this.id+")'><option value='No'>No</option><option value='Yes'>Yes</option></select></td>"+
+                                   "</tr>"+
+                                   "<tr id='behreasonRecommended"+this.id+"'>"+
+                                   "<td> Reason for Not Recommending for Continued Treatment: </td>"+
+                                   "<td style='padding: 0;'><textarea style='width: 99%; height: 46px;'></textarea></td>"+
+                                   "</tr>"+
+                                 "</table>"+
+                               "</div>"+
+                             "</div>")
+      //Create Identified Antecedents & Consequences List
+        var ACContainer = document.getElementById('A&CContainer');
+        ACContainer.innerHTML += "<div id="+this.id+"A&C class=basic>"+
+                                   "<h4><u> " + this.value +"</u></h4>"+
+                                   "<p><strong>Antecedents that have been identified as initiating " + clientName +"'s emission of " + this.value + " are as follows: </strong></p>"+
+                                     "<input id="+this.id+"A1 value='When certain types of tasks/request are presented to "+clientName+"' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A1> When certain types of tasks/request are presented to "+clientName+"</label><br>"+
+                                     
+                                     "<input id="+this.id+"A2 value='When easy tasks/request are presented to "+clientName+"' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A2> When easy tasks/request are presented to "+clientName+"</label><br>"+
+                                     
+                                     "<input id="+this.id+"A3 value='When difficult tasks/request are presented to "+clientName+"' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A3> When difficult tasks/request are presented to "+clientName+"</label><br>"+
+                                     
+                                     "<input id="+this.id+"A4 value='When particular tasks/activities are presented to "+clientName+"' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A4> When particular tasks/activities are presented to "+clientName+"</label><br>"+
+                                     
+                                     "<input id="+this.id+"A5 value='When new/novel tasks/activities are presented to "+clientName+"' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A5> When new/novel tasks/activities are presented to "+clientName+"</label><br>"+
+                                     
+                                     "<input id="+this.id+"A6 value='When tasks/requests are presented to "+clientName+" during an ongoing activity' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A6> When tasks/requests are presented to "+clientName+" during an ongoing activity</label><br>"+
+                                     
+                                     "<input id="+this.id+"A7 value='When "+clientName+" is asked to start a certain task/activity' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A7> When "+clientName+" is asked to start a certain task/activity</label><br>"+
+                                     
+                                     "<input id="+this.id+"A8 value='When "+clientName+" is asked to stop a certain task/activity' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A8> When "+clientName+" is asked to stop a certain task/activity</label><br>"+
+                                     
+                                     "<input id="+this.id+"A&C9 value='When a disruption occurs in "+clientName+"\’s normal/typical routine\' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A9> When a disruption occurs in "+clientName+'\’s normal/typical routine</label><br>'+
+                                     
+                                     "<input id="+this.id+"A&C10 value='When a specific person is present within the room/setting' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A10> When a specific person is present within the room/setting</label><br>"+
+                                     
+                                     "<input id="+this.id+"A11 value='When a specific person is absent within the room/setting' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A11> When a specific person is absent within the room/setting</label><br>"+
+                                     
+                                     "<input id="+this.id+"A12 value='When a specific person attempts to interact with "+clientName+"' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A12> When a specific person attempts to interact with "+clientName+"</label><br>"+
+                                     
+                                     "<input id="+this.id+"A13 value='When a specific person delivers a specific request/demand to "+clientName+"' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A13> When a specific person delivers a specific request/demand to "+clientName+"</label><br>"+
+                                     
+                                     "<input id="+this.id+"A14 value='When "+clientName+" is not feeling well/When " + clientName +"is feeling ill' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A14> When "+clientName+" is not feeling well/When " + clientName +"is feeling ill</label><br>"+
+                                     
+                                     "<input id="+this.id+"A15 value='During teaching/training activities' type=checkbox>"+
+                                     "<label for="+this.id+"A15> During teaching/training activities</label><br>"+
+                                     
+                                     "<input id="+this.id+"A16 value='When "+clientName+" has not received much attention/When attention is withheld or removed from " + clientName +"' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A16> When "+clientName+" has not received much attention/When attention is withheld or removed from " + clientName + "</label><br>"+
+                                     
+                                     "<input id="+this.id+"A17 value='When "+clientName+" is denied access to preferred items and activities' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A17> When "+clientName+" is denied access to preferred items and activities</label><br>"+
+                                     
+                                     "<input id="+this.id+"A18 value='When non-preferred demands, instructions, activities, or requests are presented to "+clientName+"' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A18> When non-preferred demands, instructions, activities, or requests are presented to "+clientName+"</label><br>"+
+                                     
+                                     "<input id="+this.id+"A19 value='When "+clientName+" is in the presence of others' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A19> When "+clientName+" is in the presence of others</label><br>"+
+                                     
+                                     "<input id="+this.id+"A20 value='Immediately after someone interacts with "+clientName+"  (delivers an instruction or reprimand to " + clientName +", walks away from or ignores " + 
+                                                                                   clientName + "takes away a preferred item or activity from " + clientName + ",or requires " + clientName +" to change activities)' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A20> Immediately after someone interacts with "+clientName+"  (delivers an instruction or reprimand to " + clientName +", walks away from or ignores " + 
+                                                                                   clientName + " takes away a preferred item or activity from " + clientName + ", or requires " + clientName +" to change activities)</label><br>"+
+                                                                                   
+                                     "<input id="+this.id+"A21 value='When "+clientName+" is denied a request' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A21> When "+clientName+" is denied a request</label><br>"+
+                                     
+                                     "<input id="+this.id+"A22 value='When "+clientName+" is told it is time to end a preferred activity' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A22> When "+clientName+" is told it is time to end a preferred activity</label><br>"+
+                                     
+                                     "<input id="+this.id+"A23 value='When "+clientName+" is in a noisy or crowded environment' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A23> When "+clientName+" is in a noisy or crowded environment</label><br>"+
+                                     
+                                     "<input id="+this.id+"A24 value='When "+clientName+" is left alone for long periods of time/When "+ clientName +" is alone, bored, or unoccupied' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A24> When "+clientName+" is left alone for long periods of time/When "+ clientName +" is alone, bored, or unoccupied</label><br>"+
+                                     
+                                     "<input id="+this.id+"A25 value='When attention is being be provided to other people in "+clientName+ "\’s immediate environment\' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A&C25> When attention is being be provided to other people in "+clientName+ "\’s immediate environment</label><br>"+
+                                     
+                                     "<input id="+this.id+"A26 value='The behavior occurs at relatively high rates regardless of what is going in the immediate environment' type=checkbox name='" + this.value + "Antecedent'>"+
+                                     "<label for="+this.id+"A26> The behavior occurs at relatively high rates regardless of what is going in the immediate environment</label><br><br><br>"+
+                                     
+                                     "<p><strong> Identified consequences that appear to be maintaining " + clientName + "'s emission of " + this.value + " are as follows: </strong></p>" +
+                                     "<input id="+this.id+"C1 value='Escape, Avoidance, or Delay' type=checkbox name='" + this.value + "Consequences'>"+
+                                     "<label for="+this.id+"C1> Escape, Avoidance, or Delay</label><br>"+
+                                     
+                                     "<input id="+this.id+"C2 value='Sensory Stimulation' type=checkbox name='" + this.value + "Consequences'>"+
+                                     "<label for="+this.id+"C2> Sensory Stimulation</label><br>"+
+                                     
+                                     "<input id="+this.id+"C3 value='Tasks, Demands & Activities' type=checkbox name='" + this.value + "Consequences'>"+
+                                     "<label for="+this.id+"C3> Tasks, Demands & Activities</label><br>"+
+                                     
+                                     "<input id="+this.id+"C4 value='Tangible Items & Objects' type=checkbox name='" + this.value + "Consequences'>"+
+                                     "<label for="+this.id+"C4> Tangible Items & Objects</label><br>"+
+                                     
+                                     "<input id="+this.id+"C5 value='Attention' type=checkbox name='" + this.value + "Consequences'>"+
+                                     "<label for="+this.id+"C5> Attention</label><br>"+
+                                     
+                                     "<p><strong>   Access to: </strong></p>"+
+                                     "<input id="+this.id+"C6 value='Sensory Stimulation' type=checkbox name='" + this.value + "Access'>"+
+                                     "<label for="+this.id+"C6> Sensory Stimulation</label><br>"+
+                                     
+                                     "<input id="+this.id+"C7 value='Tasks, Demands, & Activities' type=checkbox name='" + this.value + "Access'>"+
+                                     "<label for="+this.id+"C7> Tasks, Demands, & Activities</label><br>"+
+                                     
+                                     "<input id="+this.id+"C8 value='Tangible Items & Objects' type=checkbox name='" + this.value + "Access'>"+
+                                     "<label for="+this.id+"C8> Tangible Items & Objects</label><br>"+
+                                     
+                                     "<input id="+this.id+"C9 value='Attention' type=checkbox name='" + this.value + "Access'>"+
+                                     "<label for="+this.id+"C9> Attention</label><br>"+
+                                     
+                                     "<p> Identified Functionally Equivalent Replacement Skills to be Taught: </p>" +
+                                     
+                                     "<table class=shortTable><col width=7%><col width=93%>"+ 
+                                       "<tr><th></th><th> Replacement Skills</th></tr>"+
+                                       "<tr><td>1</td><td><textarea rows=1 style='width:99%' id="+this.id+"Replace1 name='"+this.value+"Replace1'></textarea></td></tr>"+
+                                       "<tr><td>2</td><td><textarea rows=1 style='width:99%' id="+this.id+"Replace2 name='"+this.value+"Replace1'></textarea></td></tr>"+
+                                       "<tr><td>3</td><td><textarea rows=1 style='width:99%' id="+this.id+"Replace3 name='"+this.value+"Replace1'></textarea></td></tr>"+
+                                       "<tr><td>4</td><td><textarea rows=1 style='width:99%' id="+this.id+"Replace4 name='"+this.value+"Replace1'></textarea></td></tr>"+
+                                       "<tr><td>5</td><td><textarea rows=1 style='width:99%' id="+this.id+"Replace5 name='"+this.value+"Replace1'></textarea></td></tr>"+
+                                     "</table>" + 
+                                     "<table class=shortTable><col width=7%><col width=93%>"+ 
+                                       "<tr><th></th><th> Frequency of X </th></tr>"+
+                                       "<tr><td>1</td><td><label for="+this.id+"Freq1><strong>How often does the target behavior occur?</strong><br> 1=Every Month,7=Every Minute</label><input type='range' list='tickmarks' min='1' max='7'                              id="+this.id+"Freq1 name='"+this.value+"Freq' onchange='appendixSum("+this.id+"FreqScore, '"+this.value+"Freq')'></td></tr>"+
+                                       "<tr><td>2</td><td><label for="+this.id+"Freq2><strong>What times of day does the target behavior occur? </strong><br> 1=Specific Times of Day,7=All Times of Day</label><input type='range' list='tickmarks' min='1' max='7'       id="+this.id+"Freq2 name='"+this.value+"Freq' onchange='appendixSum("+this.id+"FreqScore, '"+this.value+"Freq')'></td></tr>"+
+                                       "<tr><td>3</td><td><label for="+this.id+"Freq3><strong>What times of month does the target behavior occur? </strong><br> 1=Specific Times of Month,7=All Times of Month</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Freq3 name='"+this.value+"Freq' onchange='appendixSum("+this.id+"FreqScore, '"+this.value+"Freq')'></td></tr>"+
+                                       "<tr><td>4</td><td><label for="+this.id+"Freq4><strong>What times of year does the target behavior occur?  </strong><br> 1=Specific Times of Year,7=All Times of Year</label><input type='range' list='tickmarks' min='1' max='7'   id="+this.id+"Freq4 name='"+this.value+"Freq' onchange='appendixSum("+this.id+"FreqScore, '"+this.value+"Freq')'></td></tr>"+
+                                     "<datalist id='tickmarks'><option value='0'></option><option value='1'></option><option value='2'></option><option value='3'></option><option value='4'></option> <option value='5'></option><option value='6'></option><option value='7'></option></datalist></table>" + 
+                                    "<table class=shortTable><col width=7%><col width=93%>"+ 
+                                       "<tr><th></th><th> Intensity of X </th></tr>"+
+                                       "<tr><td>1</td><td><label for="+this.id+"Int1><strong>How severe is the physical damage to the client as a result of the target behavior?</strong><br> 1=No Element of Physical Damage to Self, 7=Life Threatening to Self</label><input type='range' list='tickmarks' min='1' max='7'     id="+this.id+"Intensity1 name="+this.value+"Int onchange='appendixSum("+this.id+"IntensityScore, '"+this.value+"Int')'></td></tr>"+
+                                       "<tr><td>2</td><td><label for="+this.id+"Int2><strong>How severe is the physical damage to others as a result of the target behavior?</strong><br> 1=No Element of Physical Damage to Other(s), 7=Life Threatening to Other(s)</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Intensity2 name="+this.value+"Int onchange='appendixSum("+this.id+"IntensityScore, '"+this.value+"Int')'></td></tr>"+
+                                       "<tr><td>3</td><td><label for="+this.id+"Int3><strong>How severe is the physical damage to the environment as a result of the target behavior? </strong><br> 1=No Damage to Environment, 7=Severe Property Damage</label><input type='range' list='tickmarks' min='1' max='7'              id="+this.id+"Intensity3 name="+this.value+"Int onchange='appendixSum("+this.id+"IntensityScore, '"+this.value+"Int')'></td></tr>"+
+                                       "<tr><td>4</td><td><label for="+this.id+"Int4><strong>How severe is the disruption to routines as a result of the target behavior?  </strong><br> 1=Does Not Interfere with Routines, 7= Severe Disruption to Routines</label><input type='range' list='tickmarks' min='1' max='7'         id="+this.id+"Intensity4 name="+this.value+"Int onchange='appendixSum("+this.id+"IntensityScore, '"+this.value+"Int')'></td></tr>"+
+                                     "<datalist id='tickmarks'><option value='0'></option><option value='1'></option><option value='2'></option><option value='3'></option><option value='4'></option> <option value='5'></option><option value='6'></option><option value='7'></option></datalist></table>" +
+                                     "<table class=shortTable><col width=7%><col width=93%>"+ 
+                                       "<tr><th></th><th> Duration of X </th></tr>"+
+                                       "<tr><td>1</td><td><label for="+this.id+"Dur1><strong>How soon does the target behavior re-occur? </strong><br> 1=Days Later, 7=Right Away</label><input type='range' list='tickmarks' min='1' max='7'           id="+this.id+"Duration1 name='"+this.value+"Dur' onchange='appendixSum("+this.id+"DurationScore, '"+this.value+"Dur')'></td></tr>"+
+                                       "<tr><td>2</td><td><label for="+this.id+"Dur2><strong>How long does this target behavior last from start to finish? </strong><br> 1=Seconds, 7=Hours</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Duration2 name='"+this.value+"Dur' onchange='appendixSum("+this.id+"DurationScore, '"+this.value+"Dur')'></td></tr>"+
+                                       "<tr><td>3</td><td><label for="+this.id+"Dur3><strong>How long is the escalation leading up to the target behavior? </strong><br> 1=Seconds, 7=Hours</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Duration3 name='"+this.value+"Dur' onchange='appendixSum("+this.id+"DurationScore, '"+this.value+"Dur')'></td></tr>"+
+                                       "<tr><td>4</td><td><label for="+this.id+"Dur4><strong>How long is the de-escalation following the target behavior? </strong><br> 1=Seconds, 7=Hours</label><input type='range' list='tickmarks' min='1' max='7'  id="+this.id+"Duration4 name='"+this.value+"Dur' onchange='appendixSum("+this.id+"DurationScore, '"+this.value+"Dur')'></td></tr>"+
+                                     "<datalist id='tickmarks'><option value='0'></option><option value='1'></option><option value='2'></option><option value='3'></option><option value='4'></option> <option value='5'></option><option value='6'></option><option value='7'></option></datalist onchange='appendixSum("+this.id+"DurationScore, "+this.id+")'></table>" + 
+                                    "<table class=shortTable><col width=7%><col width=93%>"+ 
+                                       "<tr><th></th><th> Discrimination of X </th></tr>"+
+                                       "<tr><td>1</td><td><label for="+this.id+"Disc1><strong>With whom does this target behavior occur?</strong><br> 1=With One Person Only, 7=Everyone</label><input type='range' list='tickmarks' min='1' max='7'                     id="+this.id+"Disc1 name='"+this.value+"Dis' onchange='appendixSum("+this.id+"DiscriminationScore, '"+this.value+"Dis')'></td></tr>"+
+                                       "<tr><td>2</td><td><label for="+this.id+"Disc2><strong>Where does this target behavior occur (across settings)? </strong><br> 1=In One Setting, 7=All Settings</label><input type='range' list='tickmarks' min='1' max='7'        id="+this.id+"Disc2 name='"+this.value+"Dis' onchange='appendixSum("+this.id+"DiscriminationScore, '"+this.value+"Dis')'></td></tr>"+
+                                       "<tr><td>3</td><td><label for="+this.id+"Disc3><strong>Where does this target behavior occur (within settings)?  </strong><br>  1=In One Area/Room, 7=Every Area/Room</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Disc3 name='"+this.value+"Dis' onchange='appendixSum("+this.id+"DiscriminationScore, '"+this.value+"Dis')'></td></tr>"+
+                                       "<tr><td>4</td><td><label for="+this.id+"Disc4><strong>When does this target behavior occur? </strong><br> 1=In One Activity/Routine, 7 = Every Activity/Routine</label><input type='range' list='tickmarks' min='1' max='7'      id="+this.id+"Disc4 name='"+this.value+"Dis' onchange='appendixSum("+this.id+"DiscriminationScore, '"+this.value+"Dis')'></td></tr>"+
+                                     "<datalist id='tickmarks'><option value='0'></option><option value='1'></option><option value='2'></option><option value='3'></option><option value='4'></option> <option value='5'></option><option value='6'></option><option value='7'></option></datalist></table>" +
+                                  "</div>"
+        }
+      else{
+      //Delete entry from table
+        var malTable = document.getElementById('malTable');
+        for(var i = 1; i < malTable.rows.length; i++){
+          if(malTable.rows[i].cells[0].innerHTML == this.value){
+            alert('Unchecked ' + malTable.rows[i].cells[0].innerHTML);
+            malTable.deleteRow(i);}
+          }
+      //Delete entry from table2
+        var malTable2 = document.getElementById('malTable2');
+        for(var i = 1; i < malTable2.rows.length; i++){
+          if(malTable2.rows[i].cells[0].innerHTML == this.value){
+            malTable2.deleteRow(i);}
+          }
+       //Delete Identified Antecedents & Consequences List
+         var id = this.id+"A&C"
+         document.getElementById(id).remove();
+         document.getElementById(this.id+"BEH").remove();
+        }
+      };
+    label.htmlFor = 'mal' + x;
+    malListDiv.appendChild(checkBox);
+    malListDiv.appendChild(label);
+    label.appendChild(document.createTextNode(malList[x]));
+    var linebreak = document.createElement('br');
+    label.appendChild(linebreak);
+  }
+  
+  var symptomologyList=['is lacking basic social, emotional, and communication skills and emits a variety of non-functional, maladaptive behaviors. ','does not consistently respond to their name',
+                     'does not point at or towards toys, items, or objects to demonstrate interest','does not look in the direction of a toy, item, or object when another person points at or towards a toy, item, or object; has trouble relating to other people',
+                     'may not have any interest in other people at all at times', 'does not consistently make eye contact with other people', 'will often avoid making eye contact with other people',
+                     'typically prefers to be alone', 'typically prefers to play alone', 'has trouble recognizing, understanding, and talking about other people’s feelings', 'has trouble recognizing, understanding, and talking about their own feelings',
+                     'prefers not to be held or cuddled', 'may only cuddle when they want to', 'frequently appears to be unaware when other people talk to them but will often respond to other environmental stimuli, such as sounds', 
+                     'may be interested in people at times, but does not know how to talk, play, or relate to them', 'will often repeat or echo words or phrases said to them in place of using typical language', 'has trouble expressing their needs using typical words, gestures, or motions',
+                     'does not play “pretend” games', 'will often repeat actions over and over again', 'has trouble adapting when minor changes are made to their normal routine or schedule', 
+                     'frequently has unusual reactions to the way things smell, taste, look, feel, or sound', 'has difficulty providing related answers to questions asked to them', 
+                     'exhibits narrow, extreme, or obsessive interests', 'engages in high rates of hand flapping behavior', 'engages in high rates of body rocking behavior', 'repeatedly spins their body in circles',
+                     'engaged in high rates of other stereotypical behaviors', 'does not share their interests with other people', 'typically only interacts with other people in order to achieve a desired goal or outcome',
+                     'exhibits flat facial expressions', 'exhibits inappropriate facial expressions', 'has difficulty understanding and respecting other people’s personal space and boundaries',
+                     'is not easily comforted by others during times of distress or duress', 'exhibits delayed speech and language skills', 'often reverses pronouns when speaking, such as says “You” instead of “I"',
+                     'emits few to no gestures in order to communicate basic wants, needs, and desires', 'talks using a flat, robot-like, and/or sing song voice', 'has difficulty recognizing and understanding jokes, sarcasm, and/or playful teasing made by other people',
+                     'plays with toys in the same way each and every time', 'demonstrates extreme interest in specific parts of toys, items, or objects rather than toy, item, or object itself, such as shows an extreme interest in playing with the wheels on a toy car rather than the toy car itself',
+                     'keeps toys, items, and objects nearby extremely organized', 'has to follow certain steps, rituals, or routines', 'easily loses skills they had once acquired']
+  
+  var treatmentList = ['Decrease Length of Tasks','Decrease Difficulty of Tasks','Non-Contingent Reinforcement (NCR)','Provide Functional Communication Training (FCT)',
+                     'Provide Scheduled Access to Attention','Provide Scheduled Access to Preferred Items/Activities','Provide Scheduled Access to Sensory Stimulation/Sensory Activities',
+                     'Provide Scheduled Breaks/Trade-Ins','Provide Frequent Review/Reminders of Behavior Expectations and Rules','Simply Tasks/Activities',
+                     'Provide/Utilize Visuals Supports','Provide/Utilize Visual Schedules','Provide Clear Instructions','Set Clear Expectations & Rules',
+                     'Utilize Behavioral Contracts','Utilize Behavioral Momentum','Provide Frequent Adult Check-ins',
+                     'Provide Direct Instruction and Reinforcement for the Emission of Socially Appropriate Alternative Replacement Behaviors',
+                     'Provide Frequent Movement Breaks','Provide Frequent Sensory Breaks',
+                     'Provide Consistent and Clear Consequences for both Socially Appropriate and Socially Inappropriate Behaviors/Maladaptive Behaviors',
+                     'Provide Choices as Frequently as Possible (Forced Choices)','Implement Extinction Procedures',
+                     'Provide Behavioral Contracts and/or Tokens to Reinforce Socially Appropriate Behaviors, Attending Skills, and Participation',
+                     'Provide Frequent Breaks, Trade-ins, Rewards/Reinforcers for Appropriate Behaviors','Conduct Preference Assessments on a Regular Basis',
+                     'Provide/Utilize of Social Scripts/Social Stories','Provide a Highly Structured and Consistent Teaching Environment',
+                     'Break Skills Taught Down into their Smallest Components','Provide Massed Opportunities for Practice',
+                     'Implement One-to-One Direct Teaching Procedures, such as Discrete Trial Teaching (DTT)','Implement Errorless Learning Procedures',
+                     'Implement Reinforced Learning Trial Procedures','Implement Systematic Prompting Procedures (Least-to-Most or Most-to-Least)',
+                     'Implement Systematic Prompt Fading Procedures','Implement Priming Procedures','Limit Distractions','Program and Provide for the Generalization and Maintenance of all Skills']
+  
+    
+  var instructionalMethodsList = ['Discrete Trial Training/Teaching (DTT)','Functional Communication Training (FCT)','Modeling','Natural Environment Training','Naturalistic Intervention (NI)',
+                     'Parent Implemented Intervention (PII)','Peer Mediated Instruction and Intervention (PMI)','Picture Exchange Communication System','Pivotal Response Training (PRT)',
+                     'Prompting','Reinforcement','Scripting','Social Skills Training','Social Stories/Social Narratives','Structured Play Group','Task Analysis (TA)','Technology Aide Instruction and Intervention (TAI)',
+                     'Time Delay','Video Modeling','Visual Supports']
+                                  
+  var behavioralMethodsList = ['Antecedent Based Interventions','Consequence Based Interventions','Differential Reinforcement of Other Behavior (DRO)','Differential Reinforcement of Incompatible Behavior (DRI)',
+                               'Differential Reinforcement of Alternative Behavior (DRA)','Extinction','Response Interruption (RI)','Response Redirection (RR)','Self-Management','Behavioral Momentum']
+
+  var lists = [treatmentList,instructionalMethodsList,behavioralMethodsList, symptomologyList]
+  var listString = ['maladaptiveBehavioralTreatment','instructionalMethods','behavioralMethods', 'Current Symptomology']
+                                  
+  var treatmentDiv = document.getElementById('treatmentList');
+  var instructionalMethodsDiv = document.getElementById('instructionalMethodsChecklist');
+  var behavioralMethodsDiv = document.getElementById('behavioralMethodsChecklist');
+  var symptomologyDiv = document.getElementById('currSymptomology')
+  var divs = [treatmentDiv,instructionalMethodsDiv,behavioralMethodsDiv, symptomologyDiv]
+  
+  for(var y=0; y<lists.length; y++){
+    for(var x=0; x<lists[y].length; x++){
+      var checkbox = document.createElement("input");
+      var label = document.createElement("label");
+      checkbox.type= "checkbox";
+      checkbox.value= lists[y][x];
+      checkbox.id= listString[y] + x;
+      checkbox.name= listString[y];
+      label.htmlFor= listString[y] + x;
+      divs[y].appendChild(checkbox);
+      divs[y].appendChild(label);
+      label.appendChild(document.createTextNode(lists[y][x]));
+      var linebreak = document.createElement('br');
+      label.appendChild(linebreak);
+    }
+  }
+  }
+  
+  function appendixSum(container, sliders){
+    let sum = 0
+    for(var i = 0; i < sliders.length; i++){
+      sum += parseInt(sliders[i].value);
+    }
+    container.value=sum;
+  }
+  
+  function clientPrefill(info){
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //----------------------Client Info & Contact Info------------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     
+    var doneLoading = false;
+
+    var tag = ['ClientID', 'ClientName', 'DOB', 
+                'PrimaryLangauge', 'SecondaryLanguage', 
+                'Guardian1Name', 'Guardian1HP', 'Guardian1CP', 'Guardian1Add', 
+                'Guardian2Name', 'Guardian2HP', 'Guardian2CP', 'Guardian2Add', 
+                'Emergency1Name', 'Emergency1HP', 'Emergency1CP','ClientGen']
+                
+    var index = [0,1,3,6,7,9,11,12,13,14,15,16,20,22,23,24,25,26,27,30,32,33, 5]
+    var len = index.length
+    
+    for(var i=0; i < len; i++){
+      if(i == 8 || i == 15){
+        if(info[1][index[0]] != ''){
+          document.getElementById(tag.shift()).innerHTML = '<strong>' + info[1][index.shift()]+ ' ' + info[1][index.shift()] +
+                                                           ', '+ info[1][index.shift()] + ' ' + info[1][index.shift()] + '</strong>'; 
+          i+=3;
+          }
+        else{
+        document.getElementById(tag.shift()).innerHTML = '<span style="background-color:Tomato"><strong>-</strong></span>';
+        i+=3;
+        index.shift();
+        index.shift();
+        index.shift();
+        index.shift();
+        }
+      }
+      else{
+        if(info[1][index[0]] != ''){
+          document.getElementById(tag.shift()).innerHTML = '<strong>' + info[1][index.shift()] +'</strong>';
+        }
+        else{
+          document.getElementById(tag.shift()).innerHTML = '<span style="background-color:Tomato"><strong>-</strong></span>';
+          index.shift();
+        }
+      }
+    }
+    doneLoading = true;
+     
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //------------------------------Insurance Info----------------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     var primTag =    [ 'PrimaryInsurancePlanName', 'PrimaryInsuranceID', 'PrimaryInsurancePayerName']
+     var secTag =     ['SecondaryInsurancePlanName', 'SecondaryInsuranceID', 'SecondaryInsurancePayerName']
+      
+     var insIndex = [3, 6, 5]
+     
+     
+     for(var j=0; j < 3; j++){
+       if(info[2] != null){
+         if(info[2][insIndex[j]] != ''){
+           document.getElementById(primTag[j]).innerHTML = '<strong>' + info[2][insIndex[j]] +'</strong>';
+         }
+         else{
+           document.getElementById(primTag[j]).innerHTML = '<span style="background-color:Tomato"><strong>-</strong></span>';
+         }
+       }
+       if(info[3] != null){
+         if(info[3][insIndex[j]] != ''){
+           document.getElementById(secTag[j]).innerHTML = '<strong>' + info[3][insIndex[j]] +'</strong>';
+         }
+         else{
+           document.getElementById(secTag[j]).innerHTML = '<span style="background-color:Tomato"><strong>-</strong></span>';
+         }
+       }
+       else{
+         document.getElementById('PhysicianInfo').style.width = '50%';
+         document.getElementById('PrimaryIns').style.width = '50%';
+         document.getElementById('SecondaryIns').style.display = 'none';
+       }
+     }
+     
+     
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //------------------------Family Composition Prefill----------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     
+     if(info[1][1] != ''){
+       document.getElementById('FamilyComp').innerHTML = info[1][1] +
+                                        " currently lives at home with his/her <FAMILY COMPOSITION>. " + info[1][1] +
+                                        "'s maternal and paternal grandparents live in close physical proximity to " + info[1][1] +
+                                        " and spend time with " + info[1][1] + " on a regular basis.";
+     }
+     
+  
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //-------------------Load from Sheet Button Initialization----------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+  var loadbtn = document.getElementById('loadBtn')
+  
+  if(doneLoading){
+  loadbtn.disabled = false;  
+  }
+  
+  loadbtn.onclick = function(){
+    google.script.run.withSuccessHandler(getLastReport).getFunderSheetData($("#ClientID").text());
+  }
+}
+
+function riskInfo(element,container, title, fam){
+  if(element.checked == true){
+    if( $("#"+container).is(":empty")){
+      document.getElementById(container).innerHTML += '<h4><u>'+title+'</u></h4>' + 
+                                           "<div class=head><p> Step #1: Warning Signs that a Crisis May be Developing (Thoughts, Images, Mood, Situation, Behavior) </p></div>" + 
+                                             "<table class=shortTable>" + 
+                                               "<col width=10%>"+
+                                               "<col width=90%>"+
+                                               "<tr><td> 1a </td><td><input type=text style='width: 99%' name='"+title+" Step1_1'></td></tr>" + 
+                                               "<tr><td> 1b </td><td><input type=text style='width: 99%' name='"+title+" Step1_2'></td></tr>" +
+                                               "<tr><td> 1c </td><td><input type=text style='width: 99%' name='"+title+" Step1_3'></td></tr>" +
+                                             "</table>"+
+                                           "<div class=head style='height: 55px'><p> Step #2: Internal Coping Strategies/Things the Child/Client Can Do W/Out Contacting Another Person (Relaxation Techniques, Physical Activity) </p></div>"+
+                                             "<table class=shortTable>" + 
+                                               "<col width=10%>"+
+                                               "<col width=90%>"+
+                                               "<tr><td> 2a </td><td><input type=text style='width: 99%' name='"+title+" Step2_1'></td></tr>" + 
+                                               "<tr><td> 2b </td><td><input type=text style='width: 99%' name='"+title+" Step2_2'></td></tr>" +
+                                               "<tr><td> 2c </td><td><input type=text style='width: 99%' name='"+title+" Step2_3'></td></tr>" +
+                                             "</table>"+
+                                           "<div class=head><p> Step #3: People & Social Settings that Provide a Distraction </p></div>"+
+                                             "<table class=default>"+
+                                               "<col width=100%>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='(Name, Location)' name='"+title+" Step3_1'></textarea></td></tr>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='(Name, Location)' name='"+title+" Step3_2'></textarea></td></tr>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='(Name, Location)' name='"+title+" Step3_3'></textarea></td></tr>"+
+                                             "</table>"+
+                                           "<div class=head><p> Step #4: People Whom to Contact for Help </p></div>"+
+                                             "<table class=default>"+
+                                               "<col width=100%>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='(Name, Location, & Phone #)' name='"+title+" Step4_1'></textarea></td></tr>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='(Name, Location, & Phone #)' name='"+title+" Step4_2'></textarea></td></tr>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='(Name, Location, & Phone #)' name='"+title+" Step4_3'></textarea></td></tr>"+
+                                             "</table>"+
+                                           "<div class=head><p> Step #5: Professionals & Agencies’ to Contact During a Crisis </p></div>"+
+                                             "<table class=default>"+
+                                               "<col width=100%>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='(Clinician Name, Location, & Phone #)' name='"+title+" Step5_1'></textarea></td></tr>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='(Clinician Name, Location, & Phone #)' name='"+title+" Step5_2'></textarea></td></tr>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='(Clinician Name, Location, & Phone #)' name='"+title+" Step5_3'></textarea></td></tr>"+
+                                             "</table>"+
+                                           "<div class=head><p> Step #6: Making the Environment Safe </p></div>"+
+                                             "<table class=default>"+
+                                               "<col width=100%>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='Remove Dangerous Items' name='"+title+" Step6_1'></textarea></td></tr>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='Block/Redirect Physical Harm/Injury' name='"+title+" Step6_2'></textarea></td></tr>"+
+                                               "<tr><td><textarea rows=2 style='width:99%;height:99%;' placeholder='Evade' name='"+title+" Step6_3'></textarea></td></tr>"+
+                                             "</table>"
+    }
+  }
+  else if(document.getElementById(fam+"PresentYes").checked !=true && document.getElementById(fam+"IdeationYes").checked !=true && document.getElementById(fam+"PlanYes").checked !=true && document.getElementById(fam+"MeansYes").checked !=true && document.getElementById(fam+"PriorYes").checked !=true ){
+    $("#"+container).empty();
+  }
+}
+
+  
+ //=================================================================================================================================================================
+ //-----------------------------------Scripts for Medical and Mental History Page-----------------------------------------------------------------------------------
+ //=================================================================================================================================================================
+ 
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //-------------------------Medical Condition/Diagnosis--------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ 
+ $(document).ready(function(){
+   //Medical Diagnosis Table
+   $("#medTableLengthConfirm").click(function(){
+     var x = $("#medTableLength").val()
+     var y = $("#medTable tr").length - 1;
+     if(y < x){
+       var z = x-y;
+       for(var i = 0; i< z; i++){
+       var h = $("#medTable tr").length;
+       $('#medTable tr:last').after("<tr><td>" + h + "</td>"+
+         "<td><textarea id='medTable" + h + "' style='width: 99%;' rows=2 name='Medical Condition/Diagnosis'> Medical Condition/Diagnosis " + h +"</textarea></td></tr>" );}
+     }
+     else if(y == x){}
+     else{
+       var z = y-x;
+       for(var i=0; i < z; i++){
+         $("#medTable tr:last").remove();
+       }
+     }
+   });
+   //Allergies Table
+   $("#allergiesTableLengthConfirm").click(function(){
+     var x = $("#allergiesTableLength").val()
+     var y = $("#allergiesTable tr").length - 1;
+     if(y < x){
+       var z = x-y;
+       for(var i = 0; i< z; i++){
+       var h = $("#allergiesTable tr").length;
+       $('#allergiesTable tr:last').after("<tr><td>" + h + "</td>"+
+                                           "<td><textarea id='allergiesTable" + h + "' style='width: 99%;' rows=2 name='Allergies' placeholde='Allergy " + h +"'></textarea></td></tr>" );}
+     }
+     else if(y == x){}
+     else{
+       var z = y-x;
+       for(var i=0; i < z; i++){
+         $("#allergiesTable tr:last").remove();
+       }
+     }
+   });
+   //Current Medications Table
+   $("#curMedTableLengthConfirm").click(function(){
+     var x = $("#curMedTableLength").val()
+     var y = $("#medicationsTable tr").length - 1;
+     if(y < x){
+       var z = x-y;
+       for(var i = 0; i< z; i++){
+       var h = $("#medicationsTable tr").length;
+       $('#medicationsTable tr:last').after("<tr><td>" + h + "</td>"+
+                                          "<td><textarea id='curMedTable" + h + "Col1' style='width: 99%;' rows=2 name='Medications' placeholder='Current Medication " + h +"'></textarea></td>" +
+                                          "<td><textarea id='curMedTable" + h + "Col2' style='width: 99%;' rows=2 name='Medications Dosage' placeholder='Example Dosage " + h +"></textarea></td>"+
+                                          "<td><textarea id='curMedTable" + h + "Col3' style='width: 99%;' rows=2 name='Medications Frequency' placeholder='Example Frequency " + h +"'></textarea></td>"+
+                                          "</tr>" );}
+     }
+     else if(y == x){}
+     else{
+       var z = y-x;
+       for(var i=0; i < z; i++){
+         $("#medicationsTable tr:last").remove();
+       }
+     }
+   });
+   //Current Supplements Table
+   $("#curVitTableLengthConfirm").click(function(){
+     var x = $("#curVitTableLength").val()
+     var y = $("#vitaminsTable tr").length - 1;
+     if(y < x){
+       var z = x-y;
+       for(var i = 0; i< z; i++){
+       var h = $("#vitaminsTable tr").length;
+       $('#vitaminsTable tr:last').after("<tr><td>" + h + "</td>"+
+                                          "<td><textarea id='curVitTable" + h + "Col1' style='width: 99%;' rows=2 name='Vitamins' placeholder='Current Vitamin/Mineral/Supplement " + h +"'></textarea></td>" +
+                                          "<td><textarea id='curVitTable" + h + "Col2' style='width: 99%;' rows=2 name='Vitamins Dosage' placeholder='Example Dosage " + h +"'></textarea></td>"+
+                                          "<td><textarea id='curVitTable" + h + "Col3' style='width: 99%;' rows=2 name='Vitamins Frequency' placeholder='Example Frequency " + h +"'></textarea></td>"+
+                                          "</tr>" );}
+     }
+     else if(y == x){}
+     else{
+       var z = y-x;
+       for(var i=0; i < z; i++){
+         $("#vitaminsTable tr:last").remove();
+       }
+     }
+   });
+ 
+   $("#medTableAdd").click(function(){
+     var i = $('#medTable tr').length;
+     $('#medTable tr:last').after("<tr><td>" + i + "</td>"+
+                                           "<td><textarea id='medTable" + i + "' style='width: 99%;' rows=2 name='Medical Condition/Diagnosis' placeholder='Medical Condition/Diagnosis " + i +"'></textarea></td></tr>" );
+   });
+   
+   $("#medTableMinus").click(function() {
+     if($('#medTable tr').length > 2){
+       $("#medTable tr:last").remove();
+     }
+    });
+   
+ });
+ 
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //-------------------------------Current Medication-----------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+ $(document).ready(function(){
+   $("#curMedTableAdd").click(function(){
+     var i = $('#medicationsTable tr').length;
+     $('#medicationsTable tr:last').after("<tr><td>" + i + "</td>"+
+                                          "<td><textarea id='curMedTable" + i + "Col1' style='width: 99%;' rows=2 name='Medications'> Current Medication " + i +"</textarea></td>" +
+                                          "<td><textarea id='curMedTable" + i + "Col2' style='width: 99%;' rows=2 name='Medications Dosage'> Example Dosage " + i +"</textarea></td>"+
+                                          "<td><textarea id='curMedTable" + i + "Col3' style='width: 99%;' rows=2 name='Medications Frequency'> Example Frequency " + i +"</textarea></td>"+
+                                          "</tr>" );
+     });
+   });
+
+ $(document).ready(function(){
+   $("#curMedTableMinus").click(function() {
+     if($('#medicationsTable tr').length > 1){
+       $("#medicationsTable tr:last").remove();
+     }
+    });
+  });
+  
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //-------------------------------Current Vitamins-----------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+ $(document).ready(function(){
+   $("#curVitTableAdd").click(function(){
+     var i = $('#vitaminsTable tr').length;
+     $('#vitaminsTable tr:last').after("<tr><td>" + i + "</td>"+
+                                          "<td><textarea id='curVitTable" + i + "Col1' style='width: 99%;' rows=2 name='Vitamins'> Current Vitamin/Mineral/Supplement " + i +"</textarea></td>" +
+                                          "<td><textarea id='curVitTable" + i + "Col2' style='width: 99%;' rows=2 name='Vitamins Dosage'> Example Dosage " + i +"</textarea></td>"+
+                                          "<td><textarea id='curVitTable" + i + "Col3' style='width: 99%;' rows=2 name='Vitamins Frequency'> Example Frequency " + i +"</textarea></td>"+
+                                          "</tr>" );
+     });
+   });
+
+ $(document).ready(function(){
+   $("#curVitTableMinus").click(function() {
+     if($('#vitaminsTable tr').length > 1){
+       $("#vitaminsTable tr:last").remove();
+     }
+    });
+  });
+  
+  
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //-----------------------------------Allergies----------------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ 
+ $(document).ready(function(){
+   $("#allergiesTableAdd").click(function(){
+     var i = $('#allergiesTable tr').length;
+     $('#allergiesTable tr:last').after("<tr><td>" + i + "</td>"+
+                                           "<td><textarea id='allergiesTable" + i + "' style='width: 99%;' rows=2 name='Allergies'> Allergy " + i +"</textarea></td></tr>" );
+   });
+ });
+ 
+ $(document).ready(function(){
+   $("#allergiesTableMinus").click(function() {
+     if($('#allergiesTable tr').length > 1){
+       $("#allergiesTable tr:last").remove();
+     }
+    });
+  });
+  
+ //=================================================================================================================================================================
+ //-------------------------------------------------Current and Past Services Page----------------------------------------------------------------------------------
+ //=================================================================================================================================================================
+  
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //----------------------------------EITrue -------------------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     
+     
+  $(document).ready(function(){
+    $("#EIYes").click(function(){
+      if($('#EIYes').is(':checked')){ 
+        $("#EITrue").show()
+        $("#EITrue2").show();        
+      }
+    });
+    $("#EINo").click(function(){
+      if($('#EINo').is(':checked')){ 
+        $("#EITrue").hide();
+        $("#EITrue2").hide();
+        while($("#IFSPTable tr").length != 1){
+          $("#IFSPTable tr:last").remove();
+          }
+        }
+    });
+  });
+  
+
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //---------------------------------EITrue1 Table--------------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     
+ $(document).ready(function(){
+   $("#IFSPTableAdd").click(function(){
+     var i = $('#IFSPTable tr').length;
+     $('#IFSPTable tr:last').after(     
+                                   "<tr>"+
+                                   "<td><textarea id='IFSPTable"+i+"Col1'  style='width: 99%;' rows=2 placeholder='EI Service/Method' name='PastEIService'></textarea></td>" +
+                                   "<td><textarea id='IFSPTable"+i+"Col2'  style='width: 99%;' rows=2 placeholder='Provider' name='PastEIProvider'         ></textarea></td>" +
+                                   "<td><textarea id='IFSPTable"+i+"Col3'  style='width: 99%;' rows=2 placeholder='Location' name='PastEILocation'         ></textarea></td>" +
+                                   "<td><textarea id='IFSPTable"+i+"Col4'  style='width: 99%;' rows=2 placeholder='Frequency/Length' name='PastEIFrequency' ></textarea></td>" +
+                                   "<td><textarea id='IFSPTable"+i+"Col5'  style='width: 99%;' rows=2 placeholder='Intensity' name='PastEIIntesity'        ></textarea></td>" +
+                                   "<td><textarea id='IFSPTable"+i+"Col6'  style='width: 99%;' rows=2 placeholder='Duration' name='PastEIDuration'         ></textarea></td>" +
+                                   "<td><textarea id='IFSPTable"+i+"Col7'  style='width: 99%;' rows=2 placeholder='Start Date' name='PastEIStart'       ></textarea></td>" +
+                                   "<td><textarea id='IFSPTable"+i+"Col8'  style='width: 99%;' rows=2 placeholder='End Date' name='PastEIEnd'         ></textarea></td>"+
+                                   "</tr>"
+                                    );
+   });
+ });
+ 
+ $(document).ready(function(){
+   $("#IFSPTableMinus").click(function() {
+     if($('#IFSPTable tr').length > 1){
+       $("#IFSPTable tr:last").remove();
+     }
+    });
+  });
+  
+  
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //----------------------------------OSEITrue -------------------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     
+     
+  $(document).ready(function(){
+    $("#OSEIYes").click(function(){
+      if($('#OSEIYes').is(':checked')){ 
+        $("#OSEITrue").show();        
+      }
+    });
+    $("#OSEINo").click(function(){
+      if($('#OSEINo').is(':checked')){ 
+        $("#OSEITrue").hide();
+        while($("#OSEITable tr").length != 1){
+          $("#OSEITable tr:last").remove();
+          }
+        }
+    });
+  });
+  
+  
+  
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //---------------------------------OSEITrue Table--------------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     
+ $(document).ready(function(){
+   $("#OSEITableAdd").click(function(){
+     var i = $('#OSEITable tr').length;
+     $('#OSEITable tr:last').after(     
+                                   "<tr>"+
+                                   "<td><textarea id='OSEITable"+i+"Col1'  style='width: 99%;' rows=2 placeholder='Treatment Service' name='OSEI Service' ></textarea></td>" +
+                                   "<td><textarea id='OSEITable"+i+"Col2'  style='width: 99%;' rows=2 placeholder='SessionDuration' name='OSEI Duration'  ></textarea></td>" +
+                                   "<td><textarea id='OSEITable"+i+"Col3'  style='width: 99%;' rows=2 placeholder='Frequency' name='OSEI Frequency'       ></textarea></td>" +
+                                   "<td><textarea id='OSEITable"+i+"Col4'  style='width: 99%;' rows=2 placeholder='Location' name='OSEI Location'         ></textarea></td>" +
+                                   "<td><textarea id='OSEITable"+i+"Col5'  style='width: 99%;' rows=2 placeholder='Start Date' name='OSEI Start Date'     ></textarea></td>" +
+                                   "<td><textarea id='OSEITable"+i+"Col6'  style='width: 99%;' rows=2 placeholder='End Date' name='OSEI End Date'         ></textarea></td>"+
+                                   "</tr>"
+                                    );
+   });
+ });
+ 
+ $(document).ready(function(){
+   $("#OSEITableMinus").click(function() {
+     if($('#OSEITable tr').length > 1){
+       $("#OSEITable tr:last").remove();
+     }
+    });
+  });
+  
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //----------------------------------CEITrue -------------------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     
+     
+  $(document).ready(function(){
+    $("#CEIYes").click(function(){
+      if($('#CEIYes').is(':checked')){ 
+        $("#CEITrue").show()
+        $("#CEITrue2").show();        
+      }
+    });
+    $("#CEINo").click(function(){
+      if($('#CEINo').is(':checked')){ 
+        $("#CEITrue").hide();
+        $("#CEITrue2").hide();
+        while($("#CEITable tr").length != 1){
+          $("#CEITable tr:last").remove();
+          }
+        }
+    });
+  });
+  
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //---------------------------------OSEITrue Table--------------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     
+ $(document).ready(function(){
+   $("#CEITableAdd").click(function(){
+     var i = $('#CEITable tr').length;
+     $('#CEITable tr:last').after(     
+                                   "<tr>"+
+                                   "<td><textarea id='CEITable"+i+"Col1'  style='width: 99%;' rows=2 placeholder='EI Service/Method'name='CEI Service' ></textarea></td>" +
+                                   "<td><textarea id='CEITable"+i+"Col2'  style='width: 99%;' rows=2 placeholder='Provider'         name='CEI Provider' ></textarea></td>" +
+                                   "<td><textarea id='CEITable"+i+"Col3'  style='width: 99%;' rows=2 placeholder='Location'         name='CEI Location' ></textarea></td>" +
+                                   "<td><textarea id='CEITable"+i+"Col4'  style='width: 99%;' rows=2 placeholder='Frequency/Length' name='CEI Frequency'></textarea></td>" +
+                                   "<td><textarea id='CEITable"+i+"Col5'  style='width: 99%;' rows=2 placeholder='Intensity'        name='CEI Intensity' ></textarea></td>" +
+                                   "<td><textarea id='CEITable"+i+"Col6'  style='width: 99%;' rows=2 placeholder='Duration'         name='CEI Duration' ></textarea></td>" +
+                                   "<td><textarea id='CEITable"+i+"Col7'  style='width: 99%;' rows=2 placeholder='Start Date'       name='CEI Start' ></textarea></td>" +
+                                   "<td><textarea id='CEITable"+i+"Col8'  style='width: 99%;' rows=2 placeholder='End Date'         name='CEI End' ></textarea></td>"+
+                                   "</tr>"
+                                    );
+   });
+ });
+ 
+ $(document).ready(function(){
+   $("#CEITableMinus").click(function() {
+     if($('#CEITable tr').length > 1){
+       $("#CEITable tr:last").remove();
+     }
+    });
+  });
+  
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     //--------------------------------- School -------------------------------------
+     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+     
+     
+  $(document).ready(function(){
+    $("#schoolYes").click(function(){
+      if($('#schoolYes').is(':checked')){ 
+          $("#schoolTrue").show();
+      }
+    });
+    $("#schoolNo").click(function(){
+      if($('#schoolNo').is(':checked')){ 
+        $("#schoolTrue").hide();
+        $("#isIEPTrue").hide();
+        $("#is504True").hide();
+        $("#isEvalTrue").hide();
+        }
+    });
+  });
+  
+  //For event handling dynamically added elements : https://stackoverflow.com/questions/12055462/handle-click-event-for-appended-elements-in-jquery
+  $(document).on('click', '#notIEP504', function(){ 
+    if($('#notIEP504').is(':checked')){ 
+        $("#isIEPTrue").hide();
+        $("#is504True").hide();    
+        $("#isEvalTrue").hide();    
+     }
+}); 
+
+  $(document).on('click', '#is504', function(){ 
+    if($('#is504').is(':checked')){ 
+        $("#is504True").show();
+        $("#isIEPTrue").hide();
+        $("#isEvalTrue").hide();        
+     }
+}); 
+
+$(document).on('click', '#isIEP', function(){ 
+    if($('#isIEP').is(':checked')){ 
+        $("#isIEPTrue").show()
+        $("#is504True").hide();
+        $("#isEvalTrue").hide();        
+     }
+}); 
+
+$(document).on('click', '#isEval', function(){ 
+    if($('#isEval').is(':checked')){ 
+        $("#isEvalTrue").show();
+        $("#is504True").hide();
+        $("#isIEPTrue").hide();
+     }
+}); 
+
+
+
+function fileReportUpload(x, container,image){
+  readReportURL(x, image);
+  
+  var txt = "";
+  if ('files' in x) {
+    if (x.files.length == 0) {
+      txt = "Select one or more files.";
+    } else {
+      for (var i = 0; i < x.files.length; i++) {
+        txt += "<br><strong>" + (i+1) + ". file</strong><br>";
+        var file = x.files[i];
+        if ('name' in file) {
+          txt += "name: " + file.name + "<br>";
+        }
+        if ('size' in file) {
+          txt += "size: " + file.size + " bytes <br>";
+        }
+      }
+    }
+  } 
+  else {
+    if (x.value == "") {
+      txt += "Select one or more files.";
+    } else {
+      txt += "The files property is not supported by your browser!";
+      txt  += "<br>The path of the selected file: " + x.value; // If the browser does not support the files property, it will return the path of the selected file instead. 
+    }
+  }
+  document.getElementById(container).innerHTML = txt;
+}
+  
+function readReportURL(input, container) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    
+    reader.onload = function(e) {
+      $('#'+container).attr('src', e.target.result);
+    }
+    
+    reader.readAsDataURL(input.files[0]); // convert to base64 string
+  }
+}
+
+</script>

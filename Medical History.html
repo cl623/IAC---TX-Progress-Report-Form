@@ -1,0 +1,218 @@
+<div style="border-bottom: 1px solid #666;">
+  <h2>Medical & Mental History</h2>
+</div>
+
+<div class=col> <!-- Medical & Mental History Container Start-->
+<div class=section50 style="padding: 20px;"><!-- Left Column of Tables Start-->
+<div style="margin: 30px 10;border: 1px solid #666" >
+  <div class="head" id=medCond>
+    <div style="float: left;"><p> Medical Condition/ Diagnosis  <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(medCond)'></i></p></div>
+    <div style="float: right; padding: 3px;">
+    <input type=number id=medTableLength min=0 value=1 hidden>
+    <input type=checkbox id=medTableLengthConfirm value=true hidden>
+   
+    <a style="width: 30px;  padding: 10px; border: solid 1px #666; background-color: White;" title="Add a row to the table" id="medTableAdd"> + </a>
+    <a style="width: 30px;  padding: 10px; border: solid 1px #666; background-color: White;" title="Remove a row from the table" id="medTableMinus"> -- </a>
+   
+    </div>
+  </div>
+  <div class='med'>
+    <table id= 'medTable'>
+      <tr>
+        <th></th>
+        <th style="text-align: center; width: 96%;">Medical Condition/Diagnosis</th>
+      </tr>
+      <tr>
+        <td> 1 </td>
+        <td> <textarea id='medTable1' style="width: 99%;" rows=2 name="Medical Condition/Diagnosis"> F84.0 Autism Spectrum Disorder </textarea> </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<br><br>
+
+<div style="margin: 30px 10; border: 1px solid #666" >
+  <div class="head" id=medAllergies>
+    <div style="float: left;"><p> Current Allergies  <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(medAllergies)'></i></p></div>
+    <div style="float:right; padding: 3px;">
+    <input type=number id=allergiesTableLength min=0 value=1 hidden>
+    <input type=checkbox id=allergiesTableLengthConfirm value=true hidden>
+    
+    <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Add a row to the table" id="allergiesTableAdd"> + </a>
+    <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Remove a row from the table" id="allergiesTableMinus"> -- </a>
+    
+    </div>
+  </div>
+  <div class='med'>
+    <table id= 'allergiesTable'>
+      <tr>
+        <th></th>
+        <th style="text-align: center; width: 96%;">Allergies</th>
+      </tr>
+      <tr>
+        <td> 1 </td>
+        <td> <textarea id='allergiesTable1' style="width: 99%;" rows=2 placeholder="Allergy 1" name="Allergies"></textarea> </td>
+      </tr>
+    </table>
+  </div>
+</div><!-- Left Column of Tables End-->
+
+</div><!-- Right Column of Tables Start-->
+<div class=section50 style="padding: 20px;">
+<div style="margin: 30px 10;border: 1px solid #666" >
+  <div class="head" id=medMedications>
+    <div style="float: left;"><p> Current Medications  <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(medMedications)'></i></p></div>
+    <div style="float: right; padding: 3px;">
+    <input type=number id=curMedTableLength min=0 value=1 hidden>
+    <input type=checkbox id=curMedTableLengthConfirm value=true hidden>
+    
+    <a style="width: 30px;  padding: 10px; border: solid 1px #666; background-color: White;" title="Add a row to the table" id="curMedTableAdd"> + </a>
+    <a style="width: 30px;  padding: 10px; border: solid 1px #666; background-color: White;" title="Remove a row from the table" id="curMedTableMinus"> -- </a>
+    
+    </div>
+  </div>
+  <div class='med'>
+    <table id= 'medicationsTable'>
+      <tr>
+        <th></th>
+        <th style="text-align: center; width: 50%;">Medication</th>
+        <th style="text-align: center; width: 23%;">Dosage</th>
+        <th style="text-align: center; width: 23%;">Frequency</th>
+      </tr>
+      <tr>
+        <td> 1 </td>
+        <td> <textarea id='curMedTable1Col1'  style="width: 99%;" rows=2 placeholder="Current Medication 1" name="Medications"></textarea> </td>
+        <td> <textarea id='curMedTable1Col2'  style="width: 99%;" rows=2 placeholder="Example Dosage 1" name="Medications Dosage"></textarea> </td>
+        <td> <textarea id='curMedTable1Col3'  style="width: 99%;" rows=2 placeholder="Example Frequency 1" name="Medications Frequency"></textarea> </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+
+<br><br>
+
+<div style=" margin: 30px 10;border: 1px solid #666" >
+  <div class="head" id=medVitamins>
+    <div style="float: left;"><p> Current Vitamins, Minerals, & Supplements  <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(medVitamins)'></i></p></div>
+    <div style="float: right; padding: 3px;">
+    <input type=number id=curVitTableLength min=0 value=1 hidden>
+    <input type=checkbox id=curVitTableLengthConfirm value=true hidden>
+    
+    <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Add a row to the table" id="curVitTableAdd"> + </a>
+    <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Remove a row from the table" id="curVitTableMinus"> -- </a>
+    
+    </div>
+  </div>
+  <div class='med'>
+    <table id= 'vitaminsTable'>
+      <tr>
+        <th></th>
+        <th style="text-align: center; width: 50%;">Vitamin/Mineral/Supplement</th>
+        <th style="text-align: center; width: 23%;">Dosage</th>
+        <th style="text-align: center; width: 23%;">Frequency</th>
+      </tr>
+      <tr>
+        <td> 1 </td>
+        <td> <textarea id='curVitTable1Col1'  style="width: 99%;" rows=2 placeholder="Current Vitamin/Mineral/Supplement 1" name="Vitamins"></textarea> </td>
+        <td> <textarea id='curVitTable1Col2'  style="width: 99%;" rows=2 placeholder="Example Dosage 1" name="Vitamins Dosage"></textarea> </td>
+        <td> <textarea id='curVitTable1Col3'  style="width: 99%;" rows=2 placeholder="Example Frequency 1" name="Vitamins Frequency"></textarea> </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- Right Column of Tables End-->
+</div> <!-- Medical & Mental History Container Start-->
+
+
+<!--
+<div style="border-bottom: 1px solid #666;">
+  <h2>Axes</h2>
+</div>
+
+<p> According to <span id="ClientName2"> &ltClientName&gt</span>’s parent(s)/guardians(s), <br><br>
+The Client’s current clinical diagnoses only include an Autism Spectrum Disorder (ASD).</p>
+
+
+
+<!----------------------------------------------------- Axis I -----------------------------------------------------------------------
+
+<input type="radio" id="AxisITrue" name="AxisITrueFalse" value="True"> <label for="AxisITrue"> True </label>
+<input type="radio" id="AxisIFalse" name="AxisITrueFalse" value="False"> <label for="AxisIFalse"> False </label>
+
+<div class=col>
+<div class="section33" style="margin-top:20px; margin-left:1px; margin-right:1px;border: 1px solid #666" id="AxisITableContent">
+  <div class="head">
+    <div style="float: left;"><p> Axis I </p></div>
+    <div style="float: right; padding: 3px;">
+    <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Add a row to the table" id="AxisITableAdd"> + </a>
+    <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Remove a row from the table" id="AxisITableMinus"> -- </a>
+    </div>
+  </div>
+  <div class='med'>
+    <table id= 'AxisITable'>
+      <tr>
+        <th></th>
+        <th style="text-align: center; width: 96%;">Clinical Diagnosis</th>
+      </tr>
+      <tr>
+        <td> 1 </td>
+        <td> <textarea id='AxisITable1' style="width: 99%;" rows=2 placeholder="Clinical Diagnosis 1"></textarea> </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+
+<!----------------------------------------------------- Axis II ---------------------------------------------------------------------
+
+<div class="section33" style="margin-top:20px; margin-left:1px; margin-right:1px;border: 1px solid #666" id="AxisIITableContent">
+  <div class="head">
+    <div style="float: left;"><p> Axis II </p></div>
+    <div style="float: right; padding: 3px;">
+    <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Add a row to the table" id="AxisIITableAdd"> + </a>
+    <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Remove a row from the table" id="AxisIITableMinus"> -- </a>
+    </div>
+  </div>
+  <div class='med'>
+    <table id= 'AxisIITable'>
+      <tr>
+        <th></th>
+        <th style="text-align: center; width: 96%;">Clinical Diagnosis</th>
+      </tr>
+      <tr>
+        <td> 1 </td>
+        <td> <textarea id='AxisIITable1' style="width: 99%;" rows=2 placeholder="Clinical Diagnosis 1"></textarea> </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!----------------------------------------------------- Axis III --------------------------------------------------------------------
+
+<div class="section33" style="margin-top:20px; margin-left:1px; margin-right:1px;border: 1px solid #666" id="AxisIIITableContent">
+  <div class="head">
+    <div style="float: left;"><p> Axis III </p></div>
+    <div style="float: right; padding: 3px;">
+    <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Add a row to the table" id="AxisIIITableAdd"> + </a>
+    <a style="width: 30px; padding: 10px; border: solid 1px #666; background-color: White;" title="Remove a row from the table" id="AxisIIITableMinus"> -- </a>
+    </div>
+  </div>
+  <div class='med'>
+    <table id= 'AxisIIITable'>
+      <tr>
+        <th></th>
+        <th style="text-align: center; width: 96%;">Medical Conditions</th>
+      </tr>
+      <tr>
+        <td> 1 </td>
+        <td> <textarea id='AxisIIITable1' style="width: 99%;" rows=2 placeholder="Medical Condition 1"></textarea> </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+</div>
+-->

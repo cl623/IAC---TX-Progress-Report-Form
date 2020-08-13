@@ -1,0 +1,78 @@
+<style>
+
+ .med table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+     .med td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+      
+     .med tr:nth-child(even) {
+        background-color:#f0f0f0;
+      }      
+      .med td: nth-child(odd){
+        width: 10%;
+      }
+      
+      .med p{
+        width: 100%; 
+        height: 60px;
+      }
+     
+      
+    .default {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+    .default td, th {
+        border-bottom: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+        height: 50px;
+      }
+      
+      
+    .shortTable {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+    .shortTable td, th {
+        border-bottom: 1px solid #dddddd;
+        text-align: left;
+      }
+    
+    /*
+      .shortTable tr:nth-child(even) {
+        background-color:#f0f0f0;
+      }   */   
+      
+      .loader {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+      }
+      
+      /* Safari */
+      @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+</style>
