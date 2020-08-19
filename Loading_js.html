@@ -1,36 +1,50 @@
 <script>
 
-  
-function getLastReport(data){
 
-  if(data[5] != ''){
-    google.script.run.withSuccessHandler(listParse).beaconParse(data[5])
-  }
-  
-  console.log(data)
+function getLastReport(data){
   
   var answers = JSON.parse(data[4]);
   var myForm = document.getElementById("myForm").elements;
   
   var type = []
+  if(answers.hasOwnProperty('IEPTableFile')){
+    var id = answers['IEPTableFile']
+    IEPFile.set(id)
+    document.getElementById('IEPimg').src = 'https://drive.google.com/file/d/' + id + '/preview'
+  }
+  if(answers.hasOwnProperty('vinelandScoreTableFile')){
+    var id = answers['vinelandScoreTableFile']
+    VinelandFile.set(id)
+    document.getElementById('vinelandImg').src = 'https://drive.google.com/file/d/' + id + '/preview'
+  }
+  if(answers.hasOwnProperty('ParseReportFile')){
+    ParseFile.set(answers['ParseReportFile'])
+  }
   
   for(var i = 0; i < myForm.length; i++){
     let element = myForm[i]
-    let answer = answers[element.name]
+    answers[element.name]
   
     if(element.type == "checkbox" || element.type == "radio"){
-      if(Array.isArray(answer)){
-        for(x of answer)
+      if(Array.isArray(answers[element.name])){
+        for(x of answers[element.name])
           if(element.value == x)
             element.click()}
       else
-        if(element.value == answer)
+        if(element.value == answers[element.name])
           element.click()
     }
-    else if(element.type != "file")
-      element.value = answer
+    else if(element.type != "file" && element.type != 'button')
+      if(Array.isArray(answers[element.name]))
+        element.value = answers[element.name].shift()
+      else
+        element.value = answers[element.name]
     else
       {}
+  }
+    if(data[6] != undefined && data[6] != ''){
+    skillData = JSON.parse(data[6])
+    listParse(skillData)
   }
 }
 

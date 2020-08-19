@@ -1,9 +1,9 @@
 function tag(text){
   var url = ScriptApp.getService().getUrl()
   var user = Session.getActiveUser().getEmail()
-    let tag = /([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})/
-    var email = text.match(tag)
-    GmailApp.sendEmail(email[0], user, text)
+  let tag = /([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})/
+  var email = text.match(tag)
+  GmailApp.sendEmail(email[0], user, text)
 }
 
 function include(filename){
@@ -11,9 +11,10 @@ function include(filename){
 }
 
 function getScriptUrl() {
- var url = ScriptApp.getService().getUrl();
- return url;
+  var url = ScriptApp.getService().getUrl();
+  return url;
 }
+
 
 function doGet(requestInfo) {
   console.log(requestInfo);
@@ -28,17 +29,94 @@ function doGet(requestInfo) {
   return HtmlService.createTemplateFromFile("Search").evaluate();
 }
 
-//=========TEST FUNCTIONS===========
-
-function clientSearch(){
-  console.log("Searching for client...");
+////=========Database Functions===========
+//
+///*
+//* Contains info to connect to database
+//*/      
+function databaseConnect(){
+  var connection = PropertiesService.getScriptProperties().getProperties();
+  
+  return connection;
+}
+///*
+//* Creates connection to database
+//*/
+function connect(connection){
+  var connection = 'test-project-278417:us-east4:live-data-v1'
+  var url = 'jdbc:google:mysql://test-project-278417:us-east4:live-data-v1/DatabaseProject'
+  var user = 'root'
+  var password = 'ci8sgfk8LfG4jo9P'
+  var conn = Jdbc.getCloudSqlConnection(url, user, password);
+  return conn;
+  
 }
 
-function getUnreadEmails() {
-  return GmailApp.getInboxUnreadCount();
+function getInfo(clientId){
+  var dbConnect = databaseConnect();
+  var conn = connect(dbConnect);
+  var stmt = conn.createStatement(),stmt2 = conn.createStatement(),stmt3 = conn.createStatement(),stmt4 = conn.createStatement();    
+  var queryInfo = "select distinct concat(c.FirstName,' ',c.LastName) as ClientName,c.Gender,c.ClientId,c.DateOfBirth,DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(c.DateOfBirth, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(c.DateOfBirth, '00-%m-%d')) AS Age,lg1.LanguageDialect as PriLang,lg2.LanguageDialect as SecLang from client c left join person_language pl1 on pl1.ClientId=c.ClientId and pl1.Fluency='Primary' left join person_language pl2 on pl2.ClientId=c.ClientId and pl2.Fluency='Secondary' left join language lg1 on lg1.LanguageDialectId=pl1.LanguageDialectId left join language lg2 on lg2.LanguageDialectId=pl2.LanguageDialectId where c.ClientId="+clientId+";";
+  var queryContacts = "select concat(FirstName,' ',LastName) as GuardianName,Address,City,State,ZipCode,HomeNumber,MobileNumber,EmergencyContact from client_contacts where ClientId="+clientId+";";
+  var queryMedical = "select PcpName,PcpNumber from client_medical where ClientId="+clientId+";";
+  var queryInsurance = "select i.NamePolicyHolder,i.MemberId,p.InsurancePlan,a.Payer from client_insurance i left join insurance_plan p on i.InsurancePlanId=p.InsurancePlanId left join payer a on p.PayerId=a.PayerId where i.ClientId="+clientId+";";
+  var clientInfoData = stmt.executeQuery(queryInfo);
+  
+  
+  
+  var obj = {};
+  while(clientInfoData.next()){
+    obj['Name'] = clientInfoData.getString('ClientName');
+    obj['ClientId'] = clientInfoData.getInt('ClientId');
+    obj['Gender'] = clientInfoData.getString('Gender');
+    obj['DOB'] = clientInfoData.getString('DateOfBirth');
+    obj['Age'] = clientInfoData.getInt('Age');
+  
+    obj['PriLang'] = clientInfoData.getString('PriLang');
+    obj['SecLang'] = clientInfoData.getString('SecLang');
+    
+    var clientContactsData = stmt2.executeQuery(queryContacts);
+    var count = 1;
+    while(clientContactsData.next()){
+      obj['GuardianName'+count+''] = clientContactsData.getString('GuardianName');
+      obj['Address'+count+''] = clientContactsData.getString('Address');
+      obj['City'+count+''] = clientContactsData.getString('City');
+      obj['State'+count+''] = clientContactsData.getString('State');
+      obj['ZipCode'+count+''] = clientContactsData.getString('ZipCode');
+      obj['HomeNumber'+count+''] = clientContactsData.getString('HomeNumber');
+      obj['MobileNumber'+count+''] = clientContactsData.getString('MobileNumber');
+      obj['EmergencyContact'+count+''] = clientContactsData.getString('EmergencyContact');
+      count++
+    }
+    var clientMedicalData = stmt3.executeQuery(queryMedical);
+    var count = 1;
+    while(clientMedicalData.next()){
+      obj['PcpName'] = clientMedicalData.getString('PcpName');
+      obj['PcpNumber'] = clientMedicalData.getString('PcpNumber');
+    }
+    var clientInsuranceData = stmt4.executeQuery(queryInsurance);
+    var count = 1;
+    while(clientInsuranceData.next()){
+      obj['NamePolicyHolder'+count+''] = clientInsuranceData.getString('NamePolicyHolder');
+      obj['MemberId'+count+''] = clientInsuranceData.getString('MemberId');
+      obj['InsurancePlan'+count+''] = clientInsuranceData.getString('InsurancePlan');
+      obj['Payer'+count+''] = clientInsuranceData.getString('Payer');
+      count++
+    }
+  }
+  stmt.close();
+  stmt2.close();
+  stmt3.close();
+  stmt4.close();
+  conn.close();
+  var json = JSON.stringify(obj);
+  return json;
 }
-
-//==================================
+function testDB(){
+ Logger.log(getInfo('3')); 
+}
+//
+////==================================
 
 function getClientName() {
   var spreadsheetID = "1G0kpCNdmow74d0u7pGCbN7ubFE4lmMFbVMCnlWPbt0I";
@@ -119,10 +197,10 @@ function sendFormData(data){
   var spreadsheet = SpreadsheetApp.openById(sheetID).getSheets()[0];
   var nextEmpty = getEmptyRow(sheetID);
   try{
-  var range = spreadsheet.getRange(nextEmpty,1,1, data[0].length).setValues(data);
+    var range = spreadsheet.getRange(nextEmpty,1,1, data[0].length).setValues(data);
   }
   catch(e){
-   return e;
+    return e;
   }
   
   return "Saved Successfully"
@@ -133,9 +211,11 @@ function makeTemplate(data, skills){
   var file= DriveApp.getFileById('1_Bw_WeQnjnIdYI0teO2-00DKBVhwR4caqwq69SwyIn4').makeCopy(data[0][2] + " " + data[0][0] + " TX PLAN TEMPLATE")
   var body= DocumentApp.openById(file.getId()).getBody();
   
-  var o = JSON.parse(data[0][4])
   var crisisPlan = ['Assaultive Behavior','Self-Injurious Behavior', 'Fire Setting', 'Impulsive Behavior', 'Current Family Abuse Violence', 'Elopement/Bolting', 'Sexually Offending Behavior', 'Substance Abuse', 'Psychotic Symptoms', 'Coping with Significant Loss', 'Suicidality', 'Homicidality']
+  var crisisRisks = ['Present','Ideation','Plan','Means','Prior']
   var crisisDone = false;
+  
+  var o = JSON.parse(data[0][4])
   
   for(x in o){
     if(x == 'Communication Skills Domain'){
@@ -145,19 +225,19 @@ function makeTemplate(data, skills){
         var offset = body.getChildIndex(ele.getParent());
         if(o['Physical Activity Skills Domain'] != undefined){
           var PASD = 'Physical Activity Skills Domain: ' + o['Physical Activity Skills Domain']
-          body.insertListItem(offset + 1, PASD);
+          body.insertListItem(offset + 1, PASD).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
         }
         if(o['Daily Living Skills Domain'] != undefined){
           var DLSD = 'Daily Living Skills Domain: ' + o['Daily Living Skills Domain']
-          body.insertListItem(offset + 1, DLSD);
+          body.insertListItem(offset + 1, DLSD).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
         }
         if(o['Social Skills & Relationship Skills Domain'] != undefined){
           var SSRSD = 'Social Skills & Relationship Skills Domain: ' + o['Social Skills & Relationship Skills Domain']
-          body.insertListItem(offset + 1, SSRSD);
+          body.insertListItem(offset + 1, SSRSD).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
         }
         if(o[x] != undefined){
           var CDS = 'Communication Skills Domain: ' + o[x]
-          body.insertListItem(offset + 1, CDS);
+          body.insertListItem(offset + 1, CDS).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
         }
       }
     }
@@ -173,8 +253,13 @@ function makeTemplate(data, skills){
         body.replaceText("{"+x+"}", "According to "+ o['Name1'] +"’s parents, "+ o['Name1'] +" does not presently take any prescription or over the counter medications on a daily or regular basis.") 
       }else{
         var medications=[]
-        for(var i = 0; i < o['Medications'].length; i++){
-          medications.push([o['Medications'][i], o['Medications Dosage'][i], o['Medications Frequency'][i]])
+        if(Array.isArray(o[x])){
+          for(var i = 0; i < o['Medications'].length; i++){
+            medications.push([o['Medications'][i], o['Medications Dosage'][i], o['Medications Frequency'][i]])
+          }
+        }
+        else{
+          medications.push([o['Medications'], o['Medications Dosage'], o['Medications Frequency']])
         }
         var range = body.findText("{"+x+"}");
         var ele = range.getElement();
@@ -190,8 +275,13 @@ function makeTemplate(data, skills){
         body.replaceText("{"+x+"}", "According to "+ o['Name1'] +"’s parents, "+ o['Name1'] +" does not presently take any vitamins, minerals, or supplements on a daily or regular ") 
       }else{
         var vitamins=[]
-        for(var i = 0; i < o['Vitamins'].length; i++){
-          vitamins.push([o['Vitamins'][i], o['Vitamins Dosage'][i], o['Vitamins Frequency'][i]])
+        if(Array.isArray(o[x])){
+          for(var i = 0; i < o['Vitamins'].length; i++){
+            vitamins.push([o['Vitamins'][i], o['Vitamins Dosage'][i], o['Vitamins Frequency'][i]])
+          }
+        }
+        else{
+          vitamins.push([o['Vitamins'], o['Vitamins Dosage'], o['Vitamins Frequency']])
         }
         var range = body.findText("{"+x+"}");
         var ele = range.getElement();
@@ -226,6 +316,9 @@ function makeTemplate(data, skills){
         
       }
       if(o[x] == "Yes"){
+        var range = body.findText("{"+x+"}");
+        var ele = range.getElement();
+        var offset = body.getChildIndex(ele.getParent());
         var EI=[['EI Service/Method', 'Provider', 'Location of Service', 'Frequency & Length', 'Intensity of Service', 'Duration of Service', 'Start Date', 'End Date']]
         for(var i = 0; i < o['PastEIService'].length; i++){
           EI.push([o['PastEIService'][i], o['PastEIProvider'][i], o['PastEILocation'][i], o['PastEIFrequency'][i], o['PastEIIntesity'][i], o['PastEIDuration'][i], o['PastEIStart'][i], o['PastEIEnd'][i]])
@@ -247,6 +340,9 @@ function makeTemplate(data, skills){
       }
       
       if(o[x] == "No" && o['OtherServicesNotEI'] == "No"){
+        var range = body.findText("{"+x+"}");
+        var ele = range.getElement();
+        var offset = body.getChildIndex(ele.getParent());
         body.insertParagraph(offset + 1, o["Name1"]+" has not and currently does not receive any type of treatment services outside of the early intervention (EI)/school environment.")
       }
       body.replaceText("{" + o[x] + "}", '')
@@ -309,19 +405,19 @@ function makeTemplate(data, skills){
         var offset = body.getChildIndex(ele.getParent());
         if(o['Current Physical Activity Skills Domain'] != undefined){
           var PASD = 'Physical Activity Skills Domain: ' + o['Current Physical Activity Skills Domain']
-          body.insertListItem(offset + 1, PASD);
+          body.insertListItem(offset + 1, PASD).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
         }
         if(o['Current Daily Living Skills Domain'] != undefined){
           var DLSD = 'Daily Living Skills Domain: ' + o['Current Daily Living Skills Domain']
-          body.insertListItem(offset + 1, DLSD);
+          body.insertListItem(offset + 1, DLSD).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
         }
         if(o['Current Social Skills & Relationship Skills Domain'] != undefined){
           var SSRSD = 'Social Skills & Relationship Skills Domain: ' + o['Current Social Skills & Relationship Skills Domain']
-          body.insertListItem(offset + 1, SSRSD);
+          body.insertListItem(offset + 1, SSRSD).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
         }
         if(o[x] != undefined){
           var CDS = 'Communication Skills Domain: ' + o[x]
-          body.insertListItem(offset + 1, CDS);
+          body.insertListItem(offset + 1, CDS).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
         }
       }
       body.replaceText("{"+x+"}", '')
@@ -332,16 +428,72 @@ function makeTemplate(data, skills){
       var Freq = [['Maladaptive Behavior', 'Frequency Score']]
       var Intensity = [['Maladaptive Behavior', 'Intensity Score']]
       var Duration = [['Maladaptive Behavior', 'Duration Score']]
-      var Discrimmination = [['Maladaptive Behavior', 'Discrimmination Score']]
+      var Discrimmination = [['Maladaptive Behavior', 'Discrimination Score']]
       var HypothesizedFunc = [['Maladaptive Behavior', 'Hypothesized Function(s)']];
       if (ele.getParent().getParent().getType() === DocumentApp.ElementType.BODY_SECTION) {
         
         /*
         *Current problem: function does not work if property has less than one answer/is not array. Must select more than one Maladaptive Behavior.
         *
-        */
-        for(var j = o['Maladaptive Behaviors'].length-1; j > -1 ; j--){
-          let mal = o[x][j]
+        */if(Array.isArray(o['Maladaptive Behaviors'])){
+          for(var j = o['Maladaptive Behaviors'].length-1; j > -1 ; j--){
+            let mal = o[x][j]
+            Freq.push([mal, o[mal + 'FreqScore']])
+            Intensity.push([mal, o[mal + 'IntensityScore']])
+            Duration.push([mal, o[mal + 'DurationScore']])
+            Discrimmination.push([mal, o[mal + 'DiscriminationScore']])
+            HypothesizedFunc.push([mal, o[mal + 'HF']])
+            
+            var offset = body.getChildIndex(ele.getParent());
+            body.insertListItem(offset + 1, o['Maladaptive Behaviors'][j]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
+            body.insertListItem(body.getChildIndex(body.findText("{Maladaptive2}").getElement().getParent()) + 1, o['Maladaptive Behaviors'][j]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
+            body.insertParagraph(body.getChildIndex(body.findText("{Identified Antecedents & Consequences}").getElement().getParent()) + 1, '{'+ mal + 'Antecedent}')
+            
+            if(o.hasOwnProperty(mal+'Replace1')){
+              for(var k = 4; k > -1 ; k--){
+                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Replace1'][k])
+              }
+              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Functionally Equivalent Replacement Skills to be Taught:")
+            }
+            if(o.hasOwnProperty(mal+'Access')){
+              if(Array.isArray( o[mal+'Access'])){
+                for(var k = o[mal+'Access'].length-1; k > -1 ; k--){
+                  body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+                }
+              }
+              else{
+                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+              }
+              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Access To")
+            }
+            if(o.hasOwnProperty(mal+'Consequences')){
+              if(Array.isArray( o[mal+'Consequences'])){
+                for(var k = o[mal+'Consequences'].length; k > -1 ; k--){
+                  body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences'][k]);
+                }
+              }
+              else{
+                body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences']);
+              }
+              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified consequences that appear to be maintaining "+o['Name1']+"’s emission of non-compliance are as follows:")
+            }
+            if(o.hasOwnProperty(mal+'Antecedent')){
+              if(Array.isArray( o[mal+'Antecedent'])){
+                for(var k = o[mal+'Antecedent'].length-1; k > -1 ; k--){
+                  body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+                }
+              }
+              else{
+                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+              }
+              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Antecedents that have been identified as initiating "+o['Name1']+"’s emission of non-compliance are as follows:")
+              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Antecedents & Consequences: " + mal)
+            }
+            body.replaceText("{"+mal+"Antecedent}", '')
+          }
+        }
+        else{
+          let mal = o[x]
           Freq.push([mal, o[mal + 'FreqScore']])
           Intensity.push([mal, o[mal + 'IntensityScore']])
           Duration.push([mal, o[mal + 'DurationScore']])
@@ -349,33 +501,50 @@ function makeTemplate(data, skills){
           HypothesizedFunc.push([mal, o[mal + 'HF']])
           
           var offset = body.getChildIndex(ele.getParent());
-          body.insertListItem(offset + 1, o['Maladaptive Behaviors'][j]);
-          body.insertListItem(body.getChildIndex(body.findText("{Maladaptive2}").getElement().getParent()) + 1, o['Maladaptive Behaviors'][j]);
+          body.insertListItem(offset + 1, mal).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
+          body.insertListItem(body.getChildIndex(body.findText("{Maladaptive2}").getElement().getParent()) + 1, mal).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
           body.insertParagraph(body.getChildIndex(body.findText("{Identified Antecedents & Consequences}").getElement().getParent()) + 1, '{'+ mal + 'Antecedent}')
           
-          for(var k = o[mal+'Replace1'].length-1; k > -1 ; k--){
-            body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Replace1'][k])
+          if(o.hasOwnProperty(mal+'Replace1')){
+            for(var k = 4; k > -1 ; k--){
+              body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Replace1'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+            }
+            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Functionally Equivalent Replacement Skills to be Taught:")
           }
-          body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Functionally Equivalent Replacement Skills to be Taught:")
-
-          
-          for(var k = o[mal+'Access'].length-1; k > -1 ; k--){
-            body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access'][k])
+          if(o.hasOwnProperty(mal+'Access')){
+            if(Array.isArray( o[mal+'Access'])){
+              for(var k = o[mal+'Access'].length-1; k > -1 ; k--){
+                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+              }
+            }
+            else{
+              body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+            }
+            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Access To")
           }
-          body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Access To")
-
-          
-          for(var k = o[mal+'Consequences'].length; k > -1 ; k--){
-            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences'][k])
+          if(o.hasOwnProperty(mal+'Consequences')){
+            if(Array.isArray( o[mal+'Consequences'])){
+              for(var k = o[mal+'Consequences'].length; k > -1 ; k--){
+                body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences'][k])
+              }
+            }
+            else{
+              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences'])
+            }
+            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified consequences that appear to be maintaining "+o['Name1']+"’s emission of non-compliance are as follows:")
           }
-          body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified consequences that appear to be maintaining "+o['Name1']+"’s emission of non-compliance are as follows:")
-
-          for(var k = o[mal+'Antecedent'].length-1; k > -1 ; k--){
-            body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent'][k])
+          if(o.hasOwnProperty(mal+'Antecedent')){
+            if(Array.isArray( o[mal+'Antecedent'])){
+              for(var k = o[mal+'Antecedent'].length-1; k > -1 ; k--){
+                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+              }
+            }
+            else{
+              body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+            }
+            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Antecedents that have been identified as initiating "+o['Name1']+"’s emission of non-compliance are as follows:")
+            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Antecedents & Consequences: " + mal)
           }
-          body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Antecedents that have been identified as initiating "+o['Name1']+"’s emission of non-compliance are as follows:")
-          body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Antecedents & Consequences: " + mal)
-          
           body.replaceText("{"+mal+"Antecedent}", '')
         }
         body.replaceText("{Identified Antecedents & Consequences}", '')
@@ -400,58 +569,162 @@ function makeTemplate(data, skills){
       var range = body.findText("{"+x+"}");
       var ele = range.getElement();
       var offset = body.getChildIndex(ele.getParent());
-      for(var i = o[x].length; i > -1 ; i--)
-        if(o[x] != undefined){
-          body.insertListItem(offset + 1, o[x][i]);
-        }
+      if(Array.isArray(o[x])){
+        for(var i = o[x].length; i > -1 ; i--)
+          if(o[x] != undefined){
+            body.insertListItem(offset + 1, o[x][i]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
+          }
+      }
+      else{
+       body.insertListItem(offset + 1, o[x]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);; 
+      }
       body.replaceText("{"+x+"}", '')
     }
     else if(crisisPlan.indexOf(x) > -1 && !crisisDone){
+      
       for(var j = crisisPlan.length-1; j > -1; j--){
         if(crisisPlan[j] in o){
           body.insertTable(body.getChildIndex(body.findText("{Client Crisis Plan}").getElement().getParent()) + 1, [
-            ['Step #1: Warning Signs that a Crisis May be Developing (Thoughts, Images, Mood, Situation, Behavior)'],
+                           ['Step #1: Warning Signs that a Crisis May be Developing (Thoughts, Images, Mood, Situation, Behavior)'],
                            ['1. '+ o[crisisPlan[j]+' Step1_1']],
                            ['2. '+ o[crisisPlan[j]+' Step1_2']],
                            ['3. '+ o[crisisPlan[j]+' Step1_3']],
-            ['Step #2: Internal Coping Strategies/Things the Child/Client Can Do W/Out Contacting Another Person (Relaxation Techniques, Physical Activity)'],
+                           ['Step #2: Internal Coping Strategies/Things the Child/Client Can Do W/Out Contacting Another Person (Relaxation Techniques, Physical Activity)'],
                            ['1. '+ o[crisisPlan[j]+' Step2_1']],
                            ['2. '+ o[crisisPlan[j]+' Step2_2']],
                            ['3. '+ o[crisisPlan[j]+' Step2_3']],
-            ['Step #3: People & Social Settings that Provide a Distraction'],
+                           ['Step #3: People & Social Settings that Provide a Distraction'],
                            ['1. '+ o[crisisPlan[j]+' Step3_1']],
                            ['2. '+ o[crisisPlan[j]+' Step3_2']],
                            ['3. '+ o[crisisPlan[j]+' Step3_3']],
-            ['Step #4: People Whom to Contact for Help'],
+                           ['Step #4: People Whom to Contact for Help'],
                            ['1. '+ o[crisisPlan[j]+' Step4_1']],
                            ['2. '+ o[crisisPlan[j]+' Step4_2']],
                            ['3. '+ o[crisisPlan[j]+' Step4_3']],
-           ['Step #4: People Whom to Contact for Help'],
+                           ['Step #4: People Whom to Contact for Help'],
                            ['1. '+ o[crisisPlan[j]+' Step5_1']],
                            ['2. '+ o[crisisPlan[j]+' Step5_2']],
                            ['3. '+ o[crisisPlan[j]+' Step5_3']],
-           ['Step #4: People Whom to Contact for Help'],
+                           ['Step #4: People Whom to Contact for Help'],
                            ['1. '+ o[crisisPlan[j]+' Step6_1']],
                            ['2. '+ o[crisisPlan[j]+' Step6_2']],
                            ['3. '+ o[crisisPlan[j]+' Step6_3']]
                            ])
+
         }
       }   
       crisisDone = true
     }
+    else if(x == 'Hours of One-to-One Treatment'){
+      var range = body.findText("{"+x+"}");
+      var elem = range.getElement();
+      var off = body.getChildIndex(elem.getParent());
+      var table=[]
+      var BHS = ['BHS-MH', 'BHS', 'BHS-Unicare']
+      var HCPCS = ['BHS-MH', 'MBHP', 'Optum (Allways Medicaid)', 'THP-P']
+      var CPT = ['Aetna', 'BCBS', 'Cigna', 'THP-C']
+      var Hybrid = ['BHS', 'BHS-Unicare']
+            //QUERY FOR CLIENT PAYER==========================================================================================================
+      var payer= 'BHS'
+      var hours = 0, superHours = 0;
+      if(BHS.includes(payer)){
+        hours = o['Hours of One-to-One Treatment']
+        superHours = hours * 0.15
+      }
+      else{
+        hours = o['Hours of One-to-One Treatment']
+        superHours = hours * 0.2
+      }
+      if(HCPCS.includes(payer)){
+        table = [
+          ['Code Set', 'Procedure Code', 'Modifier', 'Hours', 'Units', 'Frequency', 'Provider', 'ABA Treatment Service'],
+          ['HCPCS', 'H0031', 'U2', '3', '12', 'per 6-Months', 'BCBA/LABA', 'Reassessment'],
+          ['HCPCS', 'H2019', 'U2', hours, hours * 4, 'per week', 'BT', 'One-to-One ABA Treatment Services'],
+          ['HCPCS', 'H0032', 'U2', superHours, superHours * 1, 'per week', 'BCBA/LABA', 'Direct Case Supervision'],
+          ['HCPCS', 'H2012', 'U2', '1', '1', 'per week', 'BCBA/LABA', 'Parent Training (Individual)'],
+          ['HCPCS', 'H0031', 'U2', '1', '4', 'per week', 'BCBA/LABA', 'Treatment Planning']
+        ]
+        
+        if(o['IEP Meeting Date'] != null){
+         table.push(['HCPCS', 'H0031', 'U2', '2', '8', 'per 6-months', 'BCBA/LABA', 'Attending Client’s IEP Meeting']) 
+        }
+      }
+      else if(CPT.includes(payer)){
+        table = [
+          ['Code Set', 'Procedure Code', 'Modifier', 'Hours', 'Units', 'Frequency', 'Provider', 'ABA Treatment Service'],
+          ['CPT', '97151', '', '8', '32', 'per 6-Months', 'BCBA/LABA', 'Behavior Identification Reassessment'],
+          ['CPT', '97153', '', hours, hours * 4, 'per week', 'BT', 'One-to-One Adaptive Behavioral Treatment'],
+          ['CPT', '97155', '', superHours, superHours *4, 'per week', 'BCBA/LABA', 'Adaptive Behavior Treatment with Protocol Modification'],
+          ['CPT', '97156', '', '1', '4', 'per week', 'BCBA/LABA', 'Family Adaptive Behavior Treatment Guidance'],
+          ['CPT', '97157', '', '1', '4', 'per month', 'BCBA/LABA', 'Multiple-Family Group Adaptive Behavior Treatment Guidance']
+           ]
+      }
+      else if(Hybrid.includes(payer)){
+        table = [
+          ['Code Set', 'Procedure Code', 'Modifier', 'Hours', 'Units', 'Frequency', 'Provider', 'ABA Treatment Service'],
+          ['CPT', '97151', '', '3', '12', 'per 6-Months', 'BCBA/LABA', 'Behavior Identification Reassessment'],
+          ['CPT', '97153', '', hours, hours * 4, 'per week', 'BT', 'One-to-One Adaptive Behavioral Treatment'],
+          ['CPT', '97155', '', superHours, superHours * 4, 'per week', 'BCBA/LABA', 'Adaptive Behavior Treatment with Protocol Modification'],
+          ['CPT', '97156', '', '1', '4', 'per week', 'BCBA/LABA', 'Parent Training (Individual)'],
+          ['HCPCS', '97157', '', '1', '4', 'per month', 'BCBA/LABA', 'Family Training (Group)'],
+          ['HCPCS', 'H0032', '', '1', '4', 'per week', 'BCBA/LABA', 'Treatment Planning'],
+          ['HCPCS', 'H0032', '', '1', '4', 'per 6-months', 'BCBA/LABA', 'Attending IEP Meeting']
+        ]
+      }
+      
+      body.insertTable(off+1, table)
+      body.replaceText("{"+x+"}", payer)
+    }
     else
       if(o[x] != undefined)
         body.replaceText("{"+x+"}", o[x])
+        }
+  if(o.hasOwnProperty("IEP File ID")){
+    var img = DriveApp.getFileById(o['IEP File ID']).getBlob()
+    
+    var range = body.findText("{IEP File}");
+    var ele = range.getElement();
+    var offset = body.getChildIndex(ele.getParent());
+    
+    body.insertImage(offset + 1, img)
+  }
+  body.replaceText("{IEP File}", '')
+  
+  if(o.hasOwnProperty("Vineland File ID")){
+    var img = DriveApp.getFileById(o['Vineland File ID']).getBlob()
+    
+    var range = body.findText("{Vineland File}");
+    var ele = range.getElement();
+    var offset = body.getChildIndex(ele.getParent());
+    
+    body.insertImage(offset + 1, img)
+  }
+  body.replaceText("{Vineland File}", '')
+  
+  for(var category of crisisPlan){
+    for(var risk of crisisRisks){
+      if(o.hasOwnProperty(category)){
+        if(o[category].indexOf(risk) > -1 || o[crisisPlan[j]] == risk){
+          body.replaceText(category + ' ' +  risk, "✅")
+        }
+        else{
+          body.replaceText(category + ' ' +  risk, " ")
+        }
+      }
+      else{
+        body.replaceText(category + ' ' +  risk, " ")
+      }
+    } 
   }
   
   //PARSE DATA GOES HERE
-  if(skills != ''){
+  if(skills != null){
     var range = body.findText("{Parsed Report}");
     var ele = range.getElement();
     var offset = body.getChildIndex(ele.getParent());
     
     len = skills[0].length
-
+    
     if(skills[0] !== undefined || skills[0].length != 0){
       for(var i = len-1; i > -1; i--){
         var x = skills[0][i]
@@ -466,35 +739,52 @@ function makeTemplate(data, skills){
         var graphOptions =(x.graph_options != null) ? x.graph_options[0] : ''; 
         var image =(x.images != null) ? x.images[0] : ''; 
         var image2 =(x.images != null) ? x.images[1] : ''; 
-
         
-        var table = [
-          ["Title:", title],                                                         //1
-          ["Goal Type:", goalType],                                                    //2
-          ["Goal Category:", o[title+'goal_category']],                                      //3
-          ["Goal:", goal],                                                           //4
-          ["Mastery Criteria:", masteryCriteria],                                   //5
-          ["Maintenance Mastery Criteria:", o[title+'maintenance_criteria']],                //6
-          ["Start Date:", startDate],                                               //7
-          ["Mastery Target Date:", o[title+'mastery_target']],                               //8
-          ["Initial Baseline:", o[title+'initial_baseline']],                                //9
-          ["Baseline:", baseline],                                                   //10
-          ["Objectives Mastered:", objectives_mastered],                             //11
-          ["Total Mastered Targets:", totalMasteredTargets],                       //12
-          ["Generalization Planning/Programming:", o[title+'program']],                      //13
-          ["Graph Options:", graphOptions],                                         //14
-          ['', ''],                                                                          //15
-          ["Current Progress Status:", o[title+'goal_status']],                              //16
-          ["Reason for Not Meeting Goal:", o[title+'progress_reason']],                      //16
-          ["Reason for Not Recommending for Continued Treatment:", o[title+'recommendation']]//17  
-        ]
+        var goalCategory = (o.hasOwnProperty(title+'goal_category')) ? o[title+'goal_category'] : '';
+        var maintenanceCriteria = (o.hasOwnProperty(title+'maintenance_criteria')) ? o[title+'maintenance_criteria'] : '';
+        var masteryTarget = (o.hasOwnProperty(title+'mastery_target')) ? o[title+'mastery_target'] : '';
+        var initialBaseline = (o.hasOwnProperty(title+'initial_baseline')) ? o[title+'initial_baseline'] : '';
+        var program = (o.hasOwnProperty(title+'program')) ? o[title+'program'] : '';
+        var goalStatus = (o.hasOwnProperty(title+'goal_status')) ? o[title+'goal_status'] : '';
+        var progressReason = (o.hasOwnProperty(title+'progress_reason')) ? o[title+'progress_reason'] : '';
+        var continuedTreatment = (o.hasOwnProperty(title+'continued_treatment')) ? o[title+'continued_treatment'] : '';
+        var recommendation = (o.hasOwnProperty(title+'recommendation')) ? o[title+'recommendation'] : '';
         
-        var img = DriveApp.getFileById(image).getBlob();
-        var img2 = DriveApp.getFileById(image2).getBlob()
+          var table = [
+            ["Title:", x.title[0]],                                                         //1
+            ["Goal Type:", x.goal_type],                                                    //2
+            ["Goal Category:", goalCategory],                                 //3
+            ["Goal:", goal],                                                               //4
+            ["Mastery Criteria:", masteryCriteria],                                          //5
+            ["Maintenance Mastery Criteria:", maintenanceCriteria],           //6
+            ["Start Date:", startDate],                                                     //7
+            ["Mastery Target Date:", masteryTarget],                          //8
+            ["Initial Baseline:", initialBaseline],                                //9
+            ["Baseline:", baseline],                                                   //10
+            ["Objectives Mastered:", objectives_mastered],                             //11
+            ["Total Mastered Targets:", totalMasteredTargets],                       //12
+            ["Generalization Planning/Programming:", program],                      //13
+            ["Graph Options:", graphOptions],                                         //14
+            ['', ''],                                                                          //15
+            ["Current Progress Status:", goalStatus],                              //16
+            ["Reason for Not Meeting Goal:", progressReason],                      //17
+            ["Recommended for Continued Treatment:", continuedTreatment],                      //18
+            ["Reason for Not Recommending for Continued Treatment:", recommendation]//19  
+          ]
         
         var t = body.insertTable(offset + 1, table)
-        t.getCell(14, 0).insertImage(0, img)
-        t.getCell(14, 0).insertImage(0, img2)
+        
+        if(x.hasOwnProperty('images')){
+          if(Array.isArray(x['images'])){
+            for(img of x['images']){
+              var image = DriveApp.getFileById(img).getBlob()
+              t.getCell(14, 0).appendImage(image)}
+          }
+          else{
+            var image = DriveApp.getFileById(x.images).getBlob();
+            t.getCell(14, 0).insertImage(0, image)
+          }
+        }
         body.insertParagraph(offset + 1, '\n' + skills[0][i]['title'])
       }
     }
@@ -510,43 +800,50 @@ function makeTemplate(data, skills){
         var x = skills[0][i]
         var title =(x.title != null) ? x.title[0] : ''; 
         var goalType =(x.goal_type != null) ? x.goal_type  : ''; 
-        var goal =(x.goal != null) ? x.goal[0] : ''; 
-        var masteryCriteria =(x.mastery_criteria != null) ? x.mastery_criteria[0] : ''; 
-        var startDate =(x.start_date != null) ? x.start_date[0] : ''; 
-        var baseline = (x.baseline != null) ? x.baseline[0] : ''; 
-        var objectives_mastered = (x.objectives_mastered != null) ? x.objectives_mastered[0] : ''; 
-        var totalMasteredTargets = (x.total_mastered_targets != null) ?  x.total_mastered_targets[0] : ''; 
-        var graphOptions =(x.graph_options != null) ? x.graph_options[0] : ''; 
-        var image =(x.images != null) ? x.images[0] : ''; 
-        var image2 =(x.images != null) ? x.images[1] : ''; 
+        var goalCategory = (o.hasOwnProperty(title+'goal_category')) ? o[title+'goal_category'] : '';
+        var maintenanceCriteria = (o.hasOwnProperty(title+'maintenance_criteria')) ? o[title+'maintenance_criteria'] : '';
+        var masteryTarget = (o.hasOwnProperty(title+'mastery_target')) ? o[title+'mastery_target'] : '';
+        var initialBaseline = (o.hasOwnProperty(title+'initial_baseline')) ? o[title+'initial_baseline'] : '';
+        var program = (o.hasOwnProperty(title+'program')) ? o[title+'program'] : '';
+        var goalStatus = (o.hasOwnProperty(title+'goal_status')) ? o[title+'goal_status'] : '';
+        var progressReason = (o.hasOwnProperty(title+'progress_reason')) ? o[title+'progress_reason'] : '';
+        var continuedTreatment = (o.hasOwnProperty(title+'continued_treatment')) ? o[title+'continued_treatment'] : '';
+        var recommendation = (o.hasOwnProperty(title+'recommendation')) ? o[title+'recommendation'] : '';
         
-        var table = [
-          ["Title:", title],                                                         //1
-          ["Goal Type:", goalType],                                                    //2
-          ["Goal Category:", o[title+'goal_category']],                                      //3
-          ["Goal:", goal],                                                           //4
-          ["Mastery Criteria:", masteryCriteria],                                   //5
-          ["Maintenance Mastery Criteria:", o[title+'maintenance_criteria']],                //6
-          ["Start Date:", startDate],                                               //7
-          ["Mastery Target Date:", o[title+'mastery_target']],                               //8
-          ["Initial Baseline:", o[title+'initial_baseline']],                                //9
-          ["Baseline:", baseline],                                                   //10
-          ["Objectives Mastered:", objectives_mastered],                             //11
-          ["Total Mastered Targets:", totalMasteredTargets],                       //12
-          ["Generalization Planning/Programming:", o[title+'program']],                      //13
-          ["Graph Options:", graphOptions],                                         //14
-          ['', ''],                                                                          //15
-          ["Current Progress Status:", o[title+'goal_status']],                              //16
-          ["Reason for Not Meeting Goal:", o[title+'progress_reason']],                      //16
-          ["Reason for Not Recommending for Continued Treatment:", o[title+'recommendation']]//17  
-        ]
-        
-        var img = DriveApp.getFileById(x.images[0]).getBlob();
-        var img2 = DriveApp.getFileById(x.images[1]).getBlob()
-        
+          var table = [
+            ["Title:", x.title[0]],                                                         //1
+            ["Goal Type:", x.goal_type],                                                    //2
+            ["Goal Category:", goalCategory],                                 //3
+            ["Goal:", goal],                                                               //4
+            ["Mastery Criteria:", masteryCriteria],                                          //5
+            ["Maintenance Mastery Criteria:", maintenanceCriteria],           //6
+            ["Start Date:", startDate],                                                     //7
+            ["Mastery Target Date:", masteryTarget],                          //8
+            ["Initial Baseline:", initialBaseline],                                //9
+            ["Baseline:", baseline],                                                   //10
+            ["Objectives Mastered:", objectives_mastered],                             //11
+            ["Total Mastered Targets:", totalMasteredTargets],                       //12
+            ["Generalization Planning/Programming:", program],                      //13
+            ["Graph Options:", graphOptions],                                         //14
+            ['', ''],                                                                          //15
+            ["Current Progress Status:", goalStatus],                              //16
+            ["Reason for Not Meeting Goal:", progressReason],                      //17
+            ["Recommended for Continued Treatment:", continuedTreatment],                      //18
+            ["Reason for Not Recommending for Continued Treatment:", recommendation]//19  
+          ]
         var t = body.insertTable(offset2 + 1, table)
-        t.getCell(14, 0).insertImage(0, img)
-        t.getCell(14, 0).insertImage(0, img2)
+
+        if(x.hasOwnProperty('images')){
+          if(Array.isArray(x['images'])){
+            for(img of x['images']){
+              var image = DriveApp.getFileById(img).getBlob()
+              t.getCell(14, 0).insertImage(0, image)}
+          }
+          else{
+            var image = DriveApp.getFileById(x.images).getBlob();
+            t.getCell(14, 0).insertImage(0, image)
+          }
+        }
         body.insertParagraph(offset2 + 1, '\n' + skills[1][i]['title'])
       }
     }    
@@ -567,36 +864,41 @@ function makeTemplate(data, skills){
         var objectives_mastered = (x.objectives_mastered != null) ? x.objectives_mastered[0] : ''; 
         var totalMasteredTargets = (x.total_mastered_targets != null) ?  x.total_mastered_targets[0] : ''; 
         var graphOptions =(x.graph_options != null) ? x.graph_options[0] : ''; 
-        var image =(x.images != null) ? x.images[0] : ''; 
-        var image2 =(x.images != null) ? x.images[1] : ''; 
+      
+        var goalCategory = (o.hasOwnProperty(title+'goal_category')) ? o[title+'goal_category'] : '';
+        var maintenanceCriteria = (o.hasOwnProperty(title+'maintenance_criteria')) ? o[title+'maintenance_criteria'] : '';
+        var masteryTarget = (o.hasOwnProperty(title+'mastery_target')) ? o[title+'mastery_target'] : '';
+        var initialBaseline = (o.hasOwnProperty(title+'initial_baseline')) ? o[title+'initial_baseline'] : '';
+        var program = (o.hasOwnProperty(title+'program')) ? o[title+'program'] : '';
+        
         
         var table = [
           ["Title:", title],                                                         //1
           ["Goal Type:", goalType],                                                    //2
-          ["Goal Category:", o[title+'goal_category']],                                      //3
+          ["Goal Category:", goalCategory],                                      //3
           ["Goal:", goal],                                                           //4
           ["Mastery Criteria:", masteryCriteria],                                   //5
-          ["Maintenance Mastery Criteria:", o[title+'maintenance_criteria']],                //6
-//          ["Start Date:", startDate],                                               //7
-          ["Mastery Target Date:", o[title+'mastery_target']],                               //8
-          ["Initial Baseline:", o[title+'initial_baseline']],                                //9
-//          ["Baseline:", baseline],                                                   //10
-//          ["Objectives Mastered:", objectives_mastered],                             //11
-//          ["Total Mastered Targets:", totalMasteredTargets],                       //12
-          ["Generalization Planning/Programming:", o[title+'program']]                      //13
-//          ["Graph Options:", graphOptions],                                         //14
-//          ['', ''],                                                                          //15
-//          ["Current Progress Status:", o[title+'goal_status']],                              //16
-//          ["Reason for Not Meeting Goal:", o[title+'progress_reason']],                      //16
-//          ["Reason for Not Recommending for Continued Treatment:", o[title+'recommendation']]//17  
+          ["Maintenance Mastery Criteria:", maintenanceCriteria],                //6
+          //          ["Start Date:", startDate],                                               //7
+          ["Mastery Target Date:", masteryTarget],                               //8
+          ["Initial Baseline:", initialBaseline],                                //9
+          //          ["Baseline:", baseline],                                                   //10
+          //          ["Objectives Mastered:", objectives_mastered],                             //11
+          //          ["Total Mastered Targets:", totalMasteredTargets],                       //12
+          ["Generalization Planning/Programming:", program]                      //13
+          //          ["Graph Options:", graphOptions],                                         //14
+          //          ['', ''],                                                                          //15
+          //          ["Current Progress Status:", o[title+'goal_status']],                              //16
+          //          ["Reason for Not Meeting Goal:", o[title+'progress_reason']],                      //16
+          //          ["Reason for Not Recommending for Continued Treatment:", o[title+'recommendation']]//17  
         ]
         
-//        var img = DriveApp.getFileById(x.images[0]).getBlob();
-//        var img2 = DriveApp.getFileById(x.images[1]).getBlob()
+        //        var img = DriveApp.getFileById(x.images[0]).getBlob();
+        //        var img2 = DriveApp.getFileById(x.images[1]).getBlob()
         
         var t = body.insertTable(offset3 + 1, table)
-//        t.getCell(14, 0).insertImage(0, img)
-//        t.getCell(14, 0).insertImage(0, img2)
+        //        t.getCell(14, 0).insertImage(0, img)
+        //        t.getCell(14, 0).insertImage(0, img2)
         body.insertParagraph(offset3 + 1, '\n' + skills[2][i]['title'])
       }
     }
@@ -623,14 +925,15 @@ function makeTemplate(data, skills){
           var image =(x.images != null) ? x.images[0] : ''; 
           var image2 =(x.images != null) ? x.images[1] : ''; 
           
-          var goalCategory = (o[title+'goal_category'] != null && o.hasOwnProperty(title+'goal_category')) ? o[title+'goal_category'] : '';
-          var maintenanceCriteria = (o[title+'maintenance_criteria'] != null && o.hasOwnProperty(title+'maintenance_criteria')) ? o[title+'maintenance_criteria'] : '';
-          var masteryTarget = (o[title+'mastery_target'] != null && o.hasOwnProperty(title+'mastery_target')) ? o[title+'mastery_target'] : '';
-          var program = (o[title+'program'] != null && o.hasOwnProperty(title+'program')) ? o[title+'program'] : '';
-          var goalStatus = (o[title+'goal_status'] != null && o.hasOwnProperty(title+'goal_status')) ? o[title+'goal_status'] : '';
-          var progressReason = (o[title+'progress_reason'] != null && o.hasOwnProperty(title+'progress_reason')) ? o[title+'progress_reason'] : '';
-          var continuedTreatment = (o[title+'continued_treatment'] != null && o.hasOwnProperty(title+'continued_treatment')) ? o[title+'continued_treatment'] : '';
-          var recommendation = (o[title+'recommendation'] != null && o.hasOwnProperty(title+'recommendation')) ? o[title+'recommendation'] : '';
+          var goalCategory = (o.hasOwnProperty(title+'goal_category')) ? o[title+'goal_category'] : '';
+          var maintenanceCriteria = (o.hasOwnProperty(title+'maintenance_criteria')) ? o[title+'maintenance_criteria'] : '';
+          var masteryTarget = (o.hasOwnProperty(title+'mastery_target')) ? o[title+'mastery_target'] : '';
+          var initialBaseline = (o.hasOwnProperty(title+'initial_baseline')) ? o[title+'initial_baseline'] : '';
+          var program = (o.hasOwnProperty(title+'program')) ? o[title+'program'] : '';
+          var goalStatus = (o.hasOwnProperty(title+'goal_status')) ? o[title+'goal_status'] : '';
+          var progressReason = (o.hasOwnProperty(title+'progress_reason')) ? o[title+'progress_reason'] : '';
+          var continuedTreatment = (o.hasOwnProperty(title+'continued_treatment')) ? o[title+'continued_treatment'] : '';
+          var recommendation = (o.hasOwnProperty(title+'recommendation')) ? o[title+'recommendation'] : '';
           
           var table = [
             ["Title:", x.title[0]],                                                         //1
@@ -641,7 +944,7 @@ function makeTemplate(data, skills){
             ["Maintenance Mastery Criteria:", maintenanceCriteria],           //6
             ["Start Date:", startDate],                                                     //7
             ["Mastery Target Date:", masteryTarget],                          //8
-            ["Initial Baseline:", "o[title+'initial_baseline']"],                                //9
+            ["Initial Baseline:", initialBaseline],                                //9
             ["Baseline:", baseline],                                                   //10
             ["Objectives Mastered:", objectives_mastered],                             //11
             ["Total Mastered Targets:", totalMasteredTargets],                       //12
@@ -657,14 +960,18 @@ function makeTemplate(data, skills){
           var t = body.insertTable(offset4 + 1, table)
           
           if(x.hasOwnProperty('images')){
-            var img = DriveApp.getFileById(x.images[0]).getBlob();
-            var img2 = DriveApp.getFileById(x.images[1]).getBlob()
-            
-            t.getCell(14, 0).insertImage(0, img)
-            t.getCell(14, 0).insertImage(0, img2)
+            if(Array.isArray(x['images'])){
+              for(img of x['images']){
+                var image = DriveApp.getFileById(img).getBlob()
+                t.getCell(14, 0).insertImage(0, image)}
+            }
+            else{
+              var image = DriveApp.getFileById(x.images).getBlob();
+              t.getCell(14, 0).insertImage(0, image)
+            }
           }
           
-          body.insertParagraph(offset2 + 1, '\n' + skills[1][i]['title'])
+          body.insertParagraph(offset4 + 1, '\n' + skills[1][i]['title'])
         }
       }
     }
@@ -677,30 +984,30 @@ function makeTemplate(data, skills){
 //=================================Load Data from Save State Sheet==========================================
 
 function getFunderSheetData(clientID){
-    var sheetID = '1HQnH3hY-0YuAUOM_eP6JxAVMemhZBCAVQZJ_GZMcVT8';
-    var spreadsheet = SpreadsheetApp.openById(sheetID).getSheets()[0];
-    var data = spreadsheet.getDataRange().getDisplayValues();
-    
-    for(var i=0; i < data.length; i++){
-      if (data[i][0] == clientID){
-        Logger.log(data[i]);
-        return data[i];
-      }
+  var sheetID = '1HQnH3hY-0YuAUOM_eP6JxAVMemhZBCAVQZJ_GZMcVT8';
+  var spreadsheet = SpreadsheetApp.openById(sheetID).getSheets()[0];
+  var data = spreadsheet.getDataRange().getDisplayValues();
+  
+  for(var i=0; i < data.length; i++){
+    if (data[i][0] == clientID){
+      Logger.log(data[i]);
+      return data[i];
     }
+  }
 }
 
 function test2(){
   var body= DocumentApp.openById('1_Bw_WeQnjnIdYI0teO2-00DKBVhwR4caqwq69SwyIn4').getBody();
   var element;
-    element = body.getChild(5)
-//    Logger.log(element.asParagraph().getText())
-        
-//    Logger.log(element.getType())
-    
+  element = body.getChild(5)
+  //    Logger.log(element.asParagraph().getText())
+  
+  //    Logger.log(element.getType())
+  
   var searchType = DocumentApp.ElementType.PARAGRAPH;
   var searchHeading = DocumentApp.ParagraphHeading.HEADING2;
   var searchResult = null;
-
+  
   while (searchResult = body.findElement(searchType, searchResult)) {
     var par = searchResult.getElement().asParagraph();
     if (par.getHeading() == searchHeading) {
@@ -708,43 +1015,43 @@ function test2(){
       var h = searchResult.getElement().asText().getText();
       
       if(h == 'ABA ASSESSMENT/TREATMENT PLAN TYPE:'){
-         Logger.log(h)
+        Logger.log(h)
       }
     }
   }
-
+  
   
   
 }
 
-function saveToDrive(data, file, name, email) {
+function saveToDrive(data, file, objName) {
   var email = Session.getActiveUser().getEmail();
   try {
-
+    
     var dropbox = "My Dropbox";
     var folder, folders = DriveApp.getFoldersByName(dropbox);
-
+    
     if (folders.hasNext()) {
       folder = folders.next();
     } else {
       folder = DriveApp.createFolder(dropbox);
     }
-
+    
     var contentType = data.substring(5,data.indexOf(';')),
         bytes = Utilities.base64Decode(data.substr(data.indexOf('base64,')+7)),
         blob = Utilities.newBlob(bytes, contentType, file);
-
-    var fName = folder.createFolder([email].join(" ")).createFile(blob).getName();
-
-    return fName.split('.').slice(0, -1).join('.');;
-
+    
+    var fName = folder.createFolder([email].join(" ")).createFile(blob);
+    
+    return [fName.getName().split('.').slice(0, -1).join('.'), fName.getId(), objName];
+    
   } catch (f) {
     return f.toString();
   }
 }
 
 function beaconParse(fileName) {
-
+  
   var files = DriveApp.getFilesByName(fileName)
   while (files.hasNext()) {
     var file = files.next();
@@ -757,171 +1064,174 @@ function beaconParse(fileName) {
   
   //regex for major sections of the report
   //HEADER DATA IS WRITTEN WEIRD SO REGEX IS CONVOLUTED
-  let headerData = /Report Name:\s+(?<reportname>(?:[\w]+\s+)+)(?<reportdate>[0-9\.]+)?\s?\nClient First Name:\s+(?<ClientFName>\w+(?:\s\w+)?)\s\nClient Last Name:\s+(?<ClientLName>\w+(?:-\w+)?)\s+Skill Acquisition Progress\s+Start Date:\s+ (?<startDate>\d{2}\/\d{2}\/\d{4})\s\n+Skill Acquisition Progress\s+End Date:\s+ (?<endDate>\d{2}\/\d{2}\/\d{4})\s+Skill Acquisition Progress\s+Graph Type:\s+ (?<graphType>\w+\s+\w+)\s+Skill Acquisition Progress\s+View By:\s+ (?<viewBy>\w+\s+\w+)/;
+  let headerData = /Report Name:\s+(?<reportname>[^\n]+)(?<reportdate>[0-9\.]+)?\s?\nClient First Name:\s+(?<ClientFName>\w+(?:\s\w+)?)\s\nClient Last Name:\s+(?<ClientLName>\w+(?:-\w+)?)\s+Skill Acquisition Progress\s+Start Date:\s+ (?<startDate>\d{2}\/\d{2}\/\d{4})\s\n+Skill Acquisition Progress\s+End Date:\s+ (?<endDate>\d{2}\/\d{2}\/\d{4})\s+Skill Acquisition Progress\s+Graph Type:\s+ (?<graphType>\w+\s+\w+)\s+Skill Acquisition Progress\s+View By:\s+ (?<viewBy>\w+\s+\w+)/;
   
-   var header = headerData.exec(text)
-   var imageList = []
-     for(var i = 0; i < images.length; i++){
+  var header = headerData.exec(text)
+  var imageList = []
+  var now = new Date();
+  for(var i = 0; i < images.length; i++){
     var prevSibling = images[i].getParent().getPreviousSibling();
-
+    
     while(!/^\d+\. (?:\S\s)*/.test(prevSibling.getText())){
-          prevSibling = prevSibling.getPreviousSibling();
-          }
+      prevSibling = prevSibling.getPreviousSibling();
+    }
     Logger.log(prevSibling.getText());
     
     var goalTitle = prevSibling.getText();
     var email = Session.getActiveUser().getEmail();
+    
+    var dropbox = "Parsed Report Files";
+    var folder, folders = DriveApp.getFoldersByName(dropbox);
+    
+    if (folders.hasNext()) {
+      folder = folders.next();
+    } else {
+      folder = DriveApp.createFolder(dropbox);
+    }
+    
+    var userFolder, userFolders = folder.getFoldersByName([email].join(" "));
+    if (userFolders.hasNext()) {
+      userFolder = userFolders.next();
+    } else {
+      userFolder = folder.createFolder([email].join(" "));
+    }
+    
 
-      var dropbox = "Parsed Report Files";
-      var folder, folders = DriveApp.getFoldersByName(dropbox);
-
-      if (folders.hasNext()) {
-        folder = folders.next();
-      } else {
-        folder = DriveApp.createFolder(dropbox);
-      }
-      
-      var userFolder, userFolders = folder.getFoldersByName([email].join(" "));
-      if (userFolders.hasNext()) {
-        userFolder = userFolders.next();
-      } else {
-        userFolder = folder.createFolder([email].join(" "));
-      }
-       
-       var reportFolder, reportFolders = userFolder.getFoldersByName(`${header.groups.reportname}`);
-      if (reportFolders.hasNext()) {
-        reportFolder = reportFolders.next();
-      } else {
-        reportFolder = userFolder.createFolder(`${header.groups.reportname}`);
-      }
-      var imageFile = reportFolder.createFile(images[i].getBlob().setName(goalTitle));
-      var imageID = imageFile.getId();
-      var image = {id: imageID, title: goalTitle}
-      imageList.push(image);
+    
+    var reportFolder, reportFolders = userFolder.getFoldersByName(now);
+    if (reportFolders.hasNext()) {
+      reportFolder = reportFolders.next();
+    } else {
+      reportFolder = userFolder.createFolder(now);
+    }
+    var imageFile = reportFolder.createFile(images[i].getBlob().setName(goalTitle));
+    var imageID = imageFile.getId();
+    var image = {id: imageID, title: goalTitle}
+    imageList.push(image);
   }
-   
-   let objectives = /\w+\s?\d?\:\s[^\n]*/g
-   let goals = /(?<=\nGoal\: )[^\n]*/g
-   let objective1 = /(?<=\nObjective 1\: )[^\n]*/g
-   let objective2 = /(?<=\nObjective 2\: )[^\n]*/g
-   let objective3 = /(?<=\nObjective 3\: )[^\n]*/g
-   let objective4 = /(?<=\nObjective 4\: )[^\n]*/g
-   let mastery = /(?<=\nMastery criteria\: )[^\n]*/g
-   let maintenance = /(?<=\nMaintenance mastery criteria\: )[^\n]*/g
-   let start = /(?<=\nStart Date\: )[^\n]*/g
-   let base = /(?<=\nBaseline\: )[^\n]*/g
-   let mastered = /(?<=\nObjectives mastered\: )[^\n]*/g
-   let total = /(?<=\nTotal Mastered Targets\: )[^\n]*/g
-   let options= /(?<=\nGraph Options\: )[^\n]*/g
-   let title= /\d+\. \w+[^\n]*/g
-   let parentTraining= /Parent/ig
-   let Sections = /(\nProgress Data\s*)([\s\S]*?)(?=\nProgress Data|$)/g
-   let SectionName = /(?<=\nProgress Data\s*)(\S+\s)+/gm
-     var sName, SAP, BRP, RG, SAPObj, BRPObj, RGObj, skills = [], acquisitionGoals = [], brpGoals=[],recommendedGoals=[], ptGoals=[];
-   let Tasks = /(\n\d+\.\s\w+\s*)([\s\S]*?)(?=\n+\d+\.\s*|$)/g
-      
-   var Body = text.match(Sections)
-   for(var i=0; i < Body.length; i++){
-     if(Body[i].match(SectionName)[0] == "Skill Acquisition Progress "){
-       SAP = Body[i]
-       SAPObj = SAP.match(Tasks)
-     }
-     if(Body[i].match(SectionName)[0] == "Beh Reduction Progress "){
-       BRP = Body[i]
-       BRPObj = BRP.match(Tasks)
-     }
-     if(Body[i].match(SectionName)[0] == "Recommended Goals "){
-       RG = Body[i]
-       RGObj = RG.match(Tasks)
-     }
-   }
+  
+  let objectives = /\w+\s?\d?\:\s[^\n]*/g
+  let goals = /(?<=\nGoal\: )[^\n]*/g
+  let objective1 = /(?<=\nObjective 1\: )[^\n]*/g
+  let objective2 = /(?<=\nObjective 2\: )[^\n]*/g
+  let objective3 = /(?<=\nObjective 3\: )[^\n]*/g
+  let objective4 = /(?<=\nObjective 4\: )[^\n]*/g
+  let mastery = /(?<=\nMastery criteria\: )[^\n]*/g
+  let maintenance = /(?<=\nMaintenance mastery criteria\: )[^\n]*/g
+  let start = /(?<=\nStart Date\: )[^\n]*/g
+  let base = /(?<=\nBaseline\: )[^\n]*/g
+  let mastered = /(?<=\nObjectives mastered\: )[^\n]*/g
+  let total = /(?<=\nTotal Mastered Targets\: )[^\n]*/g
+  let options= /(?<=\nGraph Options\: )[^\n]*/g
+  let title= /\d+\. \w+[^\n]*/g
+  let parentTraining= /Parent/ig
+  let Sections = /(\nProgress Data\s*)([\s\S]*?)(?=\nProgress Data|$)/g
+  let SectionName = /(?<=\nProgress Data\s*)(\S+\s)+/gm
+  var sName, SAP, BRP, RG, SAPObj, BRPObj, RGObj, skills = [], acquisitionGoals = [], brpGoals=[],recommendedGoals=[], ptGoals=[];
+  let Tasks = /(\n\d+\.\s\w+\s*)([\s\S]*?)(?=\n+\d+\.\s*|$)/g
+  
+  var Body = text.match(Sections)
+  for(var i=0; i < Body.length; i++){
+    if(Body[i].match(SectionName)[0] == "Skill Acquisition Progress "){
+      SAP = Body[i]
+      SAPObj = SAP.match(Tasks)
+    }
+    if(Body[i].match(SectionName)[0] == "Beh Reduction Progress "){
+      BRP = Body[i]
+      BRPObj = BRP.match(Tasks)
+    }
+    if(Body[i].match(SectionName)[0] == "Recommended Goals "){
+      RG = Body[i]
+      RGObj = RG.match(Tasks)
+    }
+  }
   if(!SAPObj==''){
     var objID=[]
-  for(var i=0; i< SAPObj.length; i++){
-    for(var j=0; j< imageList.length; j++){
-      if(imageList[j].title == SAPObj[i].match(title)[0])
+    for(var i=0; i< SAPObj.length; i++){
+      for(var j=0; j< imageList.length; j++){
+        if(imageList[j].title == SAPObj[i].match(title)[0])
         objID.push(imageList[j].id);
+      }
+      var objectiveObj = {
+        title: SAPObj[i].match(title),
+        goal: SAPObj[i].match(goals),
+        goal_type: 'Current Goal',
+        objective_1: SAPObj[i].match(objective1),
+        objective_2: SAPObj[i].match(objective2),
+        objective_3: SAPObj[i].match(objective3),
+        objective_4: SAPObj[i].match(objective4),
+        mastery_criteria: SAPObj[i].match(mastery),
+        maintenance_mastery: SAPObj[i].match(maintenance),
+        start_date: SAPObj[i].match(start),
+        baseline: SAPObj[i].match(base),
+        images: objID,
+        objectives_mastered: SAPObj[i].match(mastered),
+        total_mastered_targets: SAPObj[i].match(total),
+        graph_options: SAPObj[i].match(options)
+      }
+      if(objectiveObj.title[0].match(parentTraining))
+        ptGoals.push(objectiveObj);
+      else
+        acquisitionGoals.push(objectiveObj);
+      objID=[]
     }
-     var objectiveObj = {
-       title: SAPObj[i].match(title),
-       goal: SAPObj[i].match(goals),
-       goal_type: 'Current Goal',
-       objective_1: SAPObj[i].match(objective1),
-       objective_2: SAPObj[i].match(objective2),
-       objective_3: SAPObj[i].match(objective3),
-       objective_4: SAPObj[i].match(objective4),
-       mastery_criteria: SAPObj[i].match(mastery),
-       maintenance_mastery: SAPObj[i].match(maintenance),
-       start_date: SAPObj[i].match(start),
-       baseline: SAPObj[i].match(base),
-       images: objID,
-       objectives_mastered: SAPObj[i].match(mastered),
-       total_mastered_targets: SAPObj[i].match(total),
-       graph_options: SAPObj[i].match(options)
-     }
-     if(objectiveObj.title[0].match(parentTraining))
-       ptGoals.push(objectiveObj);
-    else
-     acquisitionGoals.push(objectiveObj);
-    objID=[]
-  }
   }
   skills.push(acquisitionGoals)
   if(!BRPObj ==''){
     var objID=[]
-  for(var i=0; i< BRPObj.length; i++){
-    for(var j=0; j< imageList.length; j++){
-      if(imageList[j].title == SAPObj[i].match(title)[0])
+    for(var i=0; i< BRPObj.length; i++){
+      for(var j=0; j< imageList.length; j++){
+        if(imageList[j].title == SAPObj[i].match(title)[0])
         objID.push(imageList[j].id);
+      }
+      var objectiveObj = {
+        title: BRPObj[i].match(title),
+        goal: BRPObj[i].match(goals),
+        goal_type: 'Current Goal',
+        objective_1: BRPObj[i].match(objective1),
+        objective_2: BRPObj[i].match(objective2),
+        objective_3: BRPObj[i].match(objective3),
+        objective_4: SAPObj[i].match(objective4),
+        mastery_criteria: BRPObj[i].match(mastery),
+        maintenance_mastery: BRPObj[i].match(maintenance),
+        start_date: BRPObj[i].match(start),
+        baseline: BRPObj[i].match(base),
+        images: objID,
+        objectives_mastered: BRPObj[i].match(mastered),
+        total_mastered_targets: BRPObj[i].match(total),
+        graph_options: BRPObj[i].match(options)
+      }
+      if(objectiveObj.title[0].match(parentTraining))
+        ptGoals.push(objectiveObj);
+      else
+        brpGoals.push(objectiveObj);
+      objID=[]
     }
-     var objectiveObj = {
-       title: BRPObj[i].match(title),
-       goal: BRPObj[i].match(goals),
-       goal_type: 'Current Goal',
-       objective_1: BRPObj[i].match(objective1),
-       objective_2: BRPObj[i].match(objective2),
-       objective_3: BRPObj[i].match(objective3),
-       objective_4: SAPObj[i].match(objective4),
-       mastery_criteria: BRPObj[i].match(mastery),
-       maintenance_mastery: BRPObj[i].match(maintenance),
-       start_date: BRPObj[i].match(start),
-       baseline: BRPObj[i].match(base),
-       images: objID,
-       objectives_mastered: BRPObj[i].match(mastered),
-       total_mastered_targets: BRPObj[i].match(total),
-       graph_options: BRPObj[i].match(options)
-     }
-     if(objectiveObj.title[0].match(parentTraining))
-       ptGoals.push(objectiveObj);
-    else
-     brpGoals.push(objectiveObj);
-    objID=[]
-  }
   }
   skills.push(brpGoals)
   if(!RGObj==''){
-  for(var i=0; i< RGObj.length; i++){
-     var objectiveObj = {
-       title: RGObj[i].match(title),
-       goal: RGObj[i].match(goals),
-       goal_type: 'New Goal',
-       objective_1: RGObj[i].match(objective1),
-       objective_2: RGObj[i].match(objective2),
-       objective_3: RGObj[i].match(objective3),
-       objective_4: SAPObj[i].match(objective4),
-       mastery_criteria: RGObj[i].match(mastery),
-       maintenance_mastery: RGObj[i].match(maintenance),
-       start_date: RGObj[i].match(start),
-       baseline: RGObj[i].match(base),
-       objectives_mastered: RGObj[i].match(mastered),
-       total_mastered_targets: RGObj[i].match(total),
-       graph_options: RGObj[i].match(options)
-     }
-     if(objectiveObj.title[0].match(parentTraining))
-       ptGoals.push(objectiveObj);
-    else
-     recommendedGoals.push(objectiveObj);
-  }
+    for(var i=0; i< RGObj.length; i++){
+      var objectiveObj = {
+        title: RGObj[i].match(title),
+        goal: RGObj[i].match(goals),
+        goal_type: 'New Goal',
+        objective_1: RGObj[i].match(objective1),
+        objective_2: RGObj[i].match(objective2),
+        objective_3: RGObj[i].match(objective3),
+        objective_4: SAPObj[i].match(objective4),
+        mastery_criteria: RGObj[i].match(mastery),
+        maintenance_mastery: RGObj[i].match(maintenance),
+        start_date: RGObj[i].match(start),
+        baseline: RGObj[i].match(base),
+        objectives_mastered: RGObj[i].match(mastered),
+        total_mastered_targets: RGObj[i].match(total),
+        graph_options: RGObj[i].match(options)
+      }
+      if(objectiveObj.title[0].match(parentTraining))
+        ptGoals.push(objectiveObj);
+      else
+        recommendedGoals.push(objectiveObj);
+    }
   }
   skills.push(recommendedGoals)
   skills.push(ptGoals)
@@ -932,19 +1242,19 @@ function beaconParse(fileName) {
 
 function convertDocuments(file) {
   
- return convertToGoogleDocs_(file)
-
+  return convertToGoogleDocs_(file)
+  
 }
 
 
 // By Google Docs, we mean the native Google Docs format
 function convertToGoogleDocs_(fileName) {
-
+  
   var officeFile = DriveApp.getFilesByName(fileName).next();
-
+  
   // Use the Advanced Drive API to upload the Excel file to Drive
   // convert = true will convert the file to the corresponding Google Docs format
-
+  
   var uploadFile = JSON.parse(UrlFetchApp.fetch(
     "https://www.googleapis.com/upload/drive/v2/files?uploadType=media&convert=true",
     {
@@ -957,10 +1267,10 @@ function convertToGoogleDocs_(fileName) {
       muteHttpExceptions: true
     }
   ).getContentText());
-
+  
   // Remove the file extension from the original file name
   var googleFileName = fileName.split('.').slice(0, -1).join('.');
-
+  
   // Update the name of the Google Sheet created from the Excel sheet
   DriveApp.getFileById(uploadFile.id).setName(googleFileName);
   return beaconParse(googleFileName);

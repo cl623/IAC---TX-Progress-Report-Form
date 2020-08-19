@@ -1,20 +1,121 @@
 <script>
 var reviewedCounter = 0;
-var fileName;
 var skillData;
 var categories = ["","Communication Skills Domain: Listening & Understanding", "Communication Skills Domain: Talking", "Communication Skills Domain: Reading & Writing",
          "Daily Living Skills Domain: Caring for Self", "Daily Living Skills Domain: Caring for Home", "Daily Living Skills Domain: Living in the Community", 
          "Social & Relationship Skills Domain: Relating to Others", "Social & Relationship Skills Domain: Playing & Using Leisure Time", "Social & Relationship Skills Domain: Adapting/Adaptive Learning",
          "Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills", "Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills"]
-  var file,
+  var file, IEPFile,
       reader = new FileReader();
+      
+ParseFile = function(){
+  var fileID = null;
+  var objName = 'ParseReportFile'
+  function val(){
+    return fileID
+  }
+  function change(id){
+    fileID = id
+    }
+  return{
+    set:change,
+    get:val
+  }
+}();
 
+IEPFile = function(){
+  var fileID = null;
+  var objName = 'IEPTableFile'
+  function val(){
+    return fileID
+  }
+  function change(id){
+    fileID = id
+    }
+  return{
+    set:change,
+    get:val
+  }
+}();
+
+VinelandFile = function(){
+  var fileID = null;
+  var objName = 'vinelandScoreTableFile'
+  function val(){
+    return fileID
+  }
+  function change(id){
+    fileID = id
+    }
+  return{
+    set:change,
+    get:val
+  }
+}();
+  
+document.getElementById('IEPSubmit').addEventListener('click',
+  function(e){
+    file = $('#IEPTableFile')[0].files[0];
+    file.objName = 'IEPSubmit'
+    reader.readAsDataURL(file);
+    
+  });
+  
+document.getElementById('vinelandSubmit').addEventListener('click',
+  function(e){
+    file = $('#vinelandScoreTableFile')[0].files[0];
+    file.objName = 'vinelandSubmit'
+    reader.readAsDataURL(file);
+  });
+      
+function fileUpload(x, container,image, objName){
+  readURL(x, image);
+  
+  var txt = "";
+  if ('files' in x) {
+    if (x.files.length == 0) {
+      txt = "Select one or more files.";
+    } else {
+      for (var i = 0; i < x.files.length; i++) {
+        txt += "<br><strong>" + (i+1) + ". file</strong><br>";
+        var file = x.files[i];
+        if ('name' in file) {
+          txt += "name: " + file.name + "<br>";
+        }
+        if ('size' in file) {
+          txt += "size: " + file.size + " bytes <br>";
+        }
+      }
+    }
+  } 
+  else {
+    if (x.value == "") {
+      txt += "Select one or more files.";
+    } else {
+      txt += "The files property is not supported by your browser!";
+      txt  += "<br>The path of the selected file: " + x.value; // If the browser does not support the files property, it will return the path of the selected file instead. 
+    }
+  }
+  document.getElementById(container).innerHTML = txt;
+}
+  
+function readURL(input, container) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    
+    reader.onload = function(e) {
+      $('#'+container).attr('src', e.target.result);
+    }
+    
+    reader.readAsDataURL(input.files[0]); // convert to base64 string
+  }
+}
   // Upload the file to Google Drive
   reader.onloadend = function(e) {
     google.script.run
       .withSuccessHandler(fileURL)
       .saveToDrive(
-         e.target.result, file.name
+         e.target.result, file.name, file.objName
       );
   };
   
@@ -22,14 +123,23 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
     file = $('#importReportFile')[0].files[0];
     showMessage("Uploading file..");
     reader.readAsDataURL(file);
-    google.script.run.withSuccessHandler(listParse).convertDocuments(file.name)
+    setTimeout(function(){google.script.run.withSuccessHandler(listParse).convertDocuments(file.name); }, 10000);
   }
   
   function fileURL(file){
-    fileName = file;
+    if(file[2] == 'IEPSubmit'){
+      IEPFile.set(file[1])
+    }
+    if(file[2] == 'vinelandSubmit'){
+      VinelandFile.set(file[1])
+    }
+    if(file[2] == 'ParseReportFile'){
+      ParseFile.set(file[1])
+    }
   }
   
   function listParse(skills){
+  
   
   
   skillData = skills;
@@ -161,9 +271,9 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
              "</div>"
     
     $('#testparse').append(skillHTML)
+      }
     }
-  }
-  
+      
   if($("input[name=ReportType]:checked").val() == "Client ABA Reassessment/Client ABA Treatment Progress Report Template"){
   if(!skillData[0] == ""){
   for(var i =0; i < skillData[0].length; i++){
@@ -354,8 +464,12 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
                "</div>"+
              "</div>"
     $('#testparse').append(skillHTML)
-  }}
-  
+        }
+      }
+    }
+    
+    
+      
   
   
   if(!skillData[2] == ""){
@@ -482,6 +596,7 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
   
     $('#testparse').append(skillHTML)
   }}
+
   if($("input[name=ReportType]:checked").val() == "Client ABA Reassessment/Client ABA Treatment Progress Report Template"){
   if(!skillData[1] == ""){
   for(var i =0; i < skillData[1].length; i++){
@@ -674,18 +789,20 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
     
     
     $('#BEHData').append(skillHTML)
-  }}
+      }
+    }
   }  
   
+ 
     if($("input[name=ReportType]:checked").val() == "Client ABA Reassessment/Client ABA Treatment Progress Report Template"){
   if(!skillData[3] == ""){
   for(var i =0; i < skillData[3].length; i++){
     var imageHTML = ''
     for(var j=0; j < skillData[3][i].images.length; j++){
        imageHTML += "<img src='https://drive.google.com/uc?export=download&id="+skillData[3][i].images[j]+"'>"
-    }
-    
+           }
     let skillHTML = ''
+    
     if(skillData[3][i].title != null){
     let skillTitle =   "<div class=basic>"+
                          "<div class=head>"+
@@ -719,7 +836,7 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
         "</td>"+
       "</tr>"
       skillHTML += skillCategory
-          if(skillData[3][i].goal == null || skillData[3][i].goal == undefined || skillData[3][i].goal == ''){
+    if(skillData[3][i].goal == null || skillData[3][i].goal == undefined || skillData[3][i].goal == ''){
       let skillGoal = "<tr><td class=missingInfo>Goal:</td><td class=missingInfo></td></tr>"
       skillHTML+=skillGoal;
     }
@@ -730,6 +847,7 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
         "</tr>"
         skillHTML += skillGoal
       }
+    
     if(!skillData[3][i].objective_1 == null || !skillData[3][i].objective_1 == undefined || !skillData[3][i].objective_1 == ''){ 
       let skillObjective_1 = "<tr>"+
         "<td> Objective 1: </td>"+
@@ -768,7 +886,7 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
         "<td>"+ skillData[3][i].mastery_criteria +"</td>"+
       "</tr>"
       skillHTML +=skillMasteryCriteria;
-      }
+      } 
     let skillMaintenanceCriteria = "<tr>"+
         "<td> Maintenance Mastery Criteria </td>"+
         "<td style='padding: 0;'><textarea name='"+ skillData[3][i].title +"maintenance_criteria' style='width: 99%; height: 46px;'></textarea></td>"+
@@ -828,7 +946,7 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
         "<td>"+ skillData[3][i].total_mastered_targets +"</td>"+
       "</tr>"
       skillHTML += skillTarMastered
-      } 
+      }     
     let skillProgram = "<tr>"+
         "<td> Generalization Planning/Programming:</td>"+
         "<td style='padding: 0;'><textarea name='"+ skillData[3][i].title +"program' style='width: 99%; height: 46px;'></textarea></td>"+
@@ -860,7 +978,7 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
       skillHTML += skillRecommended
     let skillRecommendation = "<tr id='behreasonRecommended"+i+"'>"+
         "<td> Reason for Not Recommending for Continued Treatment: </td>"+
-        "<td style='padding: 0;'><textarea name='" skillData[3][i].title +"recommendation' style='width: 99%; height: 46px;'></textarea></td>"+
+        "<td style='padding: 0;'><textarea name='" + skillData[3][i].title +"recommendation' style='width: 99%; height: 46px;'></textarea></td>"+
       "</tr>"
       skillHTML += skillRecommendation
     skillHTML += "</table>"+
@@ -868,9 +986,10 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
              "</div>"
    
     $('#PTData').append(skillHTML)
-  }}}
-  
-  }
+      
+     }
+    }
+   }    
   }
   
   function mastered(select, row){
@@ -907,11 +1026,7 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
   var username;
 
   function myFunction() {
-    
-    file = $('#vinelandScoreTableFile')[0].files[0];
-    showMessage("Uploading file..");
-    reader.readAsDataURL(file);
-  
+   
     document.getElementById("medTableLengthConfirm").checked = true;
     document.getElementById("allergiesTableLengthConfirm").checked = true;
     document.getElementById("curMedTableLengthConfirm").checked = true;
@@ -976,6 +1091,13 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
 
     }
     
+    if(IEPFile.get() != null){
+      answerData['IEP File ID'] = IEPFile.get()
+    }
+    if(VinelandFile.get() != null){
+      answerData['Vineland File ID'] = VinelandFile.get()
+    }
+    
     console.log(answerData);
     
     formData = answerData;
@@ -983,7 +1105,7 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
     var reviewedCounter = 0;
     var timestamp = new Date();
     var clientID = document.getElementById("ClientID").innerText;
-    var data = [clientID, timestamp.toString(), username, reviewedCounter, JSON.stringify(formData), fileName, JSON.stringify(skillData)]
+    var data = [clientID, timestamp.toString(), username, reviewedCounter, JSON.stringify(formData), ParseFile.get(), JSON.stringify(skillData)]
     console.log(data)
         google.script.run.withSuccessHandler(saveMsg).sendFormData([data]);
 //        
@@ -1000,8 +1122,8 @@ var categories = ["","Communication Skills Domain: Listening & Understanding", "
   function createTemplate(){
   myFunction();
   var timestamp = new Date();
-  var data = [document.getElementById("ClientID").innerText, timestamp.toString(), username, reviewedCounter, JSON.stringify(formData), fileName, JSON.stringify(skillData)]
-  console.log(skillData)
+  var data = [document.getElementById("ClientID").innerText, timestamp.toString(), username, reviewedCounter, JSON.stringify(formData), ParseFile.get(), JSON.stringify(skillData)]
+  console.log(data)
     google.script.run.withSuccessHandler(openDoc).makeTemplate([data], skillData);
   }
   

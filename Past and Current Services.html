@@ -239,8 +239,14 @@
   <div id='isIEPTrue' hidden>
     <h2>Service Delivery IEP:</h2>
     <br>
-    <strong>Upload Services in Other Settings Table: </strong><input type='file' name='IEPTables' value='fileupload' id='IEPTables' accept='image/*'>
+    <strong>Upload Services in Other Settings Table: </strong><input type="file" id='IEPTableFile' name='IEPTableFile' onchange="fileUpload(this, 'IEPTableCont','IEPTableImage', 'IEPTable')"> <p id=IEPTableCont> </p> <img id=IEPTableImage src= '#' style="width:100%; max-width: 800px;"/>
     <br>
+    <br>
+    <input type='button' id='IEPSubmit' value='Upload Files'>
+        <div>
+        <p id='result'></p>
+    </div>
+   <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
   </div>
   <div id='isEvalTrue' hidden>
     A Special Education Eligibility Determination Meeting has been scheduled for: 
