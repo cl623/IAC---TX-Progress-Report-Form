@@ -10,23 +10,23 @@
       <table class=default>
         <tr>
           <td> Client Name: </td>
-          <td id="ClientName" contenteditable> Loading... </td>
+          <td id="ClientName" > Loading... </td>
         </tr>
         <tr>
           <td> Gender: </td>
-          <td id="ClientGen" contenteditable> Loading... </td>
+          <td id="ClientGen" > Loading... </td>
         </tr>
         <tr>
           <td> IAC Client ID #: </td>
-          <td id="ClientID" contenteditable> Loading... </td>
+          <td id="ClientID" > Loading... </td>
         </tr>
         <tr>
           <td> Client DOB: </td>
-          <td id="DOB" contenteditable> Loading...</td>
+          <td id="DOB" > Loading...</td>
         </tr>
         <tr>
           <td> Client Age at Assessment: </td>
-          <td id="AAA" contenteditable> PLACEHOLDER </td>
+          <td><input type=text id="AAA" name='Age at Assessment'></td>
         </tr>
       </table>
     </div>
@@ -34,7 +34,7 @@
 
   <div class="basic" id=formInfo>
     <div class="head">
-      <p>Form Info<i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(formInfo)'></i></p>
+      <p>Form Info<i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Form Info",formInfo);'></i></p>
     </div>
     <div class="data">
     <table class=default>
@@ -68,7 +68,7 @@
   </div>
   <div class="basic" id='diaInfo'>
     <div class="head">
-       <p>Daignosis Info <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(diaInfo)'></i></p> 
+       <p>Daignosis Info <i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Diagnosis Info",diaInfo)'></i></p> 
     </div>
     <div class="data">
       <table class=default>
@@ -224,7 +224,7 @@
 <div class="col">
   <div id='PhysicianInfo' class= "section33">
     <div class= "head">
-       <p>Primary Physician Info <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(PhysicianInfo)'></i></p> 
+       <p>Primary Physician Info <i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Physician Info",PhysicianInfo)'></i></p> 
     </div>
     <div class="data">
       <table class=default>
@@ -247,19 +247,19 @@
       <table class=default>
         <tr>
           <td> Insured's Name: </td>
-          <td id="PrimaryInsuranceHolderName">PLACEHOLDER</td>
+          <td id="InsuranceHolder1Name">PLACEHOLDER</td>
         </tr>
         <tr>
           <td> MemberID: </td>
-          <td id="PrimaryInsuranceID">Loading...</td>
+          <td id="Insurance1ID">Loading...</td>
         </tr>
         <tr>
           <td> Plan Name: </td>
-          <td id="PrimaryInsurancePlanName">Loading...</td>
+          <td id="InsurancePlan1Name">Loading...</td>
         </tr>
         <tr>
           <td> Insurance Payer Name: </td>
-          <td id="PrimaryInsurancePayerName">Loading...</td>
+          <td id="InsurancePayer1Name">Loading...</td>
         </tr>
       </table>
     </div>
@@ -272,19 +272,19 @@
       <table class=default>
         <tr>
           <td> Insured's Name: </td>
-          <td id="SecondaryInsuranceHolderName">Loading...</td>
+          <td id="InsuranceHolder2Name">PLACEHOLDER</td>
         </tr>
         <tr>
           <td> MemberID: </td>
-          <td id="SecondaryInsuranceID">Loading...</td>
+          <td id="Insurance2ID">Loading...</td>
         </tr>
         <tr>
           <td> Plan Name: </td>
-          <td id="SecondaryInsurancePlanName">Loading...</td>
+          <td id="InsurancePlan2Name">Loading...</td>
         </tr>
         <tr>
           <td> Insurance Payer Name: </td>
-          <td id="SecondaryInsurancePayerName">Loading...</td>
+          <td id="InsurancePayer2Name">Loading...</td>
         </tr>
       </table>
     </div>
@@ -297,7 +297,7 @@
 
   <div class=basic id=serviceInfo>
     <div class="head">
-      <p> Service Info <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(serviceInfo)'></i></p>
+      <p> Service Info <i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Service Info",serviceInfo)'></i></p>
     </div>
     <div class="data" style="display:flex;">
       <div style="width: 50%;">
@@ -325,7 +325,7 @@
 
   <div class=basic id=symptomology>
     <div class="head">
-      <p>Current Symptomology<i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(symptomology)'></i></p>
+      <p>Current Symptomology<i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Symptomology Info",symptomology)'></i></p>
     </div>
     <div class="data" id=currSymptomology>
       

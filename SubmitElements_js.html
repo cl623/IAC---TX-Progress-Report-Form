@@ -1,13 +1,70 @@
 <script>
-var reviewedCounter = 0;
 var skillData;
 var categories = ["","Communication Skills Domain: Listening & Understanding", "Communication Skills Domain: Talking", "Communication Skills Domain: Reading & Writing",
          "Daily Living Skills Domain: Caring for Self", "Daily Living Skills Domain: Caring for Home", "Daily Living Skills Domain: Living in the Community", 
          "Social & Relationship Skills Domain: Relating to Others", "Social & Relationship Skills Domain: Playing & Using Leisure Time", "Social & Relationship Skills Domain: Adapting/Adaptive Learning",
          "Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills", "Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills"]
-  var file, IEPFile,
+var file, IEPFile,
       reader = new FileReader();
       
+//Function to hold comments and corresponding ids
+ 
+Comments = function(){
+  var comments = {};
+  var ids = []
+  function get(){
+    return comments
+    }
+  function set(prop, val, id){
+    var comment = val || document.getElementById('commentBox').value
+    comments[prop] = comment
+    ids.push(id.getAttribute("id"))
+    }
+  function getIDs(){
+    return ids
+  }
+  function setAll(obj){
+    comments = obj
+  }
+  function setIDs(map){
+    ids = map
+  }
+  return{
+    set:set,
+    get:get,
+    getMissing:getIDs,
+    setAll:setAll,
+    setIDs:setIDs
+  }
+}();
+
+//Function to hold bookmarked sections
+
+Bookmark = function(){
+  var key = '';
+  var element = '';
+  function get(){
+    return key
+    }
+  function set(id){
+    key = id
+    }
+  function hold(el){
+    element = el
+  }
+  function getElement(){
+    return element
+  }
+  return{
+    set:set,
+    getKey:get, 
+    alert:hold,
+    getElement:getElement
+  }
+}();
+
+//Function to hold parsed progress report drive id
+            
 ParseFile = function(){
   var fileID = null;
   var objName = 'ParseReportFile'
@@ -23,6 +80,8 @@ ParseFile = function(){
   }
 }();
 
+//Function to hold IEP image drive id
+
 IEPFile = function(){
   var fileID = null;
   var objName = 'IEPTableFile'
@@ -32,11 +91,18 @@ IEPFile = function(){
   function change(id){
     fileID = id
     }
+  function place(){
+    let iepPreview = document.getElementById('IEPTableImage')
+    iepPreview.src = 'https://drive.google.com/uc?export=download&id=' + fileID
+  }
   return{
     set:change,
-    get:val
+    get:val,
+    placeImage:place
   }
 }();
+
+//Function to hold Vineland image drive id
 
 VinelandFile = function(){
   var fileID = null;
@@ -47,27 +113,38 @@ VinelandFile = function(){
   function change(id){
     fileID = id
     }
+  function place(){
+    let vinelandPreview = document.getElementById('vinelandTableImage')
+    vinelandPreview.src = 'https://drive.google.com/uc?export=download&id=' + fileID
+  }
   return{
     set:change,
-    get:val
+    get:val,
+    placeImage:place
   }
 }();
   
-document.getElementById('IEPSubmit').addEventListener('click',
-  function(e){
-    file = $('#IEPTableFile')[0].files[0];
-    file.objName = 'IEPSubmit'
-    reader.readAsDataURL(file);
-    
-  });
-  
-document.getElementById('vinelandSubmit').addEventListener('click',
-  function(e){
-    file = $('#vinelandScoreTableFile')[0].files[0];
-    file.objName = 'vinelandSubmit'
-    reader.readAsDataURL(file);
-  });
-      
+//document.getElementById('IEPSubmit').addEventListener('click',
+//  function(e){
+//    file = $('#IEPTableFile')[0].files[0];
+//    file.objName = 'IEPSubmit'
+//    reader.readAsDataURL(file);
+//    
+//  });
+//  
+//document.getElementById('vinelandSubmit').addEventListener('click',
+//  function(e){
+//    file = $('#vinelandScoreTableFile')[0].files[0];
+//    file.objName = 'vinelandSubmit'
+//    reader.readAsDataURL(file);
+//  });
+
+/*
+ *  Seperate function for file decode and save (to drive) 
+ *
+ *  ---- Redundancy, need to try to delete
+ */
+
 function fileUpload(x, container,image, objName){
   readURL(x, image);
   
@@ -98,7 +175,7 @@ function fileUpload(x, container,image, objName){
   }
   document.getElementById(container).innerHTML = txt;
 }
-  
+
 function readURL(input, container) {
   if (input.files && input.files[0]) {
     var reader = new FileReader();
@@ -118,6 +195,10 @@ function readURL(input, container) {
          e.target.result, file.name, file.objName
       );
   };
+  
+ /*
+  *  Function to begin parsing progress report file
+  */
   
   function submitReportParse(){
     file = $('#importReportFile')[0].files[0];
@@ -143,14 +224,14 @@ function readURL(input, container) {
   
   
   skillData = skills;
-  console.log(skillData)
+//  console.log(skillData)
   $("#testparse").html('');
   if(!$("input[name=ReportType]").is(":checked")){
     alert("Please select report type in 'Basic Client Info' section");
   }
   if($("input[name=ReportType]:checked").val() == "Initial Client ABA Assessment/Initial Client ABA Treatment Plan Template"){
     for(var i =0; i < skillData[0].length; i++){
-    console.log(skills[0][i].baseline)
+//    console.log(skills[0][i].baseline)
     let skillHTML = ''
     if(skillData[0][i].title != null){
     let skillTitle = "<div class=basic>"+
@@ -625,17 +706,8 @@ function readURL(input, container) {
     let skillCategory = "<tr>"+
         "<td> Goal Category </td>"+
         "<td style='padding: 0;'><select name='"+ skillData[1][i].title +"goal_category' style='width: 100%; height: 46px;'>"+
-        "<option value='Communication Skills Domain: Listening & Understanding'>Communication Skills Domain: Listening & Understanding</option>"+
-        "<option value='Communication Skills Domain: Talking'>Communication Skills Domain: Talking</option>"+
-        "<option value='Communication Skills Domain: Reading & Writing'>Communication Skills Domain: Reading & Writing</option>"+
-        "<option value='Daily Living Skills Domain: Caring for Self'>Daily Living Skills Domain: Caring for Self</option>"+
-        "<option value='Daily Living Skills Domain: Caring for Home'>Daily Living Skills Domain: Caring for Home</option>"+
-        "<option value='Daily Living Skills Domain: Living in the Community'>Daily Living Skills Domain: Living in the Community</option>"+
-        "<option value='Social & Relationship Skills Domain: Relating to Others'>Social & Relationship Skills Domain: Relating to Others</option>"+
-        "<option value='Social & Relationship Skills Domain: Playing & Using Leisure Time'>Social & Relationship Skills Domain: Playing & Using Leisure Time</option>"+
-        "<option value='Social & Relationship Skills Domain: Adapting/Adaptive Learning'>Social & Relationship Skills Domain: Adapting/Adaptive Learning</option>"+
-        "<option value='Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills'>Physical Activity Skills Domain: Using Large Muscles/Gross Motor Skills</option>"+
-        "<option value='Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills'>Physical Activity Skills Domain: Using Small Muscles/Fine Motor Skills</option></select>"+
+        "<option value='Behavior Reduction Goal</option>"+
+        "</select>"+
         "</td>"+
       "</tr>"
       skillHTML += skillCategory
@@ -963,20 +1035,20 @@ function readURL(input, container) {
       skillHTML +=skillImages
     let skillProgressStatus = "<tr>"+
         "<td> Current Progress Status: </td>"+
-        "<td style='padding: 0;'><select name='"+ skillData[3][i].title +"goal_status' style='width: 100%; height: 46px;' onchange='mastered(this, behreasonMastered"+i+")'><option value='Goal Discontinued'>Goal Discontinued</option><option value='No Progress'>No Progress</option><option value='Minimal Progress'>Minimal Progress</option><option value='Moderate Progress'>Moderate Progress</option><option value='Significant Progress'>Significant Progress</option><option value='Goal Mastered'>Goal Mastered</option></select></td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[3][i].title +"goal_status' style='width: 100%; height: 46px;' onchange='mastered(this, parentTraining"+i+")'><option value='Goal Discontinued'>Goal Discontinued</option><option value='No Progress'>No Progress</option><option value='Minimal Progress'>Minimal Progress</option><option value='Moderate Progress'>Moderate Progress</option><option value='Significant Progress'>Significant Progress</option><option value='Goal Mastered'>Goal Mastered</option></select></td>"+
       "</tr>"
       skillHTML +=skillProgressStatus
-    let skillProgressReason = "<tr id='behreasonMastered"+i+"'>"+
+    let skillProgressReason = "<tr id='parentTraining"+i+"'>"+
         "<td> Reason for Not Meeting Goal:</td>"+
         "<td style='padding: 0;'><textarea name='"+ skillData[3][i].title +"progress_reason' style='width: 99%; height: 46px;'></textarea></td>"+
       "</tr>"
       skillHTML += skillProgressReason
     let skillRecommended = "<tr>"+
         "<td> Recommended for Continued Treatment: </td>"+
-        "<td style='padding: 0;'><select name='"+ skillData[3][i].title +"continued_treatment' style='width: 100%; height: 46px;' onchange='recommended(this, behreasonRecommended"+i+")'><option value='No'>No</option><option value='Yes'>Yes</option></select></td>"+
+        "<td style='padding: 0;'><select name='"+ skillData[3][i].title +"continued_treatment' style='width: 100%; height: 46px;' onchange='recommended(this, parentTrainingRec"+i+")'><option value='No'>No</option><option value='Yes'>Yes</option></select></td>"+
       "</tr>"
       skillHTML += skillRecommended
-    let skillRecommendation = "<tr id='behreasonRecommended"+i+"'>"+
+    let skillRecommendation = "<tr id='parentTrainingRec"+i+"'>"+
         "<td> Reason for Not Recommending for Continued Treatment: </td>"+
         "<td style='padding: 0;'><textarea name='" + skillData[3][i].title +"recommendation' style='width: 99%; height: 46px;'></textarea></td>"+
       "</tr>"
@@ -1098,15 +1170,14 @@ function readURL(input, container) {
       answerData['Vineland File ID'] = VinelandFile.get()
     }
     
-    console.log(answerData);
+//    console.log(answerData);
     
     formData = answerData;
     
-    var reviewedCounter = 0;
     var timestamp = new Date();
     var clientID = document.getElementById("ClientID").innerText;
-    var data = [clientID, timestamp.toString(), username, reviewedCounter, JSON.stringify(formData), ParseFile.get(), JSON.stringify(skillData)]
-    console.log(data)
+    var data = [clientID, timestamp.toString(), username, Reviewer.getCount(), JSON.stringify(formData), ParseFile.get(), JSON.stringify(skillData), null ,JSON.stringify(Comments.get()), JSON.stringify(Comments.getMissing())]
+//    console.log(data)
         google.script.run.withSuccessHandler(saveMsg).sendFormData([data]);
 //        
 //        
@@ -1119,32 +1190,215 @@ function readURL(input, container) {
     alert(e);
   }
   
-  function createTemplate(){
-  myFunction();
-  var timestamp = new Date();
-  var data = [document.getElementById("ClientID").innerText, timestamp.toString(), username, reviewedCounter, JSON.stringify(formData), ParseFile.get(), JSON.stringify(skillData)]
-  console.log(data)
-    google.script.run.withSuccessHandler(openDoc).makeTemplate([data], skillData);
-  }
-  
   function openDoc(url){
-    window.open(url);
+//    window.open(url);
+    emailReviewer(Reviewer.getRev(), url)
+//    emailReviewer(Reviewer.getWri(), url)
   }
   
-  $.fn.getFormObject = function() {
-    var object = $(this).serializeArray().reduce(function(obj, item) {
-        var name = item.name.replace("[]", "");
-        if ( typeof obj[name] !== "undefined" ) {
-            if ( !Array.isArray(obj[name]) ) {
-                obj[name] = [ obj[name], item.value ];
-            } else {
-               obj[name].push(item.value);
-            }
-        } else {
-            obj[name] = item.value;
+  
+  
+  function sendReviewer(){
+    var recipient = document.getElementById('emailRecipient').value
+    var subject = document.getElementById('emailSubject').value
+    var body = document.getElementById('emailBody').value
+    //open modal to select reviewer
+    emailReviewer('claggui@innovativeautism.org')
+
+  }
+  
+  function emailReviewer(email, url){
+   var timestamp = new Date();
+   var data = [document.getElementById("ClientID").innerText, timestamp.toString(), username, Reviewer.getCount(), JSON.stringify(formData), ParseFile.get(), JSON.stringify(skillData), email, JSON.stringify(Comments.get()), JSON.stringify(Comments.getMissing())]
+   //Save data with reviewer email to indicate STAGE
+   google.script.run.withSuccessHandler(saveMsg).sendFormData([data])
+   //Email reviewer with data
+   google.script.run.withSuccessHandler(forReview).emailReviewer([data], email, url)
+  }
+  
+  function forReview(e){
+  alert(e);
+  }
+  
+  function reviewComments(){
+    var id = document.getElementById("ClientID").innerText
+    var body = 'Report for client ' + id + ' has been reviewed and rejected. Here are your reviewers comments: \n\n'
+    var subject = 'Funder Report Rejected: Client #' + id 
+    var comments = Comments.get()
+    for(comment in comments){
+      body += comment + ': ' + comments[comment] + '\n'
+    }
+    
+    document.getElementById('commentsRecipient').value = 'claggui@innovativeautism.org'
+    document.getElementById('commentsSubject').value = subject
+    document.getElementById('commentsBody').value = body
+    
+    document.getElementById('reviewCommentsModal').style.display = 'block'
+  }
+  
+  function sendComments(){
+    let clientID = document.getElementById("ClientID").innerText
+    let email = 'claggui@innovativeautism.org'
+    google.script.run.withSuccessHandler(forReview).emailComments(Comments.get(), email, clientID)
+    var data = [clientID, timestamp.toString(), username, Reviewer.getCount(), JSON.stringify(formData), ParseFile.get(), JSON.stringify(skillData), email, JSON.stringify(Comments.get()), JSON.stringify(Comments.getMissing())]
+  }
+  
+  function saveComment(){
+    var comment = document.getElementById('commentBox')
+    if(comment.value != null && comment.value != ''){
+      var key = Bookmark.getKey()
+      var id = Bookmark.getElement()
+      Comments.set(key,comment.value, id)
+      comment.value = ''
+      var modal = document.getElementById("myModal");
+      modal.style.display = "none";
+      setMissing(Bookmark.getElement());
+    }
+  }
+  
+  function removeComment(){
+    var key = Bookmark.getKey()
+    var id = Bookmark.getElement()
+    document.getElementById('commentBox').value = ''
+    delete Comments.get()[key]
+
+    var index = Comments.getMissing().indexOf(id.getAttribute("id"));
+    if(index != -1){
+      Comments.getMissing().splice(index, 1);
+    }
+    removeMissing(Bookmark.getElement());
+  }
+  
+  function openModal(key,id){
+    if(Comments.get().hasOwnProperty(key)){
+      document.getElementById('commentBox').value = Comments.get()[key]
+    }
+    Bookmark.set(key)
+    Bookmark.alert(id)
+    var modal = document.getElementById("myModal");
+    document.getElementById('modalHeader').innerHTML = key + " Comments"
+    modal.style.display = "block";    
+  }
+  
+  function openSigModal(){
+    var modal = document.getElementById("sigModal");
+    modal.style.display = "block";    
+  }
+  
+  function openEmailModal(){
+    var modal = document.getElementById("emailModal");
+    modal.style.display = "block";  
+  }
+  
+  function removeA(arr) {
+    var what, a = arguments, L = a.length, ax;
+    while (L > 1 && arr.length) {
+        what = a[--L];
+        while ((ax= arr.indexOf(what)) !== -1) {
+            arr.splice(ax, 1);
         }
-        return obj;
-    }, {});
-    return object;
+    }
+    return arr;
 }
+
+/*
+ *  Signature pad functions
+ *    -Initialize signature pad
+ *    -Save and clear buttons
+ *    -Save to Drive
+ */
+var signaturePad = new SignaturePad(document.getElementById('signature-pad'), {
+  backgroundColor: 'rgba(255, 255, 255, 0)',
+  penColor: 'rgb(0, 0, 0)'
+});
+
+var saveButton = document.getElementById('save');
+var cancelButton = document.getElementById('clear');
+
+saveButton.addEventListener('click', function (event) {
+  var data = signaturePad.toDataURL('image/png');
+
+  console.log(data)
+  google.script.run.withSuccessHandler(reviewedForm).saveSignature(data)
+});
+
+function savedtoDrive(e){
+  alert(e)
+}
+
+cancelButton.addEventListener('click', function (event) {
+  signaturePad.clear();
+});
+
+function reviewedForm(signatureID){
+  Reviewer.increment();
+  createTemplate(signatureID)
+}
+
+function createTemplate(signatureID){
+  if(signatureID != null){
+    myFunction();
+    var timestamp = new Date();
+    var data = [document.getElementById("ClientID").innerText, timestamp.toString(), username, Reviewer.getCount(), JSON.stringify(formData), ParseFile.get(), JSON.stringify(skillData), null ,JSON.stringify(Comments.get()), JSON.stringify(Comments.getMissing())]
+    //  console.log(data)
+    google.script.run.withSuccessHandler(openDoc).makeTemplate([data], skillData, signatureID);
+    }
+  else
+    alert('Signature Required')
+  }
+  
+
+
+function modalClose() {
+  var modal = document.getElementById("myModal");
+  if(modal.style.display == 'block'){
+    modal.style.display = "none";
+  }
+   modal = document.getElementById("sigModal");
+  if(modal.style.display == 'block'){
+    modal.style.display = "none";
+  }
+   modal = document.getElementById("emailModal");
+  if(modal.style.display == 'block'){
+    modal.style.display = "none";
+  }
+    modal = document.getElementById("reviewCommentsModal");
+  if(modal.style.display == 'block'){
+    modal.style.display = "none";
+  }
+}
+
+window.onclick = function(event) {
+var modal = document.getElementById("myModal");
+  if(modal.style.display == 'block'){
+    if (event.target == modal) {
+      document.getElementById('commentBox').value = ''
+      modal.style.display = "none";
+    }
+  }
+ modal = document.getElementById("sigModal");
+  if(modal.style.display == 'block'){
+    if (event.target == modal) {
+      document.getElementById('commentBox').value = ''
+      modal.style.display = "none";
+    }
+  }
+ modal = document.getElementById("emailModal");
+  if(modal.style.display == 'block'){
+    if (event.target == modal) {
+      document.getElementById('commentBox').value = ''
+      modal.style.display = "none";
+    }
+  }
+   modal = document.getElementById("reviewCommentsModal");
+  if(modal.style.display == 'block'){
+    if (event.target == modal) {
+      document.getElementById('commentBox').value = ''
+      modal.style.display = "none";
+    }
+  }
+}
+
+
+
 </script>

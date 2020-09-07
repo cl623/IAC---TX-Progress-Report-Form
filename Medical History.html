@@ -6,7 +6,7 @@
 <div class=section50 style="padding: 20px;"><!-- Left Column of Tables Start-->
 <div style="margin: 30px 10;border: 1px solid #666" >
   <div class="head" id=medCond>
-    <div style="float: left;"><p> Medical Condition/ Diagnosis  <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(medCond)'></i></p></div>
+    <div style="float: left;"><p> Medical Condition/ Diagnosis  <i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Medical Condition/ Diagnosis",medCond)'></i></p></div>
     <div style="float: right; padding: 3px;">
     <input type=number id=medTableLength min=0 value=1 hidden>
     <input type=checkbox id=medTableLengthConfirm value=true hidden>
@@ -34,7 +34,7 @@
 
 <div style="margin: 30px 10; border: 1px solid #666" >
   <div class="head" id=medAllergies>
-    <div style="float: left;"><p> Current Allergies  <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(medAllergies)'></i></p></div>
+    <div style="float: left;"><p> Current Allergies  <i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Allergies",medAllergies)'></i></p></div>
     <div style="float:right; padding: 3px;">
     <input type=number id=allergiesTableLength min=0 value=1 hidden>
     <input type=checkbox id=allergiesTableLengthConfirm value=true hidden>
@@ -62,7 +62,7 @@
 <div class=section50 style="padding: 20px;">
 <div style="margin: 30px 10;border: 1px solid #666" >
   <div class="head" id=medMedications>
-    <div style="float: left;"><p> Current Medications  <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(medMedications)'></i></p></div>
+    <div style="float: left;"><p> Current Medications  <i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Medications",medMedications)'></i></p></div>
     <div style="float: right; padding: 3px;">
     <input type=number id=curMedTableLength min=0 value=1 hidden>
     <input type=checkbox id=curMedTableLengthConfirm value=true hidden>
@@ -95,7 +95,7 @@
 
 <div style=" margin: 30px 10;border: 1px solid #666" >
   <div class="head" id=medVitamins>
-    <div style="float: left;"><p> Current Vitamins, Minerals, & Supplements  <i class="fa fa-exclamation-circle" aria-hidden="true" title="Bookmark this section" onclick='setMissing(medVitamins)'></i></p></div>
+    <div style="float: left;"><p> Current Vitamins, Minerals, & Supplements  <i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Vitamins",medVitamins)'></i></p></div>
     <div style="float: right; padding: 3px;">
     <input type=number id=curVitTableLength min=0 value=1 hidden>
     <input type=checkbox id=curVitTableLengthConfirm value=true hidden>

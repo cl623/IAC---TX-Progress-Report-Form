@@ -1,3 +1,8 @@
+function getOAuthToken() {
+  DriveApp.getRootFolder();
+  return ScriptApp.getOAuthToken();
+} 
+
 function tag(text){
   var url = ScriptApp.getService().getUrl()
   var user = Session.getActiveUser().getEmail()
@@ -25,7 +30,10 @@ function doGet(requestInfo) {
     else{
       return HtmlService.createTemplateFromFile("Form").evaluate();
     }
-  }  
+  }
+  else if (requestInfo.parameter && requestInfo.parameter['page'] == 'Picker'){
+    return HtmlService.createHtmlOutputFromFile('Picker').setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  }
   return HtmlService.createTemplateFromFile("Search").evaluate();
 }
 
@@ -52,6 +60,9 @@ function connect(connection){
   
 }
 
+/*
+ *  Queries Database for client information
+ */
 function getInfo(clientId){
   var dbConnect = databaseConnect();
   var conn = connect(dbConnect);
@@ -66,41 +77,41 @@ function getInfo(clientId){
   
   var obj = {};
   while(clientInfoData.next()){
-    obj['Name'] = clientInfoData.getString('ClientName');
-    obj['ClientId'] = clientInfoData.getInt('ClientId');
-    obj['Gender'] = clientInfoData.getString('Gender');
+    obj['ClientName'] = clientInfoData.getString('ClientName');
+    obj['ClientID'] = clientInfoData.getInt('ClientId');
+    obj['ClientGen'] = clientInfoData.getString('Gender');
     obj['DOB'] = clientInfoData.getString('DateOfBirth');
     obj['Age'] = clientInfoData.getInt('Age');
   
-    obj['PriLang'] = clientInfoData.getString('PriLang');
-    obj['SecLang'] = clientInfoData.getString('SecLang');
+    obj['PrimaryLangauge'] = clientInfoData.getString('PriLang');
+    obj['SecondaryLanguage'] = clientInfoData.getString('SecLang');
     
     var clientContactsData = stmt2.executeQuery(queryContacts);
     var count = 1;
     while(clientContactsData.next()){
-      obj['GuardianName'+count+''] = clientContactsData.getString('GuardianName');
+      obj['Guardian'+count+'Name'] = clientContactsData.getString('GuardianName');
       obj['Address'+count+''] = clientContactsData.getString('Address');
       obj['City'+count+''] = clientContactsData.getString('City');
       obj['State'+count+''] = clientContactsData.getString('State');
       obj['ZipCode'+count+''] = clientContactsData.getString('ZipCode');
-      obj['HomeNumber'+count+''] = clientContactsData.getString('HomeNumber');
-      obj['MobileNumber'+count+''] = clientContactsData.getString('MobileNumber');
-      obj['EmergencyContact'+count+''] = clientContactsData.getString('EmergencyContact');
+      obj['Guardian'+count+'HP'] = clientContactsData.getString('HomeNumber');
+      obj['Guardian'+count+'CP'] = clientContactsData.getString('MobileNumber');
+      obj['Emergency'+count+'Name'] = clientContactsData.getString('EmergencyContact');
       count++
     }
-    var clientMedicalData = stmt3.executeQuery(queryMedical);
-    var count = 1;
-    while(clientMedicalData.next()){
-      obj['PcpName'] = clientMedicalData.getString('PcpName');
-      obj['PcpNumber'] = clientMedicalData.getString('PcpNumber');
-    }
+//    var clientMedicalData = stmt3.executeQuery(queryMedical);
+//    var count = 1;
+//    while(clientMedicalData.next()){
+//      obj['PcpName'] = clientMedicalData.getString('PcpName');
+//      obj['PcpNumber'] = clientMedicalData.getString('PcpNumber');
+//    }
     var clientInsuranceData = stmt4.executeQuery(queryInsurance);
     var count = 1;
     while(clientInsuranceData.next()){
-      obj['NamePolicyHolder'+count+''] = clientInsuranceData.getString('NamePolicyHolder');
-      obj['MemberId'+count+''] = clientInsuranceData.getString('MemberId');
-      obj['InsurancePlan'+count+''] = clientInsuranceData.getString('InsurancePlan');
-      obj['Payer'+count+''] = clientInsuranceData.getString('Payer');
+      obj['InsuranceHolder'+count+'Name'] = clientInsuranceData.getString('NamePolicyHolder');
+      obj['Insurance'+count+'ID'] = clientInsuranceData.getString('MemberId');
+      obj['InsurancePlan'+count+'Name'] = clientInsuranceData.getString('InsurancePlan');
+      obj['InsurancePayer'+count+'Name'] = clientInsuranceData.getString('Payer');
       count++
     }
   }
@@ -118,68 +129,91 @@ function testDB(){
 //
 ////==================================
 
+/*
+ *  Gets client names from spreadsheet
+ */
+
 function getClientName() {
   var spreadsheetID = "1G0kpCNdmow74d0u7pGCbN7ubFE4lmMFbVMCnlWPbt0I";
   var clientNames = SpreadsheetApp.openById(spreadsheetID).getDataRange().getDisplayValues();
   return clientNames; 
 }
 
+function getMaladaptives(){
+  var spreadsheet = '1aaQTY0EMtrNiuyhzchMABUvlHzc9fAkn4g5B087S2ZA';
+  var maladaptives = SpreadsheetApp.openById(spreadsheet).getDataRange().getDisplayValues();
+  return maladaptives
+}
+
+function testMal(){
+  malList = getMaladaptives()
+  for(x of malList){
+    if(x[3] != ''){
+      console.log('Madalaptive Behavior: ' + x[3] + '\nDefinition: ' + x[4])
+    }
+  }
+}
+
+/*
+ *  Gets script user email
+ */
+
 function getUser(){
   return Session.getActiveUser().getEmail()
 }
 
-function getClientInfo(clientName, clientID) {
-  var clientName = clientName || "NA";
-  var clientID =  clientID||"NA";
-  Logger.log(clientName);
-  var clientData = [];
-  var spreadsheetID = "1G0kpCNdmow74d0u7pGCbN7ubFE4lmMFbVMCnlWPbt0I";
-  
-  //Need to make multiple variables to hold several sheets/pages (Statuses/Assignments, Client Info, Client Insurance)
-  
-  //Client Status/Assignment
-  var data = getClientName();
-  
-  //Loop for sheets that have multiplicities Eg. Insurance sheet
-  // data[i][3] Second Index is location of FULL NAME in the spreadsheet. CHANGE ACCORDINGLY
-  for (var i = 0; i < data.length; i++){
-    if (data[i][3] == clientName || data[i][0] == clientID){
-      clientData.push(data[i]);
-    }
-  }
-  
-  //Contact Info
-  var contacts = SpreadsheetApp.openById(spreadsheetID).getSheetByName("Sheet2").getDataRange().getDisplayValues();
-  for(var i=0; i < contacts.length;i++){
-    if(contacts[i][1] == clientName || contacts[i][0] == clientID){
-      clientData.push(contacts[i]);
-    }
-  }
-  Logger.log(clientData[1]);
-  
-  //Client Insurance
-  // ins[i][1] Second Index is location of FULL NAME in the spreadsheet. CHANGE ACCORDINGLY
-  //Sheet3 -> Insurance Sheet
-  var ins = SpreadsheetApp.openById(spreadsheetID).getSheetByName("Sheet3").getDataRange().getDisplayValues();
-  for(var i=0 ; i < ins.length; i++){
-    if(ins[i][1] == clientName  || ins[i][0] == clientID){
-      clientData.push(ins[i]);
-    }
-  }
-  return clientData;
-}
+/*
+ *  Deprecated function for getting client info. Now getting info from DATABASE
+ */
 
+//function getClientInfo(clientName, clientID) {
+//  var clientName = clientName || "NA";
+//  var clientID =  clientID||"NA";
+//  Logger.log(clientName);
+//  var clientData = [];
+//  var spreadsheetID = "1G0kpCNdmow74d0u7pGCbN7ubFE4lmMFbVMCnlWPbt0I";
+//  
+//  //Need to make multiple variables to hold several sheets/pages (Statuses/Assignments, Client Info, Client Insurance)
+//  
+//  //Client Status/Assignment
+//  var data = getClientName();
+//  
+//  //Loop for sheets that have multiplicities Eg. Insurance sheet
+//  // data[i][3] Second Index is location of FULL NAME in the spreadsheet. CHANGE ACCORDINGLY
+//  for (var i = 0; i < data.length; i++){
+//    if (data[i][3] == clientName || data[i][0] == clientID){
+//      clientData.push(data[i]);
+//    }
+//  }
+//  
+//  //Contact Info
+//  var contacts = SpreadsheetApp.openById(spreadsheetID).getSheetByName("Sheet2").getDataRange().getDisplayValues();
+//  for(var i=0; i < contacts.length;i++){
+//    if(contacts[i][1] == clientName || contacts[i][0] == clientID){
+//      clientData.push(contacts[i]);
+//    }
+//  }
+//  Logger.log(clientData[1]);
+//  
+//  //Client Insurance
+//  // ins[i][1] Second Index is location of FULL NAME in the spreadsheet. CHANGE ACCORDINGLY
+//  //Sheet3 -> Insurance Sheet
+//  var ins = SpreadsheetApp.openById(spreadsheetID).getSheetByName("Sheet3").getDataRange().getDisplayValues();
+//  for(var i=0 ; i < ins.length; i++){
+//    if(ins[i][1] == clientName  || ins[i][0] == clientID){
+//      clientData.push(ins[i]);
+//    }
+//  }
+//  return clientData;
+//}
 
-function test(){
-  var b = "Alexia Williams"
-  var c = "000288"
-  var a = getClientInfo(undefined,c);
-  Logger.log(a[1][0]);
-  
-  //Logger.log(data);
-}
 
 //======================= Save data to sheet ===========================
+
+/*
+ *  Get next empty row of spreadsheet
+ *      @param id: id of spreadsheet
+ */
 
 function getEmptyRow(id){
   var ss = SpreadsheetApp.openById(id)
@@ -192,6 +226,11 @@ function getEmptyRow(id){
   return (nextRow+1);
 }
 
+/*
+ *  Save data to spreasheet
+ *    @param data: array to be saved pertaining to form info
+ */
+
 function sendFormData(data){
   var sheetID = '1HQnH3hY-0YuAUOM_eP6JxAVMemhZBCAVQZJ_GZMcVT8'
   var spreadsheet = SpreadsheetApp.openById(sheetID).getSheets()[0];
@@ -202,14 +241,61 @@ function sendFormData(data){
   catch(e){
     return e;
   }
-  
   return "Saved Successfully"
-  
+}
+//======================== For Review ==============================
+
+/*
+ *  Report submitted for review.
+ */
+
+function emailReviewer(data, email, cont){
+  let body = cont || 'EMAIL BODY'
+  try{
+  GmailApp.sendEmail(email, 'Funder Report Draft for ' + data[0][0], body)
+  return 'Reviewer Emailed'
+  }
+  catch(e){
+   return e 
+  }
 }
 
-function makeTemplate(data, skills){
+  /*
+   *  Report rejected and comments are passed to writer
+   */
+
+function emailComments(comments, email, id){
+  try{
+    var body = 'Report for client ' + id + ' has been reviewed and rejected. Here are your reviewers comments: \n\n'
+    var subject = 'Funder Report Rejected: Client #' + id 
+    for(comment in comments){
+      body += comment + ': ' + comments[comment] + '\n'
+    }
+   GmailApp.sendEmail(email, subject, body) 
+   return "Comments Emailed"
+  }
+  catch(e){
+   return e 
+  }
+}
+
+//======================== Create Doc =====================================
+
+/*
+ *  Create Funder Report Template and fill with form data
+ *    @param data: array with form input elements, username, review stage, timestamp
+ *    @param skills: skill data from progress report parse
+ *    @param signatureID: drive file ID for reviewer signature
+ */
+
+
+function makeTemplate(data, skills, signatureID){
   var file= DriveApp.getFileById('1_Bw_WeQnjnIdYI0teO2-00DKBVhwR4caqwq69SwyIn4').makeCopy(data[0][2] + " " + data[0][0] + " TX PLAN TEMPLATE")
-  var body= DocumentApp.openById(file.getId()).getBody();
+  var doc = DocumentApp.openById(file.getId())
+  var body= doc.getBody();
+  
+  let signature = DriveApp.getFileById(signatureID).getBlob()
+  body.appendImage(signature)
   
   var crisisPlan = ['Assaultive Behavior','Self-Injurious Behavior', 'Fire Setting', 'Impulsive Behavior', 'Current Family Abuse Violence', 'Elopement/Bolting', 'Sexually Offending Behavior', 'Substance Abuse', 'Psychotic Symptoms', 'Coping with Significant Loss', 'Suicidality', 'Homicidality']
   var crisisRisks = ['Present','Ideation','Plan','Means','Prior']
@@ -690,6 +776,23 @@ function makeTemplate(data, skills){
   }
   body.replaceText("{IEP File}", '')
   
+  if(o.hasOwnProperty("PSS0Time")){
+    var cont = true
+    var n = 0;
+    var table = [['Session Time', 'Session Activity Outline']]
+    while(cont){
+      if(o.hasOwnProperty('PSS' + n + 'Time')){
+        table.push([o['PSS' + n + 'Time'], o['PSS' + 0 + 'Outline']])
+        n++;
+      }
+      else{
+        cont = false;
+      }
+    }
+    body.insertTable(body.getChildIndex(body.findText("{Proposed Session Schedule}").getElement().getParent()), table)
+  }
+  body.replaceText("{Proposed Session Schedule}", '')
+  
   if(o.hasOwnProperty("Vineland File ID")){
     var img = DriveApp.getFileById(o['Vineland File ID']).getBlob()
     
@@ -978,51 +1081,56 @@ function makeTemplate(data, skills){
     body.replaceText("{Parent Training Goals}", '')
   }
   
+//  file.setOwner(data[0][7])
+//
+//  file.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW)
+//  //Edit permissions for the doc
+////  var editors = file.getEditors()
+////  for (var i = 0; i < editors.length; i++) {
+////     file.removeEditor(editors[i]);
+////    };
+//  
+//  file.addViewer('jlison@innovativeautism.org')
+////  if(data[0][7] != '')
+////    doc.addViewer(data[0][7])
+  
   return file.getUrl();
 }
 
 //=================================Load Data from Save State Sheet==========================================
 
+/*
+ *  Get saved funder report input
+ *    @param clientID: string of client id
+ *
+ *    if data[7] != null, then the report has been passed to a reviewer
+ */
+
 function getFunderSheetData(clientID){
   var sheetID = '1HQnH3hY-0YuAUOM_eP6JxAVMemhZBCAVQZJ_GZMcVT8';
   var spreadsheet = SpreadsheetApp.openById(sheetID).getSheets()[0];
   var data = spreadsheet.getDataRange().getDisplayValues();
-  
-  for(var i=0; i < data.length; i++){
-    if (data[i][0] == clientID){
+  var user = Session.getActiveUser().getEmail()
+  for(var i=data.length-1; i > -1; i--){
+    if (data[i][0] == clientID && (data[i][7] == user && data[i][7] != undefined)){
       Logger.log(data[i]);
-      return data[i];
+      return [data[i], 'Reviewer'];
+    }
+    else if(data[i][0] == clientID){
+     return [data[i], ''];
+    }
+    else{
+      return 'No report on file.' 
     }
   }
 }
 
-function test2(){
-  var body= DocumentApp.openById('1_Bw_WeQnjnIdYI0teO2-00DKBVhwR4caqwq69SwyIn4').getBody();
-  var element;
-  element = body.getChild(5)
-  //    Logger.log(element.asParagraph().getText())
-  
-  //    Logger.log(element.getType())
-  
-  var searchType = DocumentApp.ElementType.PARAGRAPH;
-  var searchHeading = DocumentApp.ParagraphHeading.HEADING2;
-  var searchResult = null;
-  
-  while (searchResult = body.findElement(searchType, searchResult)) {
-    var par = searchResult.getElement().asParagraph();
-    if (par.getHeading() == searchHeading) {
-      // Found one, update Logger.log and stop.
-      var h = searchResult.getElement().asText().getText();
-      
-      if(h == 'ABA ASSESSMENT/TREATMENT PLAN TYPE:'){
-        Logger.log(h)
-      }
-    }
-  }
-  
-  
-  
-}
+/*
+ *  Save progress report images to drive
+ *    @param data: image file from parse in base64
+ *    @param file: filename
+ *    @param objName: file object name
+ */
 
 function saveToDrive(data, file, objName) {
   var email = Session.getActiveUser().getEmail();
@@ -1050,8 +1158,53 @@ function saveToDrive(data, file, objName) {
   }
 }
 
-function beaconParse(fileName) {
+/*
+ *  Save signature to drive and return drive file id
+ *    @param data: base64 encoded image
+ */
+
+function saveSignature(data){  
+  try{
+  var decoded = Utilities.base64Decode(data.substr(data.indexOf('base64,')+7));
+  var blob = Utilities.newBlob(decoded, MimeType.PNG, "nameOfImage");
   
+  var dropbox = "My Dropbox";
+    var folder, folders = DriveApp.getFoldersByName(dropbox);
+    
+    if (folders.hasNext()) {
+      folder = folders.next();
+    } else {
+      folder = DriveApp.createFolder(dropbox);
+    }
+  
+  var signature = folder.createFile(blob);
+  
+  return signature.getId()
+  }
+  catch(e){
+    return e 
+  }
+}
+
+/*
+ *  Parse vineland report and return the parsed summary
+ */
+
+function vinelandParse(){
+//  var Doc = DriveApp.getFilesByName(fileName).next().getAs(contentType)
+  var body = DocumentApp.openById('1BDY4-h-e9AA0x_WzlHKNq_2DHZxoxyuT').getBody().getText()
+  var regex = /(?<=OVERALL SUMMARY\s+).*?(?=\s+Comprehensive Parent\/Caregiver Form Report)/gs
+  var summary = body.match(regex)[0]
+  Logger.log(summary)
+  return summary
+  } 
+
+/*
+ *  Parse progress report file from google drive as array of objects.
+ *     @param fileName: string name of file in drive app.
+ */
+
+function beaconParse(fileName) {  
   var files = DriveApp.getFilesByName(fileName)
   while (files.hasNext()) {
     var file = files.next();
@@ -1102,7 +1255,7 @@ function beaconParse(fileName) {
     if (reportFolders.hasNext()) {
       reportFolder = reportFolders.next();
     } else {
-      reportFolder = userFolder.createFolder(now);
+      reportFolder = userFolder.createFolder(now).setOwner('claggui@innovativeautism.org').addViewer(email);
     }
     var imageFile = reportFolder.createFile(images[i].getBlob().setName(goalTitle));
     var imageID = imageFile.getId();
@@ -1239,11 +1392,18 @@ function beaconParse(fileName) {
   return skills
 }
 
+/*
+ *  Intermediate function; expendable.
+ *
+ *    convertDocuments && convertToGoogleDocs_
+ *      @param file/fileName: drive app file to be converted to native gsuite file;
+ *          docx -> doc
+ *
+ *    calls beaconparse to parse converted doc
+ */
 
-function convertDocuments(file) {
-  
-  return convertToGoogleDocs_(file)
-  
+function convertDocuments(file) {  
+  return convertToGoogleDocs_(file)  
 }
 
 
@@ -1274,9 +1434,4 @@ function convertToGoogleDocs_(fileName) {
   // Update the name of the Google Sheet created from the Excel sheet
   DriveApp.getFileById(uploadFile.id).setName(googleFileName);
   return beaconParse(googleFileName);
-}
-
-function testp(){
-  Logger.log(convertDocuments('Rethink Report Example 4 05.28.20.docx')[0][0].title)  
-  
 }

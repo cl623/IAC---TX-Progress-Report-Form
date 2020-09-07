@@ -1,21 +1,111 @@
 <script>
 
+Reviewer = function(){
+  var reviewer = null;
+  var writer = null;
+  var reviewCounter = 0;
+  function rev(){
+    return reviewer
+  }
+  function wri(){
+    return writer
+  }
+  function count(){
+    return reviewCounter
+  }
+  function change(id){
+    reviewer = id
+    }
+  function isWri(id){
+    writer = id
+    }
+  function counter(){
+    reviewCounter++;
+  }
+  function setCounter(c){
+    reviewCounter = c;
+  }
+  return{
+    getRev:rev,
+    getWri:wri,
+    getCount:count,
+    setRev:change,
+    setWri:isWri,
+    increment:counter,
+    setStage:setCounter,
+  }
+}();
 
-function getLastReport(data){
+/* 
+ * reviewedForm() && getLastReport()
+ *
+ * User is identified as Reviewer
+ *
+ *   -Buttons on interface change to fit their needs: Submit and Send Comments/Revisions
+ *   -Timestamp that they have accessed the doc
+ *   -
+ *
+ */
+
+
+
+function getLastReport(load){
+  if(load == 'No report on file.'){
+    alert(load)
+  }
+  else{
+  var data = load[0]
+  formData = JSON.parse(data[4])
+  Reviewer.setStage(data[3])
+  if(load[1] != ''){
+    //Change review button
+    Reviewer.setRev(data[7])
+    Reviewer.increment()
+    $('#shareBtn').attr("onclick",'openSigModal();')
+    $('#shareBtn').html('<i class="fa fa-fw fa-envelope"></i>Finalize Review')
+    
+//    document.getElementById('returnComment').style.display = 'block;
+    $('#returnComment').show()
+//    $('#returnComment').html('<i class="fa fa-fw fa-user"></i>Send Revisions/Comments')
+  }
   
+  if(data[8] != undefined && data[8] != ''){
+    Comments.setAll(JSON.parse(data[8]))
+    console.log(Comments.get())
+  }
+  if(data[9] != undefined && data[9] != ''){
+    Comments.setIDs(JSON.parse(data[9]))
+    for(id of Comments.getMissing()){
+      document.getElementById(id).classList.add("missingInfo")
+    }
+  }
+
   var answers = JSON.parse(data[4]);
   var myForm = document.getElementById("myForm").elements;
+  
+  if(answers['ReportType'] == 'Client ABA Reassessment/Client ABA Treatment Progress Report Template'){
+    document.getElementById('ProgressReport').click()
+    }
+  else if(answers['ReportType'] == 'Initial Client ABA Assessment/Initial Client ABA Treatment Plan Template'){
+    document.getElementById('InitialTX').click()
+  }
+  document.getElementById('Session Start Time').value = answers['Session Start Time']
+  document.getElementById('Session End Time').value = answers['Session End Time']
+  document.getElementById('createSchedule').click()
+
+  if(data[6] != undefined && data[6] != ''){
+    skillData = JSON.parse(data[6])
+    listParse(skillData)
+  }
   
   var type = []
   if(answers.hasOwnProperty('IEPTableFile')){
     var id = answers['IEPTableFile']
     IEPFile.set(id)
-    document.getElementById('IEPimg').src = 'https://drive.google.com/file/d/' + id + '/preview'
   }
   if(answers.hasOwnProperty('vinelandScoreTableFile')){
     var id = answers['vinelandScoreTableFile']
     VinelandFile.set(id)
-    document.getElementById('vinelandImg').src = 'https://drive.google.com/file/d/' + id + '/preview'
   }
   if(answers.hasOwnProperty('ParseReportFile')){
     ParseFile.set(answers['ParseReportFile'])
@@ -42,9 +132,15 @@ function getLastReport(data){
     else
       {}
   }
-    if(data[6] != undefined && data[6] != ''){
-    skillData = JSON.parse(data[6])
-    listParse(skillData)
+  
+  if(answers.hasOwnProperty('IEP File ID')){
+    IEPFile.set(answers['IEP File ID'])
+    IEPFile.placeImage()
+  }
+  if(answers.hasOwnProperty('Vineland File ID')){
+    VinelandFile.set(answers['Vineland File ID'])
+    VinelandFile.placeImage()
+  }
   }
 }
 

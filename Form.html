@@ -4,85 +4,15 @@
   <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
 
+  
   <?!= include('Nav/Side Bar _css');?>
   <?!= include('content_css');?>
   <?!= include('tables_css');?>
-
-<script type="text/javascript">
-
-    // The Browser API key obtained from the Google API Console.
-    // Replace with your own Browser API key, or your own key.
-    var developerKey = 'AIzaSyC42DnQX4DbhYaVWXIUrGiG6ULzjEkv7oI';
-
-    // The Client ID obtained from the Google API Console. Replace with your own Client ID.
-    var clientId = "41796679134-28td93hca22o31avijmc0qsofh98nc1n.apps.googleusercontent.com"
-
-    // Replace with your own project number from console.developers.google.com.
-    // See "Project number" under "IAM & Admin" > "Settings"
-    var appId = "41796679134";
-
-    // Scope to use to access user's Drive items.
-    var scope = ['https://www.googleapis.com/auth/drive.file'];
-
-    var pickerApiLoaded = false;
-    var oauthToken;
-
-    // Use the Google API Loader script to load the google.picker script.
-    function loadPicker() {
-      gapi.load('auth', {'callback': onAuthApiLoad});
-      gapi.load('picker', {'callback': onPickerApiLoad});
-    }
-
-    function onAuthApiLoad() {
-      window.gapi.auth.authorize(
-          {
-            'client_id': clientId,
-            'scope': scope,
-            'immediate': false
-          },
-          handleAuthResult);
-    }
-
-    function onPickerApiLoad() {
-      pickerApiLoaded = true;
-      createPicker();
-    }
-
-    function handleAuthResult(authResult) {
-      if (authResult && !authResult.error) {
-        oauthToken = authResult.access_token;
-        createPicker();
-      }
-    }
-
-    // Create and render a Picker object for searching images.
-    function createPicker() {
-      if (pickerApiLoaded && oauthToken) {
-        var view = new google.picker.View(google.picker.ViewId.DOCS);
-        view.setMimeTypes("image/png,image/jpeg,image/jpg");
-        var picker = new google.picker.PickerBuilder()
-            .enableFeature(google.picker.Feature.NAV_HIDDEN)
-            .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-            .setAppId(appId)
-            .setOAuthToken(oauthToken)
-            .addView(view)
-            .addView(new google.picker.DocsUploadView())
-            .setDeveloperKey(developerKey)
-            .setCallback(pickerCallback)
-            .build();
-         picker.setVisible(true);
-      }
-    }
-
-    // A simple callback implementation.
-    function pickerCallback(data) {
-      if (data.action == google.picker.Action.PICKED) {
-        var fileId = data.docs[0].id;
-        alert('The user selected: ' + fileId);
-      }
-    }
-    </script>
+  <?!= include('modal_css');?>
+  
 </head>
 <body>
 
@@ -115,19 +45,18 @@
   <div style="width:100%; display: flex; overflow: auto; height: 50px;">
     <div class="navbar">
       <button id="openNav" class="openbtn" onclick="openNav()" style="float: left;">☰</button>
-      <a class="active" href="#"><i class="fa fa-fw fa-home"></i> Home</a> 
       <?var url = getScriptUrl();?>
-      <a href='<?=url?>?page=Search'><i class="fa fa-fw fa-search"></i> Search</a> 
-      
-      <a href="#"><i class="fa fa-fw fa-envelope"></i> Share for Review</a> 
-      <a onclick="createTemplate()"><i class="fa fa-fw fa-user"></i> Preview Report</a>
-      <button style="margin-top: 8px;" onclick="myFunction()">Save Form</button>
-      <button  style="margin-top: 8px;" title='Load Most Recent Submitted Report' id='loadBtn' disabled> Load Recent Report </button>
-      <button style="margin-top: 8px;" onclick="myAlerts()">Go to next alert</button>
+      <a id=shareBtn onclick="openEmailModal();"><i class="fa fa-fw fa-envelope"></i> Share for Review</a> 
+      <a id=returnComment onclick="reviewComments();" title='Reject and send revisions to writer' hidden><i class="fa fa-fw fa-user"></i> Reject Report</a>
+       <img src='https://le-cdn.website-editor.net/890182a9e4384ae6930cd502f9f32152/dms3rep/multi/opt/IAC+FINAL+%7C+Large-480w.png' class='logo'>
+     
+      <a style='float:right;' title='Load Most Recent Submitted Report' id='loadBtn' disabled><i class="fa fa-download" aria-hidden="true"></i> Load Recent Report </a>
+      <a style='float:right;'  onclick="myFunction()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save Form</a>
     </div>
   </div>
   
-
+   <a onclick="myAlerts()" id='alertsBtn'><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Go to next alert</a>
+    
     <form id="myForm">
   <div id="BasicInfoContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" >
    <?!=include("Basic Client Info");?>
@@ -176,8 +105,6 @@
   </div>
   
   <div id="EtcContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
-    <input type="file" id='importReportFile' onchange="fileReportUpload(this, 'importTest','importImage')"> 
-    <div><p id=importTest><img id=importImage src= '#' style="width:100%; max-width: 800px;"/></p><a onclick=submitReportParse()>IMPORT REPORT</a></div>
     <?!=include("Etc");?>
   </div>
     <div id="BEHContent" class="content" style="padding: 20px; width: 75%; display: inline-block; background-color: White; height: 100%;" hidden>
@@ -187,13 +114,89 @@
    <?!=include("Parent Training Goals");?>
   </div>
   </form>
- 
 </div>
 
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+<div id="myModal" class="modal">
+
+  <div class="modal-content">
+    
+    <span class="close" onclick='modalClose();'>&times;</span>
+    <modalHeader>
+    <h2 id=modalHeader>Comments</h2>
+    </modalHeader>
+    <textarea id="commentBox" placeholder='Some comment...'></textarea>
+    <button id=modalBtn onclick='saveComment();'> Save Comment </button>
+    <button id=removeBtn onclick='removeComment();'> Remove Comment </button>
+  </div>
+  
+</div>
+
+<div id="sigModal" class="modal">
+
+  <div class="modal-content2">
+    
+    <span class="close" onclick='modalClose();'>&times;</span>
+    <modalHeader>
+      <h2>Signature</h2>
+    </modalHeader>
+    <div>
+      <div>
+        <canvas id="signature-pad" class="signature-pad" width=400 height=200></canvas>
+        <img src='' id='sign_prev' style='display: none;' />
+      </div>
+      <button id="save">Save</button>
+      <button id="clear">Clear</button>
+    </div>
+  </div>
+  
+</div>
+
+
+<div id="emailModal" class="modal">
+
+  <div class="modal-content">
+    
+    <span class="close" onclick='modalClose();'>&times;</span>
+    <modalHeader>
+      <h2 id=modalHeader>Email Report</h2>
+    </modalHeader>
+    <modalBody>
+      <select id='emailRecipient'>Recipient</select>
+      <input type=text id=emailSubject placeholder='Email Subject'>
+      <textarea id="emailBody" placeholder='Email Body'></textarea>
+      <button id=emailReport onclick='sendReviewer();'> Send Email </button>
+    </modalBody>
+  </div>
+  
+</div>
+
+<div id="reviewCommentsModal" class="modal">
+
+  <div class="modal-content">
+    
+    <span class="close" onclick='modalClose();'>&times;</span>
+    <modalHeader>
+      <h2 id=modalHeader>Rejected: Email Comments/Revisions</h2>
+    </modalHeader>
+    <modalBody>
+      Recipient: <input type=text id=commentsRecipient disabled><br>
+      Subject: <input type=text id=commentsSubject disabled><br>
+      Body:<br>
+      <textarea id="commentsBody" placeholder='Email Body' rows=30 disabled></textarea>
+      <button onclick='sendComments();'> Send Email </button>
+    </modalBody>
+  </div>
+  
+</div>
+
  <?!= include('Loading_js');?>
  <?!= include('sidebar_js');?>
  <?!= include('form_js');?>
  <?!= include('SubmitElements_js');?>
+<?!= include('Picker');?>
+  <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=loadPicker"></script>
 </body>
 </html> 

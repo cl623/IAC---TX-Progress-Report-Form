@@ -1,30 +1,233 @@
 <script> 
+google.script.run.withSuccessHandler(getMaladaptives).getMaladaptives()
+
+Maladaptives = function(){
+  mal = ''
+  function set(o){
+    mal = o
+    maladaptiveScript(mal);
+  }
+  function get(){
+    return mal
+  }
+  return{
+    setAll:set,
+    getAll:get
+  }
+}();
+
+function getMaladaptives(list){
+  let o = removeEmpty(list)
+  let obj = o.sort(compareThirdColumn)
+  Maladaptives.setAll(obj)
+//  console.log(Maladaptives.getAll())
+}
+
+function compareThirdColumn(a, b) {
+    if (a[3] === b[3]) {
+        return 0;
+    }
+    else {
+        return (a[3] < b[3]) ? -1 : 1;
+    }
+}
+
+function removeEmpty(o){
+  var list = []
+  for(x of o){
+    if(x[3] != '')
+      list.push(x)
+  }
+  return list
+}
+
+/*
+ *  Function to convert form objects to javascript object
+ */
+
+  $.fn.getFormObject = function() {
+    var object = $(this).serializeArray().reduce(function(obj, item) {
+        var name = item.name.replace("[]", "");
+        if ( typeof obj[name] !== "undefined" ) {
+            if ( !Array.isArray(obj[name]) ) {
+                obj[name] = [ obj[name], item.value ];
+            } else {
+               obj[name].push(item.value);
+            }
+        } else {
+            obj[name] = item.value;
+        }
+        return obj;
+    }, {});
+    return object;
+}
+
+/*
+ *Calculate Age Function
+ */
+
+function getAge(birth, event) {
+    var dob = new Date(birth);
+    var e = new Date(event);
+    var age = e.getFullYear() - dob.getFullYear();
+    var m = e.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && e.getDate() < dob.getDate())) {
+        age--;
+        m = 12-(Math.abs(m))
+    }
+    return [age, m];
+}
+
+/*
+ *  Functions to automatically fill Age at Assessment && Age of Diagnosis when they user focuses out of date input
+ */
+
+$("#DOD").focusout(function(){
+  let x = getAge($('#DOB').text(), $("#DOD").val())
+//  alert( $('#DOB').text() + "\n"  + $("#DOD").val())
+  $('#CAAD').val(x[0] + ' years, ' + x[1] + ' months')
+});
+
+$("#DIAA").focusout(function(){
+  let x = getAge($('#DOB').text(), $("#DIAA").val())
+//  alert( $('#DOB').text() + "\n"  + $("#DOD").val())
+  $('#AAA').val(x[0] + ' years, ' + x[1] + ' months')
+});
+
+/*
+ *  Function to create the session schedule table. Take values from Start Time input and End Time input.
+ */
+
+$(document).on('click', '#createSchedule', function(){ 
+  var tableHeaderRowCount = 1;
+  var table = document.getElementById('Proposed Session Schedule')
+  var rowCount = table.rows.length;
+  for (var i = tableHeaderRowCount; i < rowCount; i++) {
+    table.deleteRow(tableHeaderRowCount);
+  }
+  
+  var s = document.getElementById('Session Start Time').value
+  var e = document.getElementById('Session End Time').value
+  
+  var intervals = parseTime(s, e)
+  if(intervals == 'Start Time cannot be later than End Time!'){
+    alert(intervals);
+    }
+  else{
+    var i = 0;
+    for(interval of intervals){
+    var row = table.insertRow(-1)
+    
+    var cell1 = row.insertCell(0)
+    var cell2 = row.insertCell(1)
+    
+    cell1.innerHTML = "<textarea id='PSS"+ i +"Time' rows=1 style='width:99%' name='PSS" + i + "Time'>" + interval[0] + " - " + interval[1] +" </textarea>"
+    cell2.innerHTML = "<textarea id='PSS" + i + "Outline' style='width:99%' rows=6 name='PSS" + i + "Outline' title='Example: \n\nGreetings/Check-In: Greet X and his/her family members. Check in with X’s parents in order to identify how X’s day has been so far, determine if there have been any significant life-changing events, issues, changes, or parent/caregiver parent concerns." + 
+    "\nPriming: Set-up X’s visual session schedule and review it with X."+
+    "\nSession Set-Up: Gather X’s ABA Program Binder; individualized skill acquisition programs; individualized BSP; ABA program visuals, ABA program materials, and ABA program data sheets. Set up for skill acquisition program implementation."+
+    "\nTransition: Prompt/Direct X to his/her designated ABA program work area in X.'></textarea>" 
+    i++
+    }
+  }
+}); 
+
+/*
+ *  Parse start and end inputs into 30 minute interval sets
+ */
+
+function parseTime(s,e) {	
+//Parse Start Time
+  var startHours = Number(s.match(/^(\d+)/)[1]);
+  var startMinutes = Number(s.match(/:(\d+)/)[1]);
+  var startAMPM = s.match(/\s(.*)$/)[1];
+//Parse End Time
+  var endHours = Number(e.match(/^(\d+)/)[1]);
+  var endMinutes = Number(e.match(/:(\d+)/)[1]);
+  var endAMPM = e.match(/\s(.*)$/)[1];
+  
+ //Add 12 or subtract 12 if AM or PM
+  if(startAMPM.toLowerCase() == "pm" && startHours<12) startHours = startHours+12;
+  if(startAMPM.toLowerCase() == "am" && startHours==12) startHours = startHours-12;
+  
+  if(endAMPM.toLowerCase() == "pm" && endHours<12) endHours = endHours+12;
+  if(endAMPM.toLowerCase() == "am" && endHours==12) endHours = endHours-12;
+  
+  
+  if(startHours > endHours || (startHours == endHours && startMinutes > endMinutes)){
+    return 'Start Time cannot be later than End Time!'
+  }
+  else{
+    var timesInBetween = []
+    if(startMinutes == 30){
+      timesInBetween.push([startHours < 10 ? tConvert("0" + startHours+":"+startMinutes) : tConvert(startHours+":"+startMinutes), startHours < 10 ? tConvert("0" + (startHours + 1) + ":" + "00") : tConvert((startHours + 1) + ":" + "00")])
+      startHours++;
+      }
+      
+    for(var i = startHours; i < endHours; i++){
+      timesInBetween.push([i < 10 ? tConvert("0" + i + ":00") : tConvert(i + ":00"),i < 10 ? tConvert("0" + i + ":30") : tConvert(i + ":30")])
+      timesInBetween.push([i < 10 ? tConvert("0" + i + ":30") : tConvert(i + ":30"),i < 10 ? tConvert("0" + (i+1) + ":00") : tConvert((i+1) + ":00")])
+    }
+    i = endHours
+    if(endMinutes == 30){
+      timesInBetween.push([endHours < 10 ? tConvert("0" + endHours+":"+ "00") : tConvert(endHours + ":" + "00"), endHours < 10 ? tConvert("0" + (endHours) + ":" + endMinutes) : tConvert((endHours) + ":" + endMinutes)])
+      startHours++;
+      }
+  }
+  return timesInBetween
+}
+
+/*
+ *  Convert 12Hr string values to 24Hr format
+ */
+
+function tConvert (time) {
+  // Check correct time format and split into components
+  time = time.toString ().match (/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+
+  if (time.length > 1) { // If time format correct
+    time = time.slice (1);  // Remove full string match value
+    time[5] = +time[0] < 12 ? 'AM' : 'PM'; // Set AM/PM
+    time[0] = +time[0] % 12 || 12; // Adjust hours
+  }
+  return time.join (''); // return adjusted time or original string
+}
+
+/*
+ *  Test function to email people via typed text strings
+ */
 
   function emailTag(){
     var text= $("#IAAPB").val()
     google.script.run.tag(text)
   }
   
+/*
+ *  Function to maintain alerted/bookmarked tabs and scroll through the collection
+ */
+  
   var alertIterator = 0;
   var alerts;
   
   function myAlerts(){
     alerts = document.getElementsByClassName('missingInfo')
-    if((alertIterator) < alerts.length){
-    alerts[alertIterator].scrollIntoView({behavior:"smooth"});
-    alertIterator++;
-    }
-    else{
-    alertIterator = 1;
-    alerts[0].scrollIntoView({behavior:"smooth"});
+    if(alerts.length > 0){
+      if((alertIterator) < alerts.length){
+        alerts[alertIterator].scrollIntoView({behavior:"smooth"});
+        alertIterator++;
+      }
+      else{
+        alertIterator = 1;
+        alerts[0].scrollIntoView({behavior:"smooth"});
+      }
     }
   }
 
   function setMissing(element){
-  if(element.classList.contains('missingInfo'))
-    element.classList.remove("missingInfo");
-  else
     element.classList.add("missingInfo");
+  }
+  
+  function removeMissing(element){
+    element.classList.remove("missingInfo");
   }
 
  //=================================================================================================================================================================
@@ -33,41 +236,48 @@
 
   google.script.url.getLocation(function(location) {
     var clientID = location.parameters.clientID[0];
-    google.script.run.withSuccessHandler(clientPrefill).getClientInfo(undefined, clientID);
+//    google.script.run.withSuccessHandler(clientPrefill).getClientInfo(undefined, clientID);
+    google.script.run.withSuccessHandler(clientPrefill).getInfo(clientID);
+
     google.script.run.withSuccessHandler(setUser).getUser();
-    maladaptiveScript();
   });
 
 function setUser(user){
   username = user;
+  Reviewer.setWri(user);
 }
 
-  function maladaptiveScript(){
+/*
+ *  Populate maladaptive behavior checklist and add functionality onclick 
+ */
+
+  function maladaptiveScript(malList){
   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      //-------------------Create Maladaptive Behavior Checklist----------------------
      //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      
-  var malList = ["Accusations of Others","Active Non-Compliance","Affect Incongruous with Situation","Aggressive Behaviors","Biting","Brooding",
-                 "Complaints Concerning Fairness or Treatment","Contextually Unrelated Verbalizations and Vocalizations","Conversations Held with Imaginary Persons",
-                 "Criticism of Others","Cruelty to Animals","Cursing","Delayed Echolalia","Destruction of Another's Property","Destruction of Environment",
-                 "Destruction of Personal Property","Disruption of Materials/Environment","Escape Behaviors","Excessive Eating","Excessively Slow Responsivity",
-                 "Facial Grimaces","Fire Setting","Flatness of Affect","Food Expectoration","Food Hoarding","Food Stealing","Full Echolalia","Hand Waving/Finger Play",
-                 "Head Weaving","Hitting or Kicking","Hoarding","Idiosyncratic Speech","Immature Speech","Impulsivity","Inappropriate Auditory Stimulation",
-                 "Inappropriate Denial/Defensive Responses","Inappropriate Eating Pace","Inappropriate Eye Movement","Inappropriate Intonation","Inappropriate Noises",
-                 "Inappropriate Object Manipulation","Inappropriate Oral Behaviors","Inappropriate Physical Contact","Inappropriate Question Asking",
-                 "Inappropriate Removal of Clothing","Inappropriate Rubbing/Stroking","Inappropriate Selectivity of Food Items","Inappropriate Self-Initiated Commentary",
-                 "Inappropriate Sitting","Inappropriate Speech","Inappropriate Vocalizations","Ingestion of Inedible Substances-(Pica)","Intrusion of Personal Space",
-                 "Intrusive Social Initiation","Laughing/Hysteria","Light Gazing","Lying","Masturbation","Morbid Content of Speech","Motor Perseverative",
-                 "Mouthing of Non-Food Items","Muscle Tensing","Need for Sameness in the Environment","Nonverbal Instigation","Orifice Probing/Laceration",
-                 "Other Eating Problems","Out of Seat","Overly Directive Speech","Partial Echolalia","Passive/Non-Compliance","Perseverative Behavior","Pinching",
-                 "Posturing","Pushing/Tripping","Refusal to Eat","Ritualistic Behavior","Rocking","Sarcasm","Self-Deprecating Statements","Self-Injurious Behavior (SIB)",
-                 "Self-Injurious-Behavior (SIB)-Eye-Poking","Self-Injurious-Behavior (SIB)-Hair-Pulling","Self-Injurious-Behavior (SIB)-Hitting",
-                 "Self-Injurious-Behavior (SIB)-Biting-Self","Self-Injurious-Behavior (SIB)-Head-Banging","Self-Injurious-Behavior (SIB)-Scratching",
-                 "Self-Stimulatory Behavior","Self-Talk","Shyness","Singing/Humming","Smearing","Socially Inappropriate Speech Content or Topics",
-                 "Speech which is Inappropriate because of Context","Spinning","Spitting","Stealing","Struggling/Physical Resistance","Tantrums","Teasing",
-                 "Teeth Grinding","Throwing Contents/Spilling Objects","Throwing Objects at Others","Thrusting Body Parts","Tissue Rubbing/Irritation","Toe Walking",
-                 "Twirling","Verbal Instigation","Verbal Perseverative","Verbal Refusals","Verbal Threats","Word Salad"];
-                 
+//  var malList = ["Accusations of Others","Active Non-Compliance","Affect Incongruous with Situation","Aggressive Behaviors","Biting","Brooding",
+//                 "Complaints Concerning Fairness or Treatment","Contextually Unrelated Verbalizations and Vocalizations","Conversations Held with Imaginary Persons",
+//                 "Criticism of Others","Cruelty to Animals","Cursing","Delayed Echolalia","Destruction of Another's Property","Destruction of Environment",
+//                 "Destruction of Personal Property","Disruption of Materials/Environment","Escape Behaviors","Excessive Eating","Excessively Slow Responsivity",
+//                 "Facial Grimaces","Fire Setting","Flatness of Affect","Food Expectoration","Food Hoarding","Food Stealing","Full Echolalia","Hand Waving/Finger Play",
+//                 "Head Weaving","Hitting or Kicking","Hoarding","Idiosyncratic Speech","Immature Speech","Impulsivity","Inappropriate Auditory Stimulation",
+//                 "Inappropriate Denial/Defensive Responses","Inappropriate Eating Pace","Inappropriate Eye Movement","Inappropriate Intonation","Inappropriate Noises",
+//                 "Inappropriate Object Manipulation","Inappropriate Oral Behaviors","Inappropriate Physical Contact","Inappropriate Question Asking",
+//                 "Inappropriate Removal of Clothing","Inappropriate Rubbing/Stroking","Inappropriate Selectivity of Food Items","Inappropriate Self-Initiated Commentary",
+//                 "Inappropriate Sitting","Inappropriate Speech","Inappropriate Vocalizations","Ingestion of Inedible Substances-(Pica)","Intrusion of Personal Space",
+//                 "Intrusive Social Initiation","Laughing/Hysteria","Light Gazing","Lying","Masturbation","Morbid Content of Speech","Motor Perseverative",
+//                 "Mouthing of Non-Food Items","Muscle Tensing","Need for Sameness in the Environment","Nonverbal Instigation","Orifice Probing/Laceration",
+//                 "Other Eating Problems","Out of Seat","Overly Directive Speech","Partial Echolalia","Passive/Non-Compliance","Perseverative Behavior","Pinching",
+//                 "Posturing","Pushing/Tripping","Refusal to Eat","Ritualistic Behavior","Rocking","Sarcasm","Self-Deprecating Statements","Self-Injurious Behavior (SIB)",
+//                 "Self-Injurious-Behavior (SIB)-Eye-Poking","Self-Injurious-Behavior (SIB)-Hair-Pulling","Self-Injurious-Behavior (SIB)-Hitting",
+//                 "Self-Injurious-Behavior (SIB)-Biting-Self","Self-Injurious-Behavior (SIB)-Head-Banging","Self-Injurious-Behavior (SIB)-Scratching",
+//                 "Self-Stimulatory Behavior","Self-Talk","Shyness","Singing/Humming","Smearing","Socially Inappropriate Speech Content or Topics",
+//                 "Speech which is Inappropriate because of Context","Spinning","Spitting","Stealing","Struggling/Physical Resistance","Tantrums","Teasing",
+//                 "Teeth Grinding","Throwing Contents/Spilling Objects","Throwing Objects at Others","Thrusting Body Parts","Tissue Rubbing/Irritation","Toe Walking",
+//                 "Twirling","Verbal Instigation","Verbal Perseverative","Verbal Refusals","Verbal Threats","Word Salad"];
+//                 
+
   var malListDiv = document.getElementById('MaladaptiveList');
 //  malListDiv.innerHTML = "<p>" + malList[5] + "</p>";
   
@@ -75,9 +285,11 @@ function setUser(user){
     var checkBox = document.createElement("input");
     var label = document.createElement("label");
     checkBox.type = "checkbox";
-    checkBox.value = malList[x];
+    checkBox.value = malList[x][3];
+    checkBox.title = malList[x][4];
     checkBox.id = 'mal' + x;
     checkBox.name= 'Maladaptive Behaviors'
+    checkBox.classList.add('checkbox');
     checkBox.onclick = function(){
       if(this.checked){
       
@@ -119,7 +331,7 @@ function setUser(user){
                                    "</tr>" +
                                    "<tr>"+
                                      "<td> Goal Category </td>"+
-                                     "<td style='padding: 0;'><select name='goalCategory' style='width: 100%; height: 46px;'></select></td>"+
+                                     "<td style='padding: 0;'><input type=text name='"+this.value+"Category value='Behavior Reduction Goal'</td>"+
                                    "</tr>" +
                                    "<tr>"+
                                      "<td> Goal: </td>"+
@@ -322,31 +534,31 @@ function setUser(user){
                                      "</table>" + 
                                      "<table class=shortTable><col width=7%><col width=93%>"+ 
                                        "<tr><th></th><th> Frequency of X </th></tr>"+
-                                       "<tr><td>1</td><td><label for="+this.id+"Freq1><strong>How often does the target behavior occur?</strong><br> 1=Every Month,7=Every Minute</label><input type='range' list='tickmarks' min='1' max='7'                              id="+this.id+"Freq1 name='"+this.value+"Freq' onchange='appendixSum("+this.id+"FreqScore, '"+this.value+"Freq')'></td></tr>"+
-                                       "<tr><td>2</td><td><label for="+this.id+"Freq2><strong>What times of day does the target behavior occur? </strong><br> 1=Specific Times of Day,7=All Times of Day</label><input type='range' list='tickmarks' min='1' max='7'       id="+this.id+"Freq2 name='"+this.value+"Freq' onchange='appendixSum("+this.id+"FreqScore, '"+this.value+"Freq')'></td></tr>"+
-                                       "<tr><td>3</td><td><label for="+this.id+"Freq3><strong>What times of month does the target behavior occur? </strong><br> 1=Specific Times of Month,7=All Times of Month</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Freq3 name='"+this.value+"Freq' onchange='appendixSum("+this.id+"FreqScore, '"+this.value+"Freq')'></td></tr>"+
-                                       "<tr><td>4</td><td><label for="+this.id+"Freq4><strong>What times of year does the target behavior occur?  </strong><br> 1=Specific Times of Year,7=All Times of Year</label><input type='range' list='tickmarks' min='1' max='7'   id="+this.id+"Freq4 name='"+this.value+"Freq' onchange='appendixSum("+this.id+"FreqScore, '"+this.value+"Freq')'></td></tr>"+
+                                       "<tr><td>1</td><td><label for="+this.id+"Freq1><strong>How often does the target behavior occur?</strong><br> 1=Every Month,7=Every Minute</label><input type='range' list='tickmarks' min='1' max='7'                              id="+this.id+"Freq1 name='"+this.value+"Freq' onchange='appendixSum(this)'></td></tr>"+
+                                       "<tr><td>2</td><td><label for="+this.id+"Freq2><strong>What times of day does the target behavior occur? </strong><br> 1=Specific Times of Day,7=All Times of Day</label><input type='range' list='tickmarks' min='1' max='7'       id="+this.id+"Freq2 name='"+this.value+"Freq' onchange='appendixSum(this)'></td></tr>"+
+                                       "<tr><td>3</td><td><label for="+this.id+"Freq3><strong>What times of month does the target behavior occur? </strong><br> 1=Specific Times of Month,7=All Times of Month</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Freq3 name='"+this.value+"Freq' onchange='appendixSum(this)'></td></tr>"+
+                                       "<tr><td>4</td><td><label for="+this.id+"Freq4><strong>What times of year does the target behavior occur?  </strong><br> 1=Specific Times of Year,7=All Times of Year</label><input type='range' list='tickmarks' min='1' max='7'   id="+this.id+"Freq4 name='"+this.value+"Freq' onchange='appendixSum(this)'></td></tr>"+
                                      "<datalist id='tickmarks'><option value='0'></option><option value='1'></option><option value='2'></option><option value='3'></option><option value='4'></option> <option value='5'></option><option value='6'></option><option value='7'></option></datalist></table>" + 
                                     "<table class=shortTable><col width=7%><col width=93%>"+ 
                                        "<tr><th></th><th> Intensity of X </th></tr>"+
-                                       "<tr><td>1</td><td><label for="+this.id+"Int1><strong>How severe is the physical damage to the client as a result of the target behavior?</strong><br> 1=No Element of Physical Damage to Self, 7=Life Threatening to Self</label><input type='range' list='tickmarks' min='1' max='7'     id="+this.id+"Intensity1 name="+this.value+"Int onchange='appendixSum("+this.id+"IntensityScore, '"+this.value+"Int')'></td></tr>"+
-                                       "<tr><td>2</td><td><label for="+this.id+"Int2><strong>How severe is the physical damage to others as a result of the target behavior?</strong><br> 1=No Element of Physical Damage to Other(s), 7=Life Threatening to Other(s)</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Intensity2 name="+this.value+"Int onchange='appendixSum("+this.id+"IntensityScore, '"+this.value+"Int')'></td></tr>"+
-                                       "<tr><td>3</td><td><label for="+this.id+"Int3><strong>How severe is the physical damage to the environment as a result of the target behavior? </strong><br> 1=No Damage to Environment, 7=Severe Property Damage</label><input type='range' list='tickmarks' min='1' max='7'              id="+this.id+"Intensity3 name="+this.value+"Int onchange='appendixSum("+this.id+"IntensityScore, '"+this.value+"Int')'></td></tr>"+
-                                       "<tr><td>4</td><td><label for="+this.id+"Int4><strong>How severe is the disruption to routines as a result of the target behavior?  </strong><br> 1=Does Not Interfere with Routines, 7= Severe Disruption to Routines</label><input type='range' list='tickmarks' min='1' max='7'         id="+this.id+"Intensity4 name="+this.value+"Int onchange='appendixSum("+this.id+"IntensityScore, '"+this.value+"Int')'></td></tr>"+
+                                       "<tr><td>1</td><td><label for="+this.id+"Int1><strong>How severe is the physical damage to the client as a result of the target behavior?</strong><br> 1=No Element of Physical Damage to Self, 7=Life Threatening to Self</label><input type='range' list='tickmarks' min='1' max='7'     id="+this.id+"Intensity1 name='"+this.value+"Int' onchange='appendixSum(this)'></td></tr>"+
+                                       "<tr><td>2</td><td><label for="+this.id+"Int2><strong>How severe is the physical damage to others as a result of the target behavior?</strong><br> 1=No Element of Physical Damage to Other(s), 7=Life Threatening to Other(s)</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Intensity2 name='"+this.value+"Int' onchange='appendixSum(this)'></td></tr>"+
+                                       "<tr><td>3</td><td><label for="+this.id+"Int3><strong>How severe is the physical damage to the environment as a result of the target behavior? </strong><br> 1=No Damage to Environment, 7=Severe Property Damage</label><input type='range' list='tickmarks' min='1' max='7'              id="+this.id+"Intensity3 name='"+this.value+"Int' onchange='appendixSum(this)'></td></tr>"+
+                                       "<tr><td>4</td><td><label for="+this.id+"Int4><strong>How severe is the disruption to routines as a result of the target behavior?  </strong><br> 1=Does Not Interfere with Routines, 7= Severe Disruption to Routines</label><input type='range' list='tickmarks' min='1' max='7'         id="+this.id+"Intensity4 name='"+this.value+"Int' onchange='appendixSum(this)'></td></tr>"+
                                      "<datalist id='tickmarks'><option value='0'></option><option value='1'></option><option value='2'></option><option value='3'></option><option value='4'></option> <option value='5'></option><option value='6'></option><option value='7'></option></datalist></table>" +
                                      "<table class=shortTable><col width=7%><col width=93%>"+ 
                                        "<tr><th></th><th> Duration of X </th></tr>"+
-                                       "<tr><td>1</td><td><label for="+this.id+"Dur1><strong>How soon does the target behavior re-occur? </strong><br> 1=Days Later, 7=Right Away</label><input type='range' list='tickmarks' min='1' max='7'           id="+this.id+"Duration1 name='"+this.value+"Dur' onchange='appendixSum("+this.id+"DurationScore, '"+this.value+"Dur')'></td></tr>"+
-                                       "<tr><td>2</td><td><label for="+this.id+"Dur2><strong>How long does this target behavior last from start to finish? </strong><br> 1=Seconds, 7=Hours</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Duration2 name='"+this.value+"Dur' onchange='appendixSum("+this.id+"DurationScore, '"+this.value+"Dur')'></td></tr>"+
-                                       "<tr><td>3</td><td><label for="+this.id+"Dur3><strong>How long is the escalation leading up to the target behavior? </strong><br> 1=Seconds, 7=Hours</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Duration3 name='"+this.value+"Dur' onchange='appendixSum("+this.id+"DurationScore, '"+this.value+"Dur')'></td></tr>"+
-                                       "<tr><td>4</td><td><label for="+this.id+"Dur4><strong>How long is the de-escalation following the target behavior? </strong><br> 1=Seconds, 7=Hours</label><input type='range' list='tickmarks' min='1' max='7'  id="+this.id+"Duration4 name='"+this.value+"Dur' onchange='appendixSum("+this.id+"DurationScore, '"+this.value+"Dur')'></td></tr>"+
-                                     "<datalist id='tickmarks'><option value='0'></option><option value='1'></option><option value='2'></option><option value='3'></option><option value='4'></option> <option value='5'></option><option value='6'></option><option value='7'></option></datalist onchange='appendixSum("+this.id+"DurationScore, "+this.id+")'></table>" + 
+                                       "<tr><td>1</td><td><label for="+this.id+"Dur1><strong>How soon does the target behavior re-occur? </strong><br> 1=Days Later, 7=Right Away</label><input type='range' list='tickmarks' min='1' max='7'           id="+this.id+"Duration1 name='"+this.value+"Dur' onchange='appendixSum()'></td></tr>"+
+                                       "<tr><td>2</td><td><label for="+this.id+"Dur2><strong>How long does this target behavior last from start to finish? </strong><br> 1=Seconds, 7=Hours</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Duration2 name='"+this.value+"Dur' onchange='appendixSum()'></td></tr>"+
+                                       "<tr><td>3</td><td><label for="+this.id+"Dur3><strong>How long is the escalation leading up to the target behavior? </strong><br> 1=Seconds, 7=Hours</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Duration3 name='"+this.value+"Dur' onchange='appendixSum()'></td></tr>"+
+                                       "<tr><td>4</td><td><label for="+this.id+"Dur4><strong>How long is the de-escalation following the target behavior? </strong><br> 1=Seconds, 7=Hours</label><input type='range' list='tickmarks' min='1' max='7'  id="+this.id+"Duration4 name='"+this.value+"Dur' onchange='appendixSum()'></td></tr>"+
+                                     "<datalist id='tickmarks'><option value='0'></option><option value='1'></option><option value='2'></option><option value='3'></option><option value='4'></option> <option value='5'></option><option value='6'></option><option value='7'></option></datalist></table>" + 
                                     "<table class=shortTable><col width=7%><col width=93%>"+ 
                                        "<tr><th></th><th> Discrimination of X </th></tr>"+
-                                       "<tr><td>1</td><td><label for="+this.id+"Disc1><strong>With whom does this target behavior occur?</strong><br> 1=With One Person Only, 7=Everyone</label><input type='range' list='tickmarks' min='1' max='7'                     id="+this.id+"Disc1 name='"+this.value+"Dis' onchange='appendixSum("+this.id+"DiscriminationScore, '"+this.value+"Dis')'></td></tr>"+
-                                       "<tr><td>2</td><td><label for="+this.id+"Disc2><strong>Where does this target behavior occur (across settings)? </strong><br> 1=In One Setting, 7=All Settings</label><input type='range' list='tickmarks' min='1' max='7'        id="+this.id+"Disc2 name='"+this.value+"Dis' onchange='appendixSum("+this.id+"DiscriminationScore, '"+this.value+"Dis')'></td></tr>"+
-                                       "<tr><td>3</td><td><label for="+this.id+"Disc3><strong>Where does this target behavior occur (within settings)?  </strong><br>  1=In One Area/Room, 7=Every Area/Room</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Disc3 name='"+this.value+"Dis' onchange='appendixSum("+this.id+"DiscriminationScore, '"+this.value+"Dis')'></td></tr>"+
-                                       "<tr><td>4</td><td><label for="+this.id+"Disc4><strong>When does this target behavior occur? </strong><br> 1=In One Activity/Routine, 7 = Every Activity/Routine</label><input type='range' list='tickmarks' min='1' max='7'      id="+this.id+"Disc4 name='"+this.value+"Dis' onchange='appendixSum("+this.id+"DiscriminationScore, '"+this.value+"Dis')'></td></tr>"+
+                                       "<tr><td>1</td><td><label for="+this.id+"Disc1><strong>With whom does this target behavior occur?</strong><br> 1=With One Person Only, 7=Everyone</label><input type='range' list='tickmarks' min='1' max='7'                     id="+this.id+"Disc1 name='"+this.value+"Dis' onchange='appendixSum()'></td></tr>"+
+                                       "<tr><td>2</td><td><label for="+this.id+"Disc2><strong>Where does this target behavior occur (across settings)? </strong><br> 1=In One Setting, 7=All Settings</label><input type='range' list='tickmarks' min='1' max='7'        id="+this.id+"Disc2 name='"+this.value+"Dis' onchange='appendixSum()'></td></tr>"+
+                                       "<tr><td>3</td><td><label for="+this.id+"Disc3><strong>Where does this target behavior occur (within settings)?  </strong><br>  1=In One Area/Room, 7=Every Area/Room</label><input type='range' list='tickmarks' min='1' max='7' id="+this.id+"Disc3 name='"+this.value+"Dis' onchange='appendixSum()'></td></tr>"+
+                                       "<tr><td>4</td><td><label for="+this.id+"Disc4><strong>When does this target behavior occur? </strong><br> 1=In One Activity/Routine, 7 = Every Activity/Routine</label><input type='range' list='tickmarks' min='1' max='7'      id="+this.id+"Disc4 name='"+this.value+"Dis' onchange='appendixSum()'></td></tr>"+
                                      "<datalist id='tickmarks'><option value='0'></option><option value='1'></option><option value='2'></option><option value='3'></option><option value='4'></option> <option value='5'></option><option value='6'></option><option value='7'></option></datalist></table>" +
                                   "</div>"
         }
@@ -373,7 +585,9 @@ function setUser(user){
     label.htmlFor = 'mal' + x;
     malListDiv.appendChild(checkBox);
     malListDiv.appendChild(label);
-    label.appendChild(document.createTextNode(malList[x]));
+    label.appendChild(document.createTextNode(malList[x][3]));
+    label.title = malList[x][4];
+    label.classList.add('checkbox');
     var linebreak = document.createElement('br');
     label.appendChild(linebreak);
   }
@@ -444,110 +658,73 @@ function setUser(user){
       var linebreak = document.createElement('br');
       label.appendChild(linebreak);
     }
-  }
-  }
-  
-  function appendixSum(container, sliders){
-    let sum = 0
-    for(var i = 0; i < sliders.length; i++){
-      sum += parseInt(sliders[i].value);
     }
-    container.value=sum;
+    
+    var time30 = ['5:00 AM', '5:30 AM', '6:00 AM','6:30 AM', '7:00 AM', '7:30 AM', '8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', 
+    '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM', 
+    '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM', '6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM']
+    
+    for(var time of time30){
+      var startSel = document.getElementById('Session Start Time');
+      var endSel = document.getElementById('Session End Time');
+      var opta = document.createElement('option');
+      var optb = document.createElement('option');
+      opta.appendChild( document.createTextNode(time) );
+      optb.appendChild( document.createTextNode(time) );
+      opta.value = time; 
+      optb.value = time; 
+      startSel.appendChild(opta); 
+      endSel.appendChild(optb); 
+    }
   }
   
-  function clientPrefill(info){
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //----------------------Client Info & Contact Info------------------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     
+  /*
+   *  Add up maladaptive score
+   */
+  
+  function appendixSum(a,b){
+    let sum = 0;
+    $("[name='"+a.name+"']").each(function() {
+      sum += parseInt(this.value);
+    });
+    document.getElementById(a.name+'Score').value=sum
+  }
+  
+  /*
+   *  Fill known client info via database query
+   */
+  function clientPrefill(o){
+  
     var doneLoading = false;
 
-    var tag = ['ClientID', 'ClientName', 'DOB', 
-                'PrimaryLangauge', 'SecondaryLanguage', 
-                'Guardian1Name', 'Guardian1HP', 'Guardian1CP', 'Guardian1Add', 
-                'Guardian2Name', 'Guardian2HP', 'Guardian2CP', 'Guardian2Add', 
-                'Emergency1Name', 'Emergency1HP', 'Emergency1CP','ClientGen']
-                
-    var index = [0,1,3,6,7,9,11,12,13,14,15,16,20,22,23,24,25,26,27,30,32,33, 5]
-    var len = index.length
-    
-    for(var i=0; i < len; i++){
-      if(i == 8 || i == 15){
-        if(info[1][index[0]] != ''){
-          document.getElementById(tag.shift()).innerHTML = '<strong>' + info[1][index.shift()]+ ' ' + info[1][index.shift()] +
-                                                           ', '+ info[1][index.shift()] + ' ' + info[1][index.shift()] + '</strong>'; 
-          i+=3;
+    var info = JSON.parse(o)
+    for(data in info){
+      var value = info[data]
+      if(value == null){
+        var element = document.getElementById(data)
+        if(element != null){
+          element.innerHTML = '<span style="background-color:Tomato"><strong>-</strong></span>'
           }
-        else{
-        document.getElementById(tag.shift()).innerHTML = '<span style="background-color:Tomato"><strong>-</strong></span>';
-        i+=3;
-        index.shift();
-        index.shift();
-        index.shift();
-        index.shift();
-        }
       }
-      else{
-        if(info[1][index[0]] != ''){
-          document.getElementById(tag.shift()).innerHTML = '<strong>' + info[1][index.shift()] +'</strong>';
+      else if(data == 'Address1'){
+        document.getElementById('Guardian1Add').innerHTML = '<strong>' + value + ' ' + info['City1'] +
+                                                           ', '+ info['State1'] + ' ' + info['ZipCode1'] + '</strong>'; 
+      }
+      else if(data == 'Address2'){
+        document.getElementById('Guardian2Add').innerHTML = '<strong>' + value + ' ' + info['City2'] +
+        ', '+ info['State2'] + ' ' + info['ZipCode2'] + '</strong>'; 
         }
-        else{
-          document.getElementById(tag.shift()).innerHTML = '<span style="background-color:Tomato"><strong>-</strong></span>';
-          index.shift();
+      else{
+        var element = document.getElementById(data)
+        if(element != null){
+        element.innerHTML = '<strong>' + value +  '</strong>'; 
         }
       }
     }
-    doneLoading = true;
-     
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //------------------------------Insurance Info----------------------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     var primTag =    [ 'PrimaryInsurancePlanName', 'PrimaryInsuranceID', 'PrimaryInsurancePayerName']
-     var secTag =     ['SecondaryInsurancePlanName', 'SecondaryInsuranceID', 'SecondaryInsurancePayerName']
-      
-     var insIndex = [3, 6, 5]
-     
-     
-     for(var j=0; j < 3; j++){
-       if(info[2] != null){
-         if(info[2][insIndex[j]] != ''){
-           document.getElementById(primTag[j]).innerHTML = '<strong>' + info[2][insIndex[j]] +'</strong>';
-         }
-         else{
-           document.getElementById(primTag[j]).innerHTML = '<span style="background-color:Tomato"><strong>-</strong></span>';
-         }
-       }
-       if(info[3] != null){
-         if(info[3][insIndex[j]] != ''){
-           document.getElementById(secTag[j]).innerHTML = '<strong>' + info[3][insIndex[j]] +'</strong>';
-         }
-         else{
-           document.getElementById(secTag[j]).innerHTML = '<span style="background-color:Tomato"><strong>-</strong></span>';
-         }
-       }
-       else{
-         document.getElementById('PhysicianInfo').style.width = '50%';
-         document.getElementById('PrimaryIns').style.width = '50%';
-         document.getElementById('SecondaryIns').style.display = 'none';
-       }
-     }
-     
-     
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //------------------------Family Composition Prefill----------------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     
-     if(info[1][1] != ''){
-       document.getElementById('FamilyComp').innerHTML = info[1][1] +
-                                        " currently lives at home with his/her <FAMILY COMPOSITION>. " + info[1][1] +
-                                        "'s maternal and paternal grandparents live in close physical proximity to " + info[1][1] +
-                                        " and spend time with " + info[1][1] + " on a regular basis.";
-     }
-     
-  
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //-------------------Load from Sheet Button Initialization----------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    
+    //Initialize load button after client info is loaded
+    
+    doneLoading = true; 
 
   var loadbtn = document.getElementById('loadBtn')
   
@@ -559,6 +736,10 @@ function setUser(user){
     google.script.run.withSuccessHandler(getLastReport).getFunderSheetData($("#ClientID").text());
   }
 }
+
+/*
+ *  Populate risk info when risk is selected
+ */
 
 function riskInfo(element,container, title, fam){
   if(element.checked == true){
@@ -719,15 +900,16 @@ function riskInfo(element,container, title, fam){
        $("#medTable tr:last").remove();
      }
     });
-   
- });
- 
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //-------------------------------Current Medication-----------------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    
+    
+    
+    
+    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    //-------------------------------Current Medication-----------------------------
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
- $(document).ready(function(){
    $("#curMedTableAdd").click(function(){
      var i = $('#medicationsTable tr').length;
      $('#medicationsTable tr:last').after("<tr><td>" + i + "</td>"+
@@ -736,22 +918,24 @@ function riskInfo(element,container, title, fam){
                                           "<td><textarea id='curMedTable" + i + "Col3' style='width: 99%;' rows=2 name='Medications Frequency'> Example Frequency " + i +"</textarea></td>"+
                                           "</tr>" );
      });
-   });
 
- $(document).ready(function(){
+
+
    $("#curMedTableMinus").click(function() {
      if($('#medicationsTable tr').length > 1){
        $("#medicationsTable tr:last").remove();
      }
     });
-  });
-  
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //-------------------------------Current Vitamins-----------------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    
+    
+    
+    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    //-------------------------------Current Vitamins-----------------------------
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
- $(document).ready(function(){
    $("#curVitTableAdd").click(function(){
      var i = $('#vitaminsTable tr').length;
      $('#vitaminsTable tr:last').after("<tr><td>" + i + "</td>"+
@@ -760,47 +944,42 @@ function riskInfo(element,container, title, fam){
                                           "<td><textarea id='curVitTable" + i + "Col3' style='width: 99%;' rows=2 name='Vitamins Frequency'> Example Frequency " + i +"</textarea></td>"+
                                           "</tr>" );
      });
-   });
 
- $(document).ready(function(){
    $("#curVitTableMinus").click(function() {
      if($('#vitaminsTable tr').length > 1){
        $("#vitaminsTable tr:last").remove();
      }
     });
-  });
   
-  
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //-----------------------------------Allergies----------------------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
- 
- $(document).ready(function(){
+    
+    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    //-----------------------------------Allergies----------------------------------
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    
    $("#allergiesTableAdd").click(function(){
      var i = $('#allergiesTable tr').length;
      $('#allergiesTable tr:last').after("<tr><td>" + i + "</td>"+
                                            "<td><textarea id='allergiesTable" + i + "' style='width: 99%;' rows=2 name='Allergies'> Allergy " + i +"</textarea></td></tr>" );
    });
- });
  
- $(document).ready(function(){
    $("#allergiesTableMinus").click(function() {
      if($('#allergiesTable tr').length > 1){
        $("#allergiesTable tr:last").remove();
      }
     });
-  });
-  
- //=================================================================================================================================================================
- //-------------------------------------------------Current and Past Services Page----------------------------------------------------------------------------------
- //=================================================================================================================================================================
-  
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //----------------------------------EITrue -------------------------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    
+    
+    
+    //=================================================================================================================================================================
+    //-------------------------------------------------Current and Past Services Page----------------------------------------------------------------------------------
+    //=================================================================================================================================================================
+    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    //----------------------------------EITrue -------------------------------------
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    
      
-     
-  $(document).ready(function(){
     $("#EIYes").click(function(){
       if($('#EIYes').is(':checked')){ 
         $("#EITrue").show()
@@ -816,14 +995,13 @@ function riskInfo(element,container, title, fam){
           }
         }
     });
-  });
   
-
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //---------------------------------EITrue1 Table--------------------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  
+  
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  //---------------------------------EITrue1 Table--------------------------------
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      
- $(document).ready(function(){
    $("#IFSPTableAdd").click(function(){
      var i = $('#IFSPTable tr').length;
      $('#IFSPTable tr:last').after(     
@@ -839,23 +1017,19 @@ function riskInfo(element,container, title, fam){
                                    "</tr>"
                                     );
    });
- });
  
- $(document).ready(function(){
    $("#IFSPTableMinus").click(function() {
      if($('#IFSPTable tr').length > 1){
        $("#IFSPTable tr:last").remove();
      }
     });
-  });
-  
-  
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //----------------------------------OSEITrue -------------------------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    
+    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    //----------------------------------OSEITrue -------------------------------------
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      
      
-  $(document).ready(function(){
     $("#OSEIYes").click(function(){
       if($('#OSEIYes').is(':checked')){ 
         $("#OSEITrue").show();        
@@ -869,15 +1043,12 @@ function riskInfo(element,container, title, fam){
           }
         }
     });
-  });
   
   
-  
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-     //---------------------------------OSEITrue Table--------------------------------
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  //---------------------------------OSEITrue Table--------------------------------
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      
- $(document).ready(function(){
    $("#OSEITableAdd").click(function(){
      var i = $('#OSEITable tr').length;
      $('#OSEITable tr:last').after(     
@@ -891,22 +1062,19 @@ function riskInfo(element,container, title, fam){
                                    "</tr>"
                                     );
    });
- });
  
- $(document).ready(function(){
    $("#OSEITableMinus").click(function() {
      if($('#OSEITable tr').length > 1){
        $("#OSEITable tr:last").remove();
      }
     });
-  });
-  
+
+
      //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      //----------------------------------CEITrue -------------------------------------
      //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      
      
-  $(document).ready(function(){
     $("#CEIYes").click(function(){
       if($('#CEIYes').is(':checked')){ 
         $("#CEITrue").show()
@@ -922,13 +1090,14 @@ function riskInfo(element,container, title, fam){
           }
         }
     });
-  });
-  
-     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    
+   
+   
+   
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      //---------------------------------OSEITrue Table--------------------------------
      //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      
- $(document).ready(function(){
    $("#CEITableAdd").click(function(){
      var i = $('#CEITable tr').length;
      $('#CEITable tr:last').after(     
@@ -944,22 +1113,21 @@ function riskInfo(element,container, title, fam){
                                    "</tr>"
                                     );
    });
- });
  
- $(document).ready(function(){
    $("#CEITableMinus").click(function() {
      if($('#CEITable tr').length > 1){
        $("#CEITable tr:last").remove();
      }
     });
-  });
-  
+
+
+
+
      //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      //--------------------------------- School -------------------------------------
      //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      
      
-  $(document).ready(function(){
     $("#schoolYes").click(function(){
       if($('#schoolYes').is(':checked')){ 
           $("#schoolTrue").show();
@@ -974,6 +1142,9 @@ function riskInfo(element,container, title, fam){
         }
     });
   });
+
+ 
+
   
   //For event handling dynamically added elements : https://stackoverflow.com/questions/12055462/handle-click-event-for-appended-elements-in-jquery
   $(document).on('click', '#notIEP504', function(){ 
@@ -1009,6 +1180,9 @@ $(document).on('click', '#isEval', function(){
 }); 
 
 
+/*
+ *  Function parse file inputs and upload to drive after reader is finished
+ */
 
 function fileReportUpload(x, container,image){
   readReportURL(x, image);
