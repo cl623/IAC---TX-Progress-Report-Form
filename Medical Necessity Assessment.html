@@ -1,6 +1,10 @@
 <div style="border-bottom: 1px solid #666;">
   <h2>ABA Treatment Dosage/Medical Necessity Assessment</h2>
 </div>
+<br>
+<input type='button' onclick='createPicker(medicalNecessityCallBack, "pdf");' id='medicalNecessityDrive' value='Drive Picker'> <p id=medicalNecessityCont> </p>
+<!--
+
 <div class=basic id=BarriersLearning>
   <div class=head>
     <p> Barriers/Learning Considerations: <i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Barriers/Learning Considerations",BarriersLearning)'></i></p>
@@ -166,7 +170,7 @@
     </table>
     Total Hours<input type=number name=CSAAATotal>
   </div>
-</div>
+</div>-->
 <div class=basic id=DirectServiceRequest>
   <h4> Direct Service Request <i class="fa fa-bookmark" aria-hidden="true" title="Bookmark this section" onclick='openModal("Direct Service Request",DirectServiceRequest)'></i></h4>
   <label for=DSR1T1>How many hours, per week, of one-to-one treatment? </label><input type=number id=DSR1T1 name="Hours of One-to-One Treatment"><br>

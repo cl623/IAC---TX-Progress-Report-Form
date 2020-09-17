@@ -71,7 +71,7 @@ function getLastReport(load){
   
   if(data[8] != undefined && data[8] != ''){
     Comments.setAll(JSON.parse(data[8]))
-    console.log(Comments.get())
+//    console.log(Comments.get())
   }
   if(data[9] != undefined && data[9] != ''){
     Comments.setIDs(JSON.parse(data[9]))
@@ -81,6 +81,7 @@ function getLastReport(load){
   }
 
   var answers = JSON.parse(data[4]);
+  console.log(answers)
   var myForm = document.getElementById("myForm").elements;
   
   if(answers['ReportType'] == 'Client ABA Reassessment/Client ABA Treatment Progress Report Template'){
@@ -92,7 +93,12 @@ function getLastReport(load){
   document.getElementById('Session Start Time').value = answers['Session Start Time']
   document.getElementById('Session End Time').value = answers['Session End Time']
   document.getElementById('createSchedule').click()
-
+  
+  if(answers.hasOwnProperty('Maladaptive Behaviors')){
+    Maladaptives.setAllSel(answers['Maladaptive Behaviors']);
+    selectedBehaviors()
+  }
+  
   if(data[6] != undefined && data[6] != ''){
     skillData = JSON.parse(data[6])
     listParse(skillData)
@@ -124,7 +130,7 @@ function getLastReport(load){
         if(element.value == answers[element.name])
           element.click()
     }
-    else if(element.type != "file" && element.type != 'button')
+    else if(element.type != "file" && element.type != 'button' && element.id != 'MaladaptiveSelect')
       if(Array.isArray(answers[element.name]))
         element.value = answers[element.name].shift()
       else
@@ -139,10 +145,35 @@ function getLastReport(load){
   }
   if(answers.hasOwnProperty('Vineland File ID')){
     VinelandFile.set(answers['Vineland File ID'])
-    VinelandFile.placeImage()
-  }
+//    VinelandFile.placeImage()
+    }
+  if(answers.hasOwnProperty('Medical Necessity ID')){
+    NecessityFile.set(answers['Medical Necessity ID'])
+    }
   }
 }
+
+    function selectedBehaviors(){
+      let list = []
+      for(n in Maladaptives.getSel()){
+        let beh = Maladaptives.getSel()[n]
+        list.push(beh.text)
+        // Change the select2 control to update it visually
+        // (does not fire select2:select)
+
+        $('#MaladaptiveSelect')
+         .trigger({
+          type: 'select2:select',
+          params: {
+          data: beh
+          }
+        });
+      }
+      // Set the value
+        $("#MaladaptiveSelect").val(list);
+        $("#MaladaptiveSelect").trigger("change.select2");
+      
+     }
 
 </script>
 

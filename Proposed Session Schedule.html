@@ -7,22 +7,22 @@
   </div>
   <div>
     <br>
-    Start Time: <select type='select' id='Session Start Time' name='Session Start Time'>
+    Start Time: <select type='select' id='Session Start Time' name='Session Start Time' onchange='setSchedule();'>
     </select>
     <br>
     <br>
-    End Time: <select type='select' id='Session End Time' name='Session End Time'>
+    End Time: <select type='select' id='Session End Time' name='Session End Time' onchange='setSchedule();'>
     </select>
     <br>
     <br>
-    <input type='button' id='createSchedule' value='Create Schedule'>
+    <input type='button' id='createSchedule' value='Create Schedule' hidden>
     <br>
     <br>
   </div>
   <div class=med>
     <table id='Proposed Session Schedule'>
-      <col width=15%>
-      <col width=85%>
+      <col width=25%>
+      <col width=75%>
       <tr>
         <th> Session Time </th>
         <th> Session Activity Outline </th>

@@ -17,6 +17,15 @@
 
     var pickerApiLoaded = false;
     var oauthToken;
+    
+    //Client Root folder
+    //  Assigned in form_js.html @ ln246
+    var root;
+
+    function pad(num, size) {
+      var s = "000000000" + num;
+      return s.substr(s.length-size);
+    }
 
     // Use the Google API Loader script to load the google.picker script.
     function loadPicker() {
@@ -47,13 +56,25 @@
     }
 
     // Create and render a Picker object for searching images.
-    function createPicker(pickerCallback) {
-      if (pickerApiLoaded && oauthToken) {
+      function createPicker(pickerCallback, Flag) {
+        if (pickerApiLoaded && oauthToken) {
+
         var view = new google.picker.DocsView();
 //        view.setParent('CLIENT FILES');
         view.setIncludeFolders(true)
-        .setParent('1oluEhyeO_soZePqxBWZ7cZoi0o3Ge1OW')
-        .setMimeTypes("image/png,image/jpeg,image/jpg");
+        .setParent(root)
+        if(Flag == 'image'){
+          view.setMimeTypes("image/png,image/jpeg,image/jpg");
+        }
+        if(Flag == 'doc'){
+          view.setMimeTypes("application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text,application/vnd.google-apps.document")
+        }
+        if(Flag == 'pdf'){
+          view.setMimeTypes("application/pdf")
+        }
+        if(Flag == 'wdoc'){
+          view.setMimeTypes("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        }
         var picker = new google.picker.PickerBuilder()
 //            .enableFeature(google.picker.Feature.NAV_HIDDEN)
             .setAppId(appId)
@@ -67,18 +88,66 @@
          picker.setVisible(true);
       }
     }
-
+    
+    function testCall(data){
+      if(data.action == google.picker.Action.PICKED){
+        alert(data.docs[0].id);
+      }
+    }
+    
+    function setRoot(id){
+      root = id   
+    }
+    
+    function checkFile(mimeType, gate){
+    
+      var filetype = "";
+      
+      switch (mimeType) {
+        case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': filetype = 'Microsoft Word'; break;
+        case 'application/vnd.oasis.opendocument.text': filetype = 'OpenDocument Word'; break;
+        case 'application/vnd.google-apps.document': filetype = 'Google Docs'; break;
+        case 'image/jpeg': filetype = 'JPEG'; break;
+        case 'image/png': filetype = 'PNG'; break;
+        case 'application/pdf': filetype = 'PDF'; break;
+        case MimeType.GOOGLE_DOCS: filetype = 'Google Docs'; break;
+        case MimeType.JPEG: filetype = 'JPEG'; break;
+        case MimeType.PNG: filetype = 'PNG'; break;
+        case MimeType.SVG: filetype = 'SVG'; break;
+        case MimeType.PDF: filetype = 'PDF'; break;
+        case MimeType.OPENDOCUMENT_TEXT: filetype = 'OpenDocument Word'; break;
+        case MimeType.MICROSOFT_WORD: filetype = 'Microsoft Word'; break;
+        case MimeType.MICROSOFT_WORD_LEGACY: filetype = 'Microsoft Word'; break;
+        default: filetype = "Unknown";
+      }
+    console.log(mimeType);
+    if(!gate.hasOwnProperty(filetype)){
+      let s = Object.keys(gate).join(' or ');
+      alert('Please select a ' + s + ' file.');
+      return false;
+    }
+    return true;
+    
+    }
+    
+    
     // A simple callback implementation.
     function iepCallBack(data) {
       if (data.action == google.picker.Action.PICKED) {
         let fileId = data.docs[0].id;
         let fileName= data.docs[0].name;
-        let fileMime = data.docs[0].mime_type;
-        let fileType = data.docs[0].type;
-        IEPFile.set(fileId);
-        let iepData = document.getElementById('IEPTableCont')
-        iepData.innerHTML = 'File Name: ' + fileName + '<br>' + 'File Type: ' + fileType
-        IEPFile.placeImage();
+        let fileMime = data.docs[0].mimeType;
+        let gate = {
+          JPEG: true, 
+          PNG: true
+          };
+        if(checkFile(fileMime, gate)){
+          let fileType = data.docs[0].type;
+          IEPFile.set(fileId);
+          let iepData = document.getElementById('IEPTableCont')
+          iepData.innerHTML = 'File Name: ' + fileName + '<br>' + 'File Type: ' + fileType
+          IEPFile.placeImage();
+        }
       }
     }
     
@@ -86,12 +155,62 @@
       if (data.action == google.picker.Action.PICKED) {
         let fileId = data.docs[0].id;
         let fileName= data.docs[0].name;
-        let fileMime = data.docs[0].mime_type;
+        let fileMime = data.docs[0].mimeType;
+        let gate = {
+          'Google Docs': true
+//          'Microsoft Word': true
+          };
         let fileType = data.docs[0].type;
-        VinelandFile.set(fileId);
-        let iepData = document.getElementById('vinelandTableCont')
-        iepData.innerHTML = 'File Name: ' + fileName + '<br>' + 'File Type: ' + fileType
-        VinelandFile.placeImage();
+        if(checkFile(fileMime, gate)){
+//          VinelandFile.set(fileId);
+          let vinelandTableCont = document.getElementById('vinelandTableCont')
+          vinelandTableCont.innerHTML = 'File Name: ' + fileName + '<br>' + 'File Type: ' + fileType
+//          VinelandFile.placeImage();
+//          google.script.run.withSuccessHandler(alertTest).vinelandParse(fileId)
+        }
+      }
+    }
+    
+    function medicalNecessityCallBack(data) {
+      if (data.action == google.picker.Action.PICKED) {
+        let fileId = data.docs[0].id;
+        let fileName= data.docs[0].name;
+        let fileMime = data.docs[0].mimeType;
+        let fileType = data.docs[0].type;
+        let gate = {
+          'PDF': true
+          };
+        if(checkFile(fileMime, gate)){
+          NecessityFile.set(fileId);
+          let medicalNecessityCont = document.getElementById('medicalNecessityCont')
+          medicalNecessityCont.innerHTML = 'File Name: ' + fileName + '<br>' + 'File Type: ' + fileType
+//          console.log(NecessityFile.get());
+//          google.script.run.withSuccessHandler(alertTest).convertDocuments(fileId,'ASD')
+//          necessityFile.placeImage();
+        }
+      }
+    }
+    
+    function alertTest(x){
+      console.log(x)
+    }
+    
+    function rethinkReportCallBack(data) {
+      if (data.action == google.picker.Action.PICKED) {
+        let fileId = data.docs[0].id;
+        let fileName= data.docs[0].name;
+        let fileMime = data.docs[0].mimeType;
+        let fileType = data.docs[0].type;
+        let gate = {
+          'Microsoft Word': true
+          };
+        if(checkFile(fileMime, gate)){
+          ParseFile.set(fileId);
+          let importTest = document.getElementById('importTest')
+          importTest.innerHTML = 'File Name: ' + fileName + '<br>' + 'File Type: ' + fileType
+//          console.log(ParseFile.get());
+          google.script.run.withSuccessHandler(listParse).convertDocuments(fileId, 'BP');
+        }
       }
     }
     </script>

@@ -52,7 +52,7 @@ function databaseConnect(){
 //*/
 function connect(connection){
   var connection = 'test-project-278417:us-east4:live-data-v1'
-  var url = 'jdbc:google:mysql://test-project-278417:us-east4:live-data-v1/DatabaseProject'
+  var url = 'jdbc:google:mysql://test-project-278417:us-east4:live-data-v1/LiveData1'
   var user = 'root'
   var password = 'ci8sgfk8LfG4jo9P'
   var conn = Jdbc.getCloudSqlConnection(url, user, password);
@@ -64,68 +64,177 @@ function connect(connection){
  *  Queries Database for client information
  */
 function getInfo(clientId){
-  var dbConnect = databaseConnect();
-  var conn = connect(dbConnect);
-  var stmt = conn.createStatement(),stmt2 = conn.createStatement(),stmt3 = conn.createStatement(),stmt4 = conn.createStatement();    
-  var queryInfo = "select distinct concat(c.FirstName,' ',c.LastName) as ClientName,c.Gender,c.ClientId,c.DateOfBirth,DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(c.DateOfBirth, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(c.DateOfBirth, '00-%m-%d')) AS Age,lg1.LanguageDialect as PriLang,lg2.LanguageDialect as SecLang from client c left join person_language pl1 on pl1.ClientId=c.ClientId and pl1.Fluency='Primary' left join person_language pl2 on pl2.ClientId=c.ClientId and pl2.Fluency='Secondary' left join language lg1 on lg1.LanguageDialectId=pl1.LanguageDialectId left join language lg2 on lg2.LanguageDialectId=pl2.LanguageDialectId where c.ClientId="+clientId+";";
-  var queryContacts = "select concat(FirstName,' ',LastName) as GuardianName,Address,City,State,ZipCode,HomeNumber,MobileNumber,EmergencyContact from client_contacts where ClientId="+clientId+";";
-  var queryMedical = "select PcpName,PcpNumber from client_medical where ClientId="+clientId+";";
-  var queryInsurance = "select i.NamePolicyHolder,i.MemberId,p.InsurancePlan,a.Payer from client_insurance i left join insurance_plan p on i.InsurancePlanId=p.InsurancePlanId left join payer a on p.PayerId=a.PayerId where i.ClientId="+clientId+";";
-  var clientInfoData = stmt.executeQuery(queryInfo);
-  
-  
-  
-  var obj = {};
-  while(clientInfoData.next()){
-    obj['ClientName'] = clientInfoData.getString('ClientName');
-    obj['ClientID'] = clientInfoData.getInt('ClientId');
-    obj['ClientGen'] = clientInfoData.getString('Gender');
-    obj['DOB'] = clientInfoData.getString('DateOfBirth');
-    obj['Age'] = clientInfoData.getInt('Age');
-  
-    obj['PrimaryLangauge'] = clientInfoData.getString('PriLang');
-    obj['SecondaryLanguage'] = clientInfoData.getString('SecLang');
-    
-    var clientContactsData = stmt2.executeQuery(queryContacts);
-    var count = 1;
-    while(clientContactsData.next()){
-      obj['Guardian'+count+'Name'] = clientContactsData.getString('GuardianName');
-      obj['Address'+count+''] = clientContactsData.getString('Address');
-      obj['City'+count+''] = clientContactsData.getString('City');
-      obj['State'+count+''] = clientContactsData.getString('State');
-      obj['ZipCode'+count+''] = clientContactsData.getString('ZipCode');
-      obj['Guardian'+count+'HP'] = clientContactsData.getString('HomeNumber');
-      obj['Guardian'+count+'CP'] = clientContactsData.getString('MobileNumber');
-      obj['Emergency'+count+'Name'] = clientContactsData.getString('EmergencyContact');
-      count++
-    }
-//    var clientMedicalData = stmt3.executeQuery(queryMedical);
+//  var dbConnect = databaseConnect();
+//  var conn = connect(dbConnect);
+//  var stmt = conn.createStatement(),stmt2 = conn.createStatement(),stmt3 = conn.createStatement(),stmt4 = conn.createStatement();    
+//  var queryInfo = "select distinct concat(c.FirstName,' ',c.LastName) as ClientName,c.Gender,c.ClientId,c.DateOfBirth,DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(c.DateOfBirth, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(c.DateOfBirth, '00-%m-%d')) AS Age,lg1.LanguageDialect as PriLang,lg2.LanguageDialect as SecLang from client c left join person_language pl1 on pl1.ClientId=c.ClientId and pl1.Fluency='Primary' left join person_language pl2 on pl2.ClientId=c.ClientId and pl2.Fluency='Secondary' left join language lg1 on lg1.LanguageDialectId=pl1.LanguageDialectId left join language lg2 on lg2.LanguageDialectId=pl2.LanguageDialectId where c.ClientId="+clientId+";";
+//  var queryContacts = "select concat(FirstName,' ',LastName) as GuardianName,Address,City,State,ZipCode,HomeNumber,MobileNumber,EmergencyContact from client_contacts where ClientId="+clientId+";";
+//  var queryMedical = "select PcpName,PcpNumber from client_medical where ClientId="+clientId+";";
+//  var queryInsurance = "select i.NamePolicyHolder,i.MemberId,p.InsurancePlan,a.Payer from client_insurance i left join insurance_plan p on i.InsurancePlanId=p.InsurancePlanId left join payer a on p.PayerId=a.PayerId where i.ClientId="+clientId+";";
+//  var clientInfoData = stmt.executeQuery(queryInfo);
+//  
+//  
+//  
+//  var obj = {};
+//  while(clientInfoData.next()){
+//    obj['ClientName'] = clientInfoData.getString('ClientName');
+//    obj['ClientID'] = clientInfoData.getInt('ClientId');
+//    obj['ClientGen'] = clientInfoData.getString('Gender');
+//    obj['DOB'] = clientInfoData.getString('DateOfBirth');
+//    obj['Age'] = clientInfoData.getInt('Age');
+//  
+//    obj['PrimaryLangauge'] = clientInfoData.getString('PriLang');
+//    obj['SecondaryLanguage'] = clientInfoData.getString('SecLang');
+//    
+//    var clientContactsData = stmt2.executeQuery(queryContacts);
 //    var count = 1;
-//    while(clientMedicalData.next()){
-//      obj['PcpName'] = clientMedicalData.getString('PcpName');
-//      obj['PcpNumber'] = clientMedicalData.getString('PcpNumber');
+//    while(clientContactsData.next()){
+//      obj['Guardian'+count+'Name'] = clientContactsData.getString('GuardianName');
+//      obj['Address'+count+''] = clientContactsData.getString('Address');
+//      obj['City'+count+''] = clientContactsData.getString('City');
+//      obj['State'+count+''] = clientContactsData.getString('State');
+//      obj['ZipCode'+count+''] = clientContactsData.getString('ZipCode');
+//      obj['Guardian'+count+'HP'] = clientContactsData.getString('HomeNumber');
+//      obj['Guardian'+count+'CP'] = clientContactsData.getString('MobileNumber');
+//      obj['Emergency'+count+'Name'] = clientContactsData.getString('EmergencyContact');
+//      count++
 //    }
-    var clientInsuranceData = stmt4.executeQuery(queryInsurance);
-    var count = 1;
-    while(clientInsuranceData.next()){
-      obj['InsuranceHolder'+count+'Name'] = clientInsuranceData.getString('NamePolicyHolder');
-      obj['Insurance'+count+'ID'] = clientInsuranceData.getString('MemberId');
-      obj['InsurancePlan'+count+'Name'] = clientInsuranceData.getString('InsurancePlan');
-      obj['InsurancePayer'+count+'Name'] = clientInsuranceData.getString('Payer');
-      count++
-    }
-  }
-  stmt.close();
-  stmt2.close();
-  stmt3.close();
-  stmt4.close();
-  conn.close();
-  var json = JSON.stringify(obj);
-  return json;
+////    var clientMedicalData = stmt3.executeQuery(queryMedical);
+////    var count = 1;
+////    while(clientMedicalData.next()){
+////      obj['PcpName'] = clientMedicalData.getString('PcpName');
+////      obj['PcpNumber'] = clientMedicalData.getString('PcpNumber');
+////    }
+//    var clientInsuranceData = stmt4.executeQuery(queryInsurance);
+//    var count = 1;
+//    while(clientInsuranceData.next()){
+//      obj['InsuranceHolder'+count+'Name'] = clientInsuranceData.getString('NamePolicyHolder');
+//      obj['Insurance'+count+'ID'] = clientInsuranceData.getString('MemberId');
+//      obj['InsurancePlan'+count+'Name'] = clientInsuranceData.getString('InsurancePlan');
+//      obj['InsurancePayer'+count+'Name'] = clientInsuranceData.getString('Payer');
+//      count++
+//    }
+//  }
+//  stmt.close();
+//  stmt2.close();
+//  stmt3.close();
+//  stmt4.close();
+//  conn.close();
+//  var json = JSON.stringify(obj);
+//  return json;
 }
 function testDB(){
  Logger.log(getInfo('3')); 
 }
+
+
+function loadStaff(){
+  var dbConnect = databaseConnect();
+  var conn = connect(dbConnect);
+  var stmt = conn.createStatement();
+  var query = "select StaffId,IacEmail,concat(FirstName,' ',LastName) as Name from staff;";
+  var data = stmt.executeQuery(query);
+  var numCol = data.getMetaData().getColumnCount();
+  var arr = [];
+  var obj = {};
+  while(data.next()){
+    
+    for( var x = 1; x < numCol+1; x++){
+      var colName = data.getMetaData().getColumnName(x);
+      obj[colName] = data.getString(x);      
+    }
+  arr.push(obj);
+  obj = {};
+  }
+  stmt.close();
+  conn.close();
+  var json = JSON.stringify(arr);
+  return json;
+}
+
+function getLogs(clientId, staffId){
+  var logs = JSON.parse(loadLogs(clientId, staffId))
+//  Logger.log(logs)
+  var data = { pcpLogs : ['Primary Care Provider'],              //Primary Care Provider
+              dcfLogs : ['DCF'],                                 //DCF
+              dpLogs : ['Diagnosing Physician'],                 //Diagnosing Physician
+              eiaLogs : ['Early Intervention Agency'],           //Early Intervention Agency
+              efLogs : ['Educational Facility'],                 //Educational Facility
+              mhpLogs : ['Mental Health Provider'],              //Mental Health Provider
+              otLogs : ['Occupational Therapist'],               //Occupational Therapist
+              ptLogs : ['Physical Therapist'],                   //Physical Therapist
+              rpLogs : ['Referring Provider'],                   //Referring Provider
+              slpLogs : ['Speech-Language Pathologist']          //Speech-Language Pathologist
+             }
+  for(log of logs){
+    switch(log['EntityContacted']){
+      case 'Primary Care Provider': data.pcpLogs.push(log); break;
+      case 'DCF': data.dcfLogs.push(log); break;
+      case 'Diagnosing Physician': data.dpLogs.push(log); break;
+      case 'Early Intervention Agency': data.eiaLogs.push(log); break;
+      case 'Educational Facility': data.efLogs.push(log); break;
+      case 'Mental Health Provider': data.mhpLogs.push(log); break;
+      case 'Occupational Therapist': data.otLogs.push(log); break;
+      case 'Physical Therapist': data.ptLogs.push(log); break;
+      case 'Referring Provider': data.rpLogs.push(log); break;
+      case 'Speech-Language Pathologist': data.slpLogs.push(log); break;
+    }
+  }
+  Logger.log(data)
+    return data
+}
+
+function loadLogs(clientId,staffId){
+  var dbConnect = databaseConnect();
+  var conn = connect(dbConnect);
+  var stmt = conn.createStatement();
+  
+  if(clientId == 'All Clients')
+    var query = "select l.ClientId,concat(c.FirstName,' ',c.LastName) as ClientName,l.Timestamp,concat(s.FirstName,' ',s.LastName) as StaffName,l.EntityContacted,l.ContactPersonName,l.CommType,date_format(l.DateOfComm,'%m/%e/%Y') as DateOfComm,TIME_FORMAT(l.TimeOfComm,'%I%:%i %p') as TimeOfComm,time_to_sec(l.DurationOfComm) as DurationOfComm,l.CommNote,l.DocumentReceived from communications_log l inner join client c on l.ClientId=c.ClientId inner join staff s on l.StaffId=s.StaffId where l.StaffId ="+staffId+" order by l.DateOfComm DESC,l.TimeOfComm DESC;";
+  else
+    var query = "select l.Timestamp,concat(s.FirstName,' ',s.LastName) as StaffName,l.EntityContacted,l.ContactPersonName,l.CommType,date_format(l.DateOfComm,'%m/%e/%Y') as DateOfComm,TIME_FORMAT(l.TimeOfComm,'%I%:%i %p') as TimeOfComm,time_to_sec(l.DurationOfComm) as DurationOfComm,l.CommNote,l.DocumentReceived from communications_log l inner join client c on l.ClientId=c.ClientId inner join staff s on l.StaffId=s.StaffId where l.ClientId ="+clientId+" order by l.DateOfComm DESC,l.TimeOfComm DESC;";
+  var data = stmt.executeQuery(query);
+  var numCol = data.getMetaData().getColumnCount();
+  var arr = [];
+  var obj = {};
+  var time1 = new Date();
+  while(data.next()){
+  
+  if(clientId == 'All Clients'){
+  obj['ClientId'] = data.getString('ClientId');
+  obj['ClientName'] = data.getString('ClientName');
+  }
+  obj['Timestamp'] = data.getString('Timestamp');
+  obj['StaffName'] = data.getString('StaffName');
+  obj['EntityContacted'] = data.getString('EntityContacted');     
+  obj['ContactPersonName'] = data.getString('ContactPersonName');
+  obj['CommType'] = data.getString('CommType');    
+  obj['DateOfComm'] = data.getString('DateOfComm'); 
+  obj['TimeOfComm'] = data.getString('TimeOfComm');
+  obj['DurationOfComm'] = data.getString('DurationOfComm');
+  obj['CommNote'] = data.getString('CommNote');     
+  obj['DocumentReceived'] = data.getString('DocumentReceived');
+  
+  arr.push(obj);
+  obj = {};
+  }
+  var time2 = new Date();
+  Logger.log((time2-time1)/1000)
+  if(conn.isClosed())
+    Logger.log(' failed to load communication logs.');
+  else
+    Logger.log(' loaded communication logs.');
+    
+  stmt.close();
+  conn.close();
+  if(conn.isClosed()){}
+  else
+    Logger.log(activeUser+' failed to disconnect to database.(Load Logs)');
+  var json = JSON.stringify(arr);
+  return json;
+  console.info('Loading Logs based on selected option');
+}
+
 //
 ////==================================
 
@@ -160,6 +269,19 @@ function testMal(){
 
 function getUser(){
   return Session.getActiveUser().getEmail()
+}
+  
+function getRoot(id){
+  let folders = DriveApp.getFolderById('1q8pmlILj7ta2cQgzZPCAcnL9FIv3aBsE').getFolders()
+  while(folders.hasNext()){
+    folder=folders.next()
+    if(folder.getName().includes(id)){
+//      Logger.log(folder.getId() + "\n" + folder.getName())
+      return folder.getId()
+    }
+  }
+  return 'File not found'
+//  Logger.log(folders.getFolders().next().getName())
 }
 
 /*
@@ -518,12 +640,9 @@ function makeTemplate(data, skills, signatureID){
       var HypothesizedFunc = [['Maladaptive Behavior', 'Hypothesized Function(s)']];
       if (ele.getParent().getParent().getType() === DocumentApp.ElementType.BODY_SECTION) {
         
-        /*
-        *Current problem: function does not work if property has less than one answer/is not array. Must select more than one Maladaptive Behavior.
-        *
-        */if(Array.isArray(o['Maladaptive Behaviors'])){
-          for(var j = o['Maladaptive Behaviors'].length-1; j > -1 ; j--){
-            let mal = o[x][j]
+        if(o['Maladaptive Behaviors'] != {}){             //if Maladaptive List != null
+          for(beh in o[x]){                                 //loop through each key to perform actions
+            let mal = o[x][beh]['id']
             Freq.push([mal, o[mal + 'FreqScore']])
             Intensity.push([mal, o[mal + 'IntensityScore']])
             Duration.push([mal, o[mal + 'DurationScore']])
@@ -531,7 +650,7 @@ function makeTemplate(data, skills, signatureID){
             HypothesizedFunc.push([mal, o[mal + 'HF']])
             
             var offset = body.getChildIndex(ele.getParent());
-            body.insertListItem(offset + 1, o['Maladaptive Behaviors'][j]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
+            body.insertListItem(offset + 1, o['Maladaptive Behaviors'][beh]['id'] + ": " + o['Maladaptive Behaviors'][beh]['text']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
             body.insertListItem(body.getChildIndex(body.findText("{Maladaptive2}").getElement().getParent()) + 1, o['Maladaptive Behaviors'][j]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
             body.insertParagraph(body.getChildIndex(body.findText("{Identified Antecedents & Consequences}").getElement().getParent()) + 1, '{'+ mal + 'Antecedent}')
             
@@ -578,61 +697,123 @@ function makeTemplate(data, skills, signatureID){
             body.replaceText("{"+mal+"Antecedent}", '')
           }
         }
-        else{
-          let mal = o[x]
-          Freq.push([mal, o[mal + 'FreqScore']])
-          Intensity.push([mal, o[mal + 'IntensityScore']])
-          Duration.push([mal, o[mal + 'DurationScore']])
-          Discrimmination.push([mal, o[mal + 'DiscriminationScore']])
-          HypothesizedFunc.push([mal, o[mal + 'HF']])
-          
-          var offset = body.getChildIndex(ele.getParent());
-          body.insertListItem(offset + 1, mal).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
-          body.insertListItem(body.getChildIndex(body.findText("{Maladaptive2}").getElement().getParent()) + 1, mal).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
-          body.insertParagraph(body.getChildIndex(body.findText("{Identified Antecedents & Consequences}").getElement().getParent()) + 1, '{'+ mal + 'Antecedent}')
-          
-          if(o.hasOwnProperty(mal+'Replace1')){
-            for(var k = 4; k > -1 ; k--){
-              body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Replace1'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
-            }
-            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Functionally Equivalent Replacement Skills to be Taught:")
-          }
-          if(o.hasOwnProperty(mal+'Access')){
-            if(Array.isArray( o[mal+'Access'])){
-              for(var k = o[mal+'Access'].length-1; k > -1 ; k--){
-                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
-              }
-            }
-            else{
-              body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
-            }
-            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Access To")
-          }
-          if(o.hasOwnProperty(mal+'Consequences')){
-            if(Array.isArray( o[mal+'Consequences'])){
-              for(var k = o[mal+'Consequences'].length; k > -1 ; k--){
-                body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences'][k])
-              }
-            }
-            else{
-              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences'])
-            }
-            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified consequences that appear to be maintaining "+o['Name1']+"’s emission of non-compliance are as follows:")
-          }
-          if(o.hasOwnProperty(mal+'Antecedent')){
-            if(Array.isArray( o[mal+'Antecedent'])){
-              for(var k = o[mal+'Antecedent'].length-1; k > -1 ; k--){
-                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
-              }
-            }
-            else{
-              body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
-            }
-            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Antecedents that have been identified as initiating "+o['Name1']+"’s emission of non-compliance are as follows:")
-            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Antecedents & Consequences: " + mal)
-          }
-          body.replaceText("{"+mal+"Antecedent}", '')
-        }
+        
+        /*
+        *Current problem: function does not work if property has less than one answer/is not array. Must select more than one Maladaptive Behavior.
+        *
+        */
+//        if(Array.isArray(o['Maladaptive Behaviors'])){
+//          for(var j = o['Maladaptive Behaviors'].length-1; j > -1 ; j--){
+//            let mal = o[x][j]
+//            Freq.push([mal, o[mal + 'FreqScore']])
+//            Intensity.push([mal, o[mal + 'IntensityScore']])
+//            Duration.push([mal, o[mal + 'DurationScore']])
+//            Discrimmination.push([mal, o[mal + 'DiscriminationScore']])
+//            HypothesizedFunc.push([mal, o[mal + 'HF']])
+//            
+//            var offset = body.getChildIndex(ele.getParent());
+//            body.insertListItem(offset + 1, o['Maladaptive Behaviors'][j]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
+//            body.insertListItem(body.getChildIndex(body.findText("{Maladaptive2}").getElement().getParent()) + 1, o['Maladaptive Behaviors'][j]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
+//            body.insertParagraph(body.getChildIndex(body.findText("{Identified Antecedents & Consequences}").getElement().getParent()) + 1, '{'+ mal + 'Antecedent}')
+//            
+//            if(o.hasOwnProperty(mal+'Replace1')){
+//              for(var k = 4; k > -1 ; k--){
+//                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Replace1'][k])
+//              }
+//              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Functionally Equivalent Replacement Skills to be Taught:")
+//            }
+//            if(o.hasOwnProperty(mal+'Access')){
+//              if(Array.isArray( o[mal+'Access'])){
+//                for(var k = o[mal+'Access'].length-1; k > -1 ; k--){
+//                  body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+//                }
+//              }
+//              else{
+//                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+//              }
+//              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Access To")
+//            }
+//            if(o.hasOwnProperty(mal+'Consequences')){
+//              if(Array.isArray( o[mal+'Consequences'])){
+//                for(var k = o[mal+'Consequences'].length; k > -1 ; k--){
+//                  body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences'][k]);
+//                }
+//              }
+//              else{
+//                body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences']);
+//              }
+//              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified consequences that appear to be maintaining "+o['Name1']+"’s emission of non-compliance are as follows:")
+//            }
+//            if(o.hasOwnProperty(mal+'Antecedent')){
+//              if(Array.isArray( o[mal+'Antecedent'])){
+//                for(var k = o[mal+'Antecedent'].length-1; k > -1 ; k--){
+//                  body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+//                }
+//              }
+//              else{
+//                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+//              }
+//              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Antecedents that have been identified as initiating "+o['Name1']+"’s emission of non-compliance are as follows:")
+//              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Antecedents & Consequences: " + mal)
+//            }
+//            body.replaceText("{"+mal+"Antecedent}", '')
+//          }
+//        }
+//        else{
+//          let mal = o[x]
+//          Freq.push([mal, o[mal + 'FreqScore']])
+//          Intensity.push([mal, o[mal + 'IntensityScore']])
+//          Duration.push([mal, o[mal + 'DurationScore']])
+//          Discrimmination.push([mal, o[mal + 'DiscriminationScore']])
+//          HypothesizedFunc.push([mal, o[mal + 'HF']])
+//          
+//          var offset = body.getChildIndex(ele.getParent());
+//          body.insertListItem(offset + 1, mal).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
+//          body.insertListItem(body.getChildIndex(body.findText("{Maladaptive2}").getElement().getParent()) + 1, mal).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);;
+//          body.insertParagraph(body.getChildIndex(body.findText("{Identified Antecedents & Consequences}").getElement().getParent()) + 1, '{'+ mal + 'Antecedent}')
+//          
+//          if(o.hasOwnProperty(mal+'Replace1')){
+//            for(var k = 4; k > -1 ; k--){
+//              body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Replace1'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+//            }
+//            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Functionally Equivalent Replacement Skills to be Taught:")
+//          }
+//          if(o.hasOwnProperty(mal+'Access')){
+//            if(Array.isArray( o[mal+'Access'])){
+//              for(var k = o[mal+'Access'].length-1; k > -1 ; k--){
+//                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+//              }
+//            }
+//            else{
+//              body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Access']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+//            }
+//            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Access To")
+//          }
+//          if(o.hasOwnProperty(mal+'Consequences')){
+//            if(Array.isArray( o[mal+'Consequences'])){
+//              for(var k = o[mal+'Consequences'].length; k > -1 ; k--){
+//                body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences'][k])
+//              }
+//            }
+//            else{
+//              body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Consequences'])
+//            }
+//            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified consequences that appear to be maintaining "+o['Name1']+"’s emission of non-compliance are as follows:")
+//          }
+//          if(o.hasOwnProperty(mal+'Antecedent')){
+//            if(Array.isArray( o[mal+'Antecedent'])){
+//              for(var k = o[mal+'Antecedent'].length-1; k > -1 ; k--){
+//                body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent'][k]).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+//              }
+//            }
+//            else{
+//              body.insertListItem(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, o[mal+'Antecedent']).setNestingLevel(1).setIndentStart(72).setGlyphType(DocumentApp.GlyphType.BULLET);
+//            }
+//            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Antecedents that have been identified as initiating "+o['Name1']+"’s emission of non-compliance are as follows:")
+//            body.insertParagraph(body.getChildIndex(body.findText("{"+mal+"Antecedent}").getElement().getParent()) + 1, "Identified Antecedents & Consequences: " + mal)
+//          }
+//          body.replaceText("{"+mal+"Antecedent}", '')
+//        }
         body.replaceText("{Identified Antecedents & Consequences}", '')
       }
       var scores = body.findText("{MaladaptiveScores}");
@@ -794,13 +975,35 @@ function makeTemplate(data, skills, signatureID){
   body.replaceText("{Proposed Session Schedule}", '')
   
   if(o.hasOwnProperty("Vineland File ID")){
-    var img = DriveApp.getFileById(o['Vineland File ID']).getBlob()
+    var parse = vinelandParse(o['Vineland File ID'])
+    let offset = body.getChildIndex(body.findText('{vinelandSummary}').getElement().getParent())
+    body.insertTable(offset + 1, parse.table_two.copy())
+    body.insertTable(offset + 1, parse.table_one.copy())
     
-    var range = body.findText("{Vineland File}");
-    var ele = range.getElement();
-    var offset = body.getChildIndex(ele.getParent());
+    body.replaceText('{vinelandSummary}', parse.summary)
     
-    body.insertImage(offset + 1, img)
+
+//    var img = DriveApp.getFileById(o['Vineland File ID']).getBlob()
+//    
+//    var range = body.findText("{Vineland File}");
+//    var ele = range.getElement();
+//    var offset = body.getChildIndex(ele.getParent());
+//    
+//    body.insertImage(offset + 1, img)
+  }
+  
+  if(o.hasOwnProperty("Medical Necessity ID")){
+    let data = convertToGoogleDocs_(o['Medical Necessity ID'], 'ASD')
+    let asd = data[0]
+    for(skills in asd){
+      let tag = '{'+skills+'}'
+      body.replaceText(tag, asd[skills])
+    }    
+    let status = data[1]
+    for(barrier in status){
+      let tag = '{'+barrier+'}'
+      body.replaceText(tag, status[barrier])
+    }
   }
   body.replaceText("{Vineland File}", '')
   
@@ -854,7 +1057,7 @@ function makeTemplate(data, skills, signatureID){
         var recommendation = (o.hasOwnProperty(title+'recommendation')) ? o[title+'recommendation'] : '';
         
           var table = [
-            ["Title:", x.title[0]],                                                         //1
+            ["Title:", title],                                                         //1
             ["Goal Type:", x.goal_type],                                                    //2
             ["Goal Category:", goalCategory],                                 //3
             ["Goal:", goal],                                                               //4
@@ -1105,7 +1308,7 @@ function makeTemplate(data, skills, signatureID){
  *
  *    if data[7] != null, then the report has been passed to a reviewer
  */
-
+  
 function getFunderSheetData(clientID){
   var sheetID = '1HQnH3hY-0YuAUOM_eP6JxAVMemhZBCAVQZJ_GZMcVT8';
   var spreadsheet = SpreadsheetApp.openById(sheetID).getSheets()[0];
@@ -1119,10 +1322,8 @@ function getFunderSheetData(clientID){
     else if(data[i][0] == clientID){
      return [data[i], ''];
     }
-    else{
-      return 'No report on file.' 
-    }
   }
+  return 'No report on file.' 
 }
 
 /*
@@ -1190,13 +1391,16 @@ function saveSignature(data){
  *  Parse vineland report and return the parsed summary
  */
 
-function vinelandParse(){
-//  var Doc = DriveApp.getFilesByName(fileName).next().getAs(contentType)
-  var body = DocumentApp.openById('1BDY4-h-e9AA0x_WzlHKNq_2DHZxoxyuT').getBody().getText()
-  var regex = /(?<=OVERALL SUMMARY\s+).*?(?=\s+Comprehensive Parent\/Caregiver Form Report)/gs
-  var summary = body.match(regex)[0]
-  Logger.log(summary)
-  return summary
+function vinelandParse(fileID){
+  var body = DocumentApp.openById(fileID).getBody()
+  var text = body.getText()
+  var regex = /(?<=OVERALL SUMMARY\s+).*?(?=\s+SCORE SUMMARY PROFILE)/gs
+  var parse = {summary: text.match(regex)[0],
+               table_one: body.getTables()[1],
+               table_two: body.getTables()[2]
+           }
+  Logger.log(parse)
+  return parse
   } 
 
 /*
@@ -1204,13 +1408,8 @@ function vinelandParse(){
  *     @param fileName: string name of file in drive app.
  */
 
-function beaconParse(fileName) {  
-  var files = DriveApp.getFilesByName(fileName)
-  while (files.hasNext()) {
-    var file = files.next();
-    var docID = file.getId();
-  }
-  var doc = DocumentApp.openById(docID);
+function beaconParse(fileID) {  
+  var doc = DocumentApp.openById(fileID);
   
   var text = doc.getBody().getText();
   var images = doc.getBody().getImages();
@@ -1391,7 +1590,65 @@ function beaconParse(fileName) {
   Logger.log(skills[0])
   return skills
 }
+  
+/*
+ * Function to parse ABA dosage google doc
+ *
+ *    @param id: google drive file id -> find doc to parse
+ *    
+ *    returns parsed data
+ */
 
+function asdParse(id){
+  var body = DocumentApp.openById(id).getBody().getText();
+  
+  //ASD CORE SKILLS
+  var asd = {rrb   : /(?<=Repetitive & Restricted Behaviors\s+)\d+?(?=\s+hours)/gs,
+             comm  : /(?<=Communication\s+)\d+?(?=\s+hours)/gs,
+             eff   : /(?<=Reinforcer Effectiveness \(Response to Treatment\)\s+)\d+?(?=\s+hours)/gs,
+             social: /(?<=Social\s+)\d+?(?=\s+hours)/gs,
+             sens  : /(?<=Sensory \(Response to Treatment\)\s+)\d+?(?=\s+hours)/gs,
+             total : /(?<=Total Recommended Hours:\s+)\d+?(?=\s+hours \/ week Assessment Details)/gs,
+            
+             rrb_considerations:    /(?<=Repetitive\s+&\s+Restricted\s+Behaviors:\s+)[^\d]*(?=\d)/gs,
+             comm_considerations:   /(?<=Communication:\s+)[^\d]*(?=\d)/gs,
+             eff_considerations:    /(?<= Reinforcer\s+Effectiveness\s+\(Response\s+to\s+Treatment\):\s+)[^\d]*(?=\d)/gs,
+             social_considerations: /(?<=Social:\s+)[^\d]*(?=\d)/gs,
+             sens_considerations:   /(?<=Sensory\s+\(Response\s+to\s+Treatment\):\s+)[^\d]*(?=$)/gs,
+            }
+  
+  //BARRIERS AND LEARNING CONSIDERATIONS
+  var barriers = {behavior_problems                : /(?<=Behavior Problems:\s+)\w+\s?\w+?(?=\s+\n+)/gs,
+                  defective_verbal_behavior_skills : /(?<=Defective Verbal Behavior Skills:\s+)\w+\s?\w+?(?=\s+\n+)/gs,
+                  prompt_dependency                : /(?<=Prompt Dependency:\s+)\w+\s?\w+?(?=\s+\n+)/gs,
+                  defective_social_skills          : /(?<=Defective Social Skills:\s+)\w+\s?\w+?(?=\s+\n+)/gs,
+                  reinforcer_dependency            : /(?<=Reinforcer Dependency:\s+)\w+\s?\w+?(?=\s+\n+)/gs,
+                  eye_contact                      : /(?<=Failure to Make Eye Contact:\s+)\w+\s?\w+?(?=\s+\n+)/gs,
+                  sensory_defensiveness            : /(?<=Sensory Defensiveness:\s+)\w+\s?\w+?(?=\s+\d+)/gs,
+                  self_stimulation                 : /(?<=Self-Stimulation:\s+)\w+\s?\w+?(?=\s+\n+)/gs,
+                  ocd                              : /(?<=Obsessive Compulsive Disorder:\s+)\w+\s?\w+?(?=\s+\n+)/gs,
+                  hyperactivity                    : /(?<=Hyperactivity:\s+)\w+\s?\w+?(?=\s+\n+)/gs,
+                  comorbid_medical_conditions      : /(?<=Comorbid Medical Conditions:\s+)\w+\s?\w+?(?=\s+\n+)/gs,
+                  comorbid_behavioral_health_conditions : /(?<=Comorbid Behavioral Health Conditions:\s+)\w+\s?\w+?(?=\s+\n+)/gs
+  }
+  
+  for(x in asd){
+     let h = body.match(asd[x])
+     if(h)
+       asd[x] = h[0]
+  }
+  
+  for(x in barriers){
+    let h = body.match(barriers[x])
+    if(h)
+      barriers[x] = h[0]
+  }
+    
+  Logger.log([asd, barriers])
+  return [asd,barriers]
+}
+
+  
 /*
  *  Intermediate function; expendable.
  *
@@ -1402,16 +1659,15 @@ function beaconParse(fileName) {
  *    calls beaconparse to parse converted doc
  */
 
-function convertDocuments(file) {  
-  return convertToGoogleDocs_(file)  
+function convertDocuments(file, flag) {  
+  return convertToGoogleDocs_(file, flag)  
 }
 
-
 // By Google Docs, we mean the native Google Docs format
-function convertToGoogleDocs_(fileName) {
+function convertToGoogleDocs_(fileID, flag) {
   
-  var officeFile = DriveApp.getFilesByName(fileName).next();
-  
+   var officeFile = DriveApp.getFileById(fileID) 
+
   // Use the Advanced Drive API to upload the Excel file to Drive
   // convert = true will convert the file to the corresponding Google Docs format
   
@@ -1428,10 +1684,20 @@ function convertToGoogleDocs_(fileName) {
     }
   ).getContentText());
   
-  // Remove the file extension from the original file name
-  var googleFileName = fileName.split('.').slice(0, -1).join('.');
+  fileID = uploadFile.id  
+//  Logger.log(uploadFile);
   
-  // Update the name of the Google Sheet created from the Excel sheet
-  DriveApp.getFileById(uploadFile.id).setName(googleFileName);
-  return beaconParse(googleFileName);
+  if(flag == "ASD"){
+    return asdParse(fileID);
+  }
+  
+  //BEACON PARSE FLAG == TRUE
+  if(flag == "BP"){
+//    // Remove the file extension from the original file name
+//    var googleFileName = fileName.split('.').slice(0, -1).join('.');
+//    
+    // Update the name of the Google Sheet created from the Excel sheet
+//    DriveApp.getFileById(uploadFile.id).setName(googleFileName);
+    return beaconParse(fileID);
+  }
 }
